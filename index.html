@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Giupi - Bienvenido</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilo para las partículas de corazones */
+        .corazon-particula {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            user-select: none;
+            animation: volar-particula var(--duracion) ease-out forwards;
+        }
+
+        @keyframes volar-particula {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0) rotate(var(--r));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; overflow: hidden; background: #020617;">
+    
+    <audio id="musica-fondo" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="pantalla-login" class="pantalla-ingreso">
+        <main class="contenedor-splash">
+            <img src="giupi.png" alt="Giupi" class="mascota-giupi" id="mascota">
+
+            <div class="contenedor-pin oculto" id="caja-pin">
+                <h2 class="titulo-giupi">GIUPI</h2>
+                <p class="subtitulo-giupi">Nuestras citas de amor</p>
+                
+                <div class="pin-display">
+                    <input type="password" id="pin-input" maxlength="4" placeholder="••••" readonly>
+                </div>
+                
+                <div class="teclado-numerico" id="teclado">
+                    <button class="btn-num">1</button>
+                    <button class="btn-num">2</button>
+                    <button class="btn-num">3</button>
+                    <button class="btn-num">4</button>
+                    <button class="btn-num">5</button>
+                    <button class="btn-num">6</button>
+                    <button class="btn-num">7</button>
+                    <button class="btn-num">8</button>
+                    <button class="btn-num">9</button>
+                    <button class="btn-borrar">⌫</button>
+                    <button class="btn-num">0</button>
+                    <button class="btn-ok">OK</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <iframe id="marco-app" style="display: none; width: 100vw; height: 100vh; border: none;"></iframe>
+
+    <script>
+        const mascota = document.getElementById('mascota');
+        const cajaPin = document.getElementById('caja-pin');
+        const pinInput = document.getElementById('pin-input');
+        const musica = document.getElementById('musica-fondo');
+        const pantallaLogin = document.getElementById('pantalla-login');
+        const marcoApp = document.getElementById('marco-app');
+        const teclado = document.getElementById('teclado');
+        
+        let pinActual = "";
+        const PIN_CORRECTO = "2925";
+        let musicaIniciada = false;
+
+        setTimeout(() => {
+            mascota.classList.add('mascota-arriba');
+            cajaPin.classList.remove('oculto');
+            cajaPin.classList.add('mostrar-fade');
+        }, 1200);
+
+        function activarMusica() {
+            if (!musicaIniciada) {
+                musica.play().catch(e => console.log("Esperando..."));
+                musicaIniciada = true;
+            }
+        }
+
+        document.querySelectorAll('.btn-num').forEach(boton => {
+            boton.addEventListener('click', (e) => {
+                activarMusica();
+                if (pinActual.length < 4) {
+                    pinActual += boton.innerText;
+                    pinInput.value = pinActual;
+                }
+                if (pinActual.length === 4) validarPin(e);
+            });
+        });
+
+        // Función para crear la explosión de corazones
+        function crearExplosionCorazones() {
+            const colores = ['#00d2ff', '#fbbf24', '#ffffff']; // Celeste Giupi, Oro y Blanco
+            const cantidad = 40;
+            const centroX = window.innerWidth / 2;
+            const centroY = window.innerHeight * 0.7; // Cerca del teclado
+
+            for (let i = 0; i < cantidad; i++) {
+                const corazon = document.createElement('div');
+                corazon.className = 'corazon-particula';
+                corazon.innerHTML = '❤'; // Puedes usar un SVG si prefieres
+                
+                // Estilo aleatorio
+                const color = colores[Math.floor(Math.random() * colores.length)];
+                const size = Math.random() * 20 + 10 + 'px';
+                const duracion = Math.random() * 1 + 0.5 + 's';
+                
+                // Variables para la animación CSS
+                const destinoX = (Math.random() - 0.5) * 400 + 'px';
+                const destinoY = (Math.random() - 0.5) * 400 + 'px';
+                const rotacion = Math.random() * 360 + 'deg';
+
+                corazon.style.color = color;
+                corazon.style.fontSize = size;
+                corazon.style.left = centroX + 'px';
+                corazon.style.top = centroY + 'px';
+                corazon.style.setProperty('--x', destinoX);
+                corazon.style.setProperty('--y', destinoY);
+                corazon.style.setProperty('--r', rotacion);
+                corazon.style.setProperty('--duracion', duracion);
+
+                document.body.appendChild(corazon);
+
+                // Limpiar el DOM
+                setTimeout(() => corazon.remove(), 1500);
+            }
+        }
+
+        function validarPin(evento) {
+            if (pinActual === PIN_CORRECTO) {
+                pinInput.style.color = "#fbbf24";
+                
+                // ¡EFECTO MAGICO!
+                teclado.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                teclado.style.opacity = "0";
+                teclado.style.transform = "scale(0.8)";
+                
+                crearExplosionCorazones();
+
+                setTimeout(() => {
+                    pantallaLogin.style.transition = "opacity 0.8s ease";
+                    pantallaLogin.style.opacity = "0";
+                    setTimeout(() => {
+                        pantallaLogin.style.display = "none";
+                        marcoApp.src = "muro.html";
+                        marcoApp.style.display = "block";
+                    }, 800);
+                }, 600);
+            } else {
+                pinInput.classList.add('vibrar');
+                setTimeout(() => {
+                    pinActual = "";
+                    pinInput.value = "";
+                    pinInput.style.color = "#00d2ff";
+                    pinInput.classList.remove('vibrar');
+                }, 600);
+            }
+        }
+
+        // Botones de borrar y ok
+        document.querySelector('.btn-borrar').addEventListener('click', () => {
+            pinActual = pinActual.slice(0, -1);
+            pinInput.value = pinActual;
+        });
+
+        document.querySelector('.btn-ok').addEventListener('click', (e) => {
+            if(pinActual.length === 4) validarPin(e);
+        });
+    </script>
+</body>
+</html>
+ 

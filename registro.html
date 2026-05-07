@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar - Giupi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="contenedor-registro">
+        <input type="file" id="camara" accept="image/*" capture="environment" hidden>
+        <label for="camara" id="label-camara" class="boton-camara-gigante">📷 Toca para foto</label>
+        
+        <textarea placeholder="Nota opcional..." class="caja-notas"></textarea>
+        <button id="btnGuardar" class="btn-guardar">Guardar Recuerdo</button>
+    </main>
+
+    <script type="module">
+        import "./app.js";
+        const params = new URLSearchParams(window.location.search);
+        const cat = params.get('cat') || 'general';
+
+        document.getElementById('btnGuardar').onclick = async () => {
+            const foto = document.getElementById('camara').files[0];
+            const nota = document.querySelector('.caja-notas').value;
+            if(!foto) return alert("Sube una foto");
+            
+            document.getElementById('btnGuardar').disabled = true;
+            document.getElementById('btnGuardar').innerText = "Subiendo...";
+            
+            await window.guardarCita("Nueva Experiencia", 5, nota, foto, cat);
+        };
+    </script>
+</body>
+</html>

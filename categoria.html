@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categoría - Giupi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="cabecera-simple">
+        <a href="muro.html" style="text-decoration:none; font-weight:bold;">← Volver</a>
+        <h2 id="titulo-cat" style="text-transform: capitalize;">Cargando...</h2>
+    </header>
+
+    <main class="grid-citas" id="contenedor-citas"></main>
+
+    <script type="module">
+        import "./app.js";
+        const params = new URLSearchParams(window.location.search);
+        const cat = params.get('cat') || 'todas';
+        document.getElementById('titulo-cat').innerText = cat.replace('airelibre', 'Aire Libre');
+
+        async function render() {
+            const citas = await window.obtenerCitas(cat);
+            const container = document.getElementById('contenedor-citas');
+            container.innerHTML = citas.length ? "" : "<p>Aún no hay fotos aquí.</p>";
+            
+            citas.forEach(c => {
+                container.innerHTML += `
+                    <div class="tarjeta-cita completada">
+                        <img src="${c.foto}" style="width:100%; height:200px; object-fit:cover;">
+                        <div style="padding:10px;">
+                            <h3>${c.idCita}</h3>
+                            <p>${c.nota}</p>
+                            <span>${'⭐'.repeat(c.estrellas)}</span>
+                        </div>
+                    </div>`;
+            });
+        }
+        render();
+    </script>
+</body>
+</html>

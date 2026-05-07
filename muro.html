@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Giupi - Nuestro Muro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="cuerpo-muro">
+    <header class="header-principal">
+        <div class="avatar-giupi">
+            <img src="giupi.png" alt="Giupi Anfitrión" class="img-giupi-mini">
+        </div>
+        <div class="saludo">
+            <h1>Hola, Piero</h1>
+            <p>¿Qué aventura guardamos hoy?</p>
+        </div>
+    </header>
+
+    <main class="panel-cajones">
+        <a href="categoria.html?cat=todas" class="cajon-premium largo">
+            <span class="emoji">📚</span>
+            <div class="texto">
+                <h3>Álbum Completo</h3>
+                <p>Todos nuestros momentos</p>
+            </div>
+        </a>
+
+        <div class="grid-2x2">
+            <a href="categoria.html?cat=distancia" class="cajon-premium">
+                <span class="emoji">✈️</span>
+                <h3>A Distancia</h3>
+            </a>
+            <a href="categoria.html?cat=reencuentro" class="cajon-premium">
+                <span class="emoji">🥂</span>
+                <h3>Reencuentro</h3>
+            </a>
+            <a href="categoria.html?cat=casa" class="cajon-premium">
+                <span class="emoji">🛋️</span>
+                <h3>En Casa</h3>
+            </a>
+            <a href="categoria.html?cat=airelibre" class="cajon-premium">
+                <span class="emoji">🐾</span>
+                <h3>Aire Libre</h3>
+            </a>
+        </div>
+    </main>
+
+    <style>
+        .cuerpo-muro {
+            background: #020617;
+            padding-bottom: 50px;
+        }
+        .header-principal {
+            display: flex;
+            align-items: center;
+            padding: 40px 25px;
+            gap: 15px;
+        }
+        .img-giupi-mini {
+            width: 70px;
+            height: auto;
+            filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.3));
+        }
+        .saludo h1 {
+            font-size: 1.5rem;
+            color: #00d2ff;
+            margin: 0;
+        }
+        .saludo p {
+            color: #94a3b8;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .cajon-premium {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .cajon-premium.largo {
+            flex-direction: row;
+            text-align: left;
+            padding: 25px;
+        }
+        .cajon-premium:active {
+            transform: scale(0.95);
+            background: rgba(0, 210, 255, 0.1);
+            border-color: #00d2ff;
+        }
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+        }
+        .emoji { font-size: 1.8rem; }
+        .cajon-premium h3 { font-size: 1rem; margin: 0; }
+    </style>
+</body>
+</html>
