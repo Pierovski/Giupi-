@@ -134,32 +134,89 @@
 
     </main>
 
-       <script type="module">
+        <script type="module">
         import { db } from './firebase-config.js';
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Añadimos getDocs, query y where para poder buscar en la base de datos
+        import { collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // 1. CARGAR DATOS DE LA MISIÓN
         const misionActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
+        const cat = localStorage.getItem('misionCategoria');
+        const idx = parseInt(localStorage.getItem('misionIndex'));
         document.getElementById('txt-mision').innerText = misionActual;
 
         // 2. ESCÁNER DE EMOJIS
         function obtenerIconoContextual(texto) {
             const t = texto.toLowerCase();
-            if(t.includes('película') || t.includes('cine') || t.includes('series')) return '🍿🎬';
-            if(t.includes('cena') || t.includes('chaufa') || t.includes('pizza')) return '🍕🍷';
+            if(t.includes('película') || t.includes('cine')) return '🍿🎬';
+            if(t.includes('cena') || t.includes('chaufa')) return '🍕🍷';
             if(t.includes('dron') || t.includes('tomas')) return '🚁📸';
             if(t.includes('playa') || t.includes('arena')) return '🏖️🌊';
             if(t.includes('abrazo') || t.includes('beso')) return '🫂❤️';
-            if(t.includes('juego') || t.includes('videojuego')) return '🎮👾';
-            if(t.includes('spa') || t.includes('masaje')) return '🧖‍♀️✨';
-            if(t.includes('ejercicio') || t.includes('pierna') || t.includes('fútbol')) return '⚽🏋️‍♂️';
-            if(t.includes('hotel') || t.includes('dormir')) return '🛌🌙';
-            if(t.includes('viaje') || t.includes('caminata') || t.includes('acamp')) return '🏕️🎒';
+            if(t.includes('fútbol') || t.includes('pierna')) return '⚽🏋️‍♂️';
+            if(t.includes('viaje') || t.includes('acamp')) return '🏕️🎒';
             if(t.includes('música') || t.includes('karaoke')) return '🎵🎤';
             if(t.includes('foto')) return '📸✨';
             return '🥂✨';
         }
         document.querySelector('.iconos-top').innerText = obtenerIconoContextual(misionActual);
+
+        // ==========================================
+        // NUEVO: SENSOR DE LECTURA (Traer las fotos)
+        // ==========================================
+        async function verificarRecuerdo() {
+            if (!cat || isNaN(idx)) return;
+
+            try {
+                // Buscamos si esta cita exacta ya tiene datos guardados
+                const q = query(
+                    collection(db, "recuerdos"),
+                    where("categoria", "==", cat),
+                    where("citaNumero", "==", idx)
+                );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const datos = querySnapshot.docs[0].data();
+                    
+                    // Mostrar Foto 1 si existe
+                    if (datos.foto1) {
+                        const img1 = document.getElementById('prev-foto1');
+                        img1.src = datos.foto1;
+                        img1.style.opacity = '1';
+                        document.getElementById('txt-foto1').style.display = 'none';
+                    }
+                    
+                    // Mostrar Foto 2 si existe
+                    if (datos.foto2) {
+                        const img2 = document.getElementById('prev-foto2');
+                        img2.src = datos.foto2;
+                        img2.style.opacity = '1';
+                        document.getElementById('txt-foto2').style.display = 'none';
+                    }
+
+                    // Mostrar el texto y bloquear edición
+                    const areaTexto = document.querySelector('textarea');
+                    if (areaTexto) {
+                        areaTexto.value = datos.nota || "";
+                        areaTexto.readOnly = true; 
+                    }
+
+                    // Cambiar el botón para indicar que ya está sellado
+                    const btn = document.getElementById('btn-submit');
+                    if (btn) {
+                        btn.innerText = "RECUERDO SELLADO ✨";
+                        btn.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
+                        btn.disabled = true;
+                    }
+                }
+            } catch (error) {
+                console.error("Error al buscar el recuerdo:", error);
+            }
+        }
+        
+        // Ejecutamos la búsqueda apenas abre la página
+        verificarRecuerdo();
 
         // 3. CAPTURA DE FOTOS EN MEMORIA
         let archivoFoto1 = null;
@@ -204,7 +261,7 @@
                     body: formData
                 });
                 const datos = await respuesta.json();
-                return datos.data.url; // Retorna el link de la bóveda
+                return datos.data.url; 
             } catch (error) {
                 console.error("Error en topografía de imagen:", error);
                 return null;
@@ -220,16 +277,11 @@
                 botonGuardar.disabled = true;
 
                 try {
-                    // Fase A: Enviar fotos a ImgBB
                     const urlFoto1 = await subirFotoAImgBB(archivoFoto1);
                     const urlFoto2 = await subirFotoAImgBB(archivoFoto2);
 
                     botonGuardar.innerText = "SELLANDO EN FIREBASE... 🔐";
 
-                    // Fase B: Guardar datos estructurados en Firestore
-                    const cat = localStorage.getItem('misionCategoria');
-                    const idx = parseInt(localStorage.getItem('misionIndex'));
-                    // Intenta capturar un área de texto si la tienes, si no, lo deja en blanco
                     const nota = document.querySelector('textarea') ? document.querySelector('textarea').value : ""; 
 
                     await addDoc(collection(db, "recuerdos"), {
@@ -239,10 +291,9 @@
                         nota: nota,
                         foto1: urlFoto1 || "",
                         foto2: urlFoto2 || "",
-                        fecha: serverTimestamp() // Hora satelital exacta de Google
+                        fecha: serverTimestamp() 
                     });
 
-                    // Fase C: Bloquear la carta en el tablero
                     if (cat && !isNaN(idx)) {
                         let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
                         if (!completadas.includes(idx)) {
@@ -251,7 +302,6 @@
                         }
                     }
 
-                    // Fase D: Celebración y redirección
                     botonGuardar.innerText = "¡RECUERDO INMORTALIZADO! ✨";
                     botonGuardar.style.background = "linear-gradient(135deg, #fbbf24, #f59e0b)";
                     
@@ -290,6 +340,5 @@
             }
         }
     </script>
-
 </body>
 </html>
