@@ -9,17 +9,14 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 50px; color: #f1f5f9; overflow-x: hidden; }
 
-        /* CABECERA */
         .header-registro { display: flex; align-items: center; justify-content: space-between; padding: 25px 20px 10px; background: transparent; position: sticky; top: 0; z-index: 100; }
         .btn-volver { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; text-decoration: none; }
 
         .contenedor-scrapbook { padding: 10px 20px; display: flex; flex-direction: column; gap: 20px; }
 
-        /* TÍTULOS */
         .titulo-mision { font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #00d2ff; margin: 0; text-shadow: 0 2px 5px rgba(0, 210, 255, 0.3); line-height: 1.1; }
         .iconos-top { font-size: 1.5rem; letter-spacing: 5px; opacity: 0.8; }
 
-        /* MARCOS DE FOTO */
         .zona-fotos { display: flex; justify-content: center; position: relative; height: 260px; margin-top: 10px; }
         .marco-foto { background: #f8fafc; padding: 10px 10px 30px 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; transition: transform 0.3s; }
         .marco-foto:active { transform: scale(0.95) !important; }
@@ -28,7 +25,6 @@
         .area-imagen { width: 100%; height: 100%; background: #e2e8f0; object-fit: cover; border: 1px dashed #94a3b8; }
         .texto-foto { color: #64748b; font-size: 0.7rem; margin-top: 10px; font-weight: 600; text-transform: uppercase; }
 
-        /* DATOS DE TEXTO */
         .zona-datos { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
         .dato-linea { display: flex; align-items: flex-end; gap: 10px; }
         .dato-linea label { color: #fbbf24; font-weight: 600; font-size: 0.9rem; }
@@ -38,11 +34,10 @@
         .titulo-sentimientos { color: #00d2ff; font-weight: 600; font-size: 1.1rem; margin: 20px 0 5px; display: flex; align-items: center; justify-content: space-between; }
         .cuaderno-lineas { width: 100%; height: 130px; background-color: transparent; background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.2) 35px); line-height: 35px; border: none; color: #f8fafc; font-size: 1rem; resize: none; outline: none; padding: 0 5px; }
 
-        /* BOTONES */
         .btn-guardar { background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s; box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%; cursor: pointer; }
+        
         .btn-eliminar { display: none; background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; }
 
-        /* VISOR DE FOTOS PANTALLA COMPLETA */
         .visor-pantalla-completa { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; }
         .img-ampliada { max-width: 95%; max-height: 85%; border-radius: 10px; border: 2px solid #fbbf24; }
 
@@ -107,16 +102,15 @@
         import { db } from './firebase-config.js';
         import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // VARIABLES DE ESTADO
         const misionActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
         const cat = localStorage.getItem('misionCategoria');
         const idx = parseInt(localStorage.getItem('misionIndex'));
         document.getElementById('txt-mision').innerText = misionActual;
+        
         let idDocumentoActual = null; 
         let archivoFoto1 = null; 
         let archivoFoto2 = null;
 
-        // 1. ASIGNAR EMOJI
         function obtenerIconoContextual(texto) {
             const t = texto.toLowerCase();
             if(t.includes('película') || t.includes('cine')) return '🍿🎬';
@@ -129,37 +123,38 @@
         }
         document.querySelector('.iconos-top').innerText = obtenerIconoContextual(misionActual);
 
-        // 2. FUNCIÓN DE COMPRESIÓN (Client-Side)
+        // MOTOR OPTIMIZADO (No colapsa con fotos de cámara)
         function comprimirImagen(archivo) {
-            return new Promise((resolve) => {
-                const lector = new FileReader();
-                lector.readAsDataURL(archivo);
-                lector.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 800; // Resolución ideal y ligera
-                        let width = img.width;
-                        let height = img.height;
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(archivo); 
+                
+                img.onload = () => {
+                    URL.revokeObjectURL(img.src); 
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1024; 
+                    let width = img.width;
+                    let height = img.height;
 
-                        if (width > MAX_WIDTH) {
-                            height *= (MAX_WIDTH / width);
-                            width = MAX_WIDTH;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
+                    if (width > MAX_WIDTH) {
+                        height *= (MAX_WIDTH / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
 
-                        // Convertimos a archivo (Blob) con 70% de calidad
-                        canvas.toBlob((blob) => { resolve(blob); }, 'image/jpeg', 0.7);
-                    };
+                    canvas.toBlob((blob) => { 
+                        if(blob) resolve(blob);
+                        else reject(new Error("Error al comprimir"));
+                    }, 'image/jpeg', 0.7);
                 };
+                img.onerror = error => reject(error);
             });
         }
 
-        // 3. LECTURA: ¿YA EXISTE ESTE RECUERDO?
+        // LECTURA DE DATOS
         async function verificarRecuerdo() {
             if (!cat || isNaN(idx)) return;
             try {
@@ -171,7 +166,6 @@
                     const datos = docRef.data();
                     idDocumentoActual = docRef.id;
 
-                    // Llenar inputs y bloquearlos
                     document.getElementById('input-fecha').value = datos.fechaTexto || "";
                     document.getElementById('input-fecha').readOnly = true;
                     document.getElementById('input-lugar').value = datos.lugar || "";
@@ -179,7 +173,6 @@
                     document.getElementById('input-nota').value = datos.nota || "";
                     document.getElementById('input-nota').readOnly = true;
 
-                    // Llenar fotos y cambiar función al hacer clic (abrir visor)
                     const marco1 = document.getElementById('marco-1');
                     const marco2 = document.getElementById('marco-2');
                     
@@ -201,17 +194,15 @@
                         marco2.onclick = () => abrirVisor(datos.foto2);
                     }
 
-                    // Cambiar botón a modo Sellado
                     const btnGuardar = document.getElementById('btn-submit');
                     btnGuardar.innerText = "RECUERDO SELLADO ✨";
                     btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
                     btnGuardar.disabled = true;
                     
-                    // Mostrar botón eliminar
                     document.getElementById('btn-eliminar').style.display = 'block';
                 }
             } catch (error) {
-                console.error("Error al hidratar datos:", error);
+                console.error("Error al cargar:", error);
             }
         }
         verificarRecuerdo();
@@ -221,7 +212,7 @@
             document.getElementById('visor').style.display = 'flex';
         }
 
-        // 4. PREVISUALIZAR FOTOS AL SELECCIONARLAS
+        // PREVISUALIZAR SIN COLAPSAR
         function configurarInputFoto(inputId, prevId, txtId, numFoto) {
             const input = document.getElementById(inputId);
             if(input) {
@@ -230,14 +221,13 @@
                     if (archivo) {
                         if(numFoto === 1) archivoFoto1 = archivo;
                         if(numFoto === 2) archivoFoto2 = archivo;
-                        const lector = new FileReader();
-                        lector.onload = function(e) {
-                            const img = document.getElementById(prevId);
-                            img.src = e.target.result;
-                            img.style.opacity = '1';
-                            document.getElementById(txtId).style.display = 'none';
-                        }
-                        lector.readAsDataURL(archivo);
+                        
+                        const img = document.getElementById(prevId);
+                        img.src = URL.createObjectURL(archivo);
+                        img.onload = () => URL.revokeObjectURL(img.src);
+                        
+                        img.style.opacity = '1';
+                        document.getElementById(txtId).style.display = 'none';
                     }
                 });
             }
@@ -245,7 +235,7 @@
         configurarInputFoto('input-foto1', 'prev-foto1', 'txt-foto1', 1);
         configurarInputFoto('input-foto2', 'prev-foto2', 'txt-foto2', 2);
 
-        // 5. SUBIDA A LA NUBE (Con foto ya comprimida)
+        // SUBIDA
         const IMGBB_API_KEY = '055cde6238b2cefe13e31dc43f2b2570';
         async function subirFotoAImgBB(blob) {
             if (!blob) return null;
@@ -258,7 +248,7 @@
             } catch (error) { return null; }
         }
 
-        // 6. GUARDAR RECUERDO
+        // GUARDAR RECUERDO
         const botonGuardar = document.getElementById('btn-submit');
         if(botonGuardar) {
             botonGuardar.addEventListener('click', async (evento) => {
@@ -267,7 +257,6 @@
                 botonGuardar.disabled = true;
 
                 try {
-                    // Pasamos las fotos por el compresor antes de enviarlas
                     const blob1 = archivoFoto1 ? await comprimirImagen(archivoFoto1) : null;
                     const blob2 = archivoFoto2 ? await comprimirImagen(archivoFoto2) : null;
 
@@ -298,7 +287,6 @@
                     botonGuardar.innerText = "¡RECUERDO INMORTALIZADO! ✨";
                     botonGuardar.style.background = "linear-gradient(135deg, #fbbf24, #f59e0b)";
                     
-                    // Explosión de corazones
                     const x = evento.clientX || window.innerWidth / 2;
                     const y = evento.clientY || window.innerHeight / 2;
                     const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
@@ -327,14 +315,13 @@
             });
         }
 
-        // 7. ELIMINAR RECUERDO
+        // ELIMINAR RECUERDO
         document.getElementById('btn-eliminar').addEventListener('click', async () => {
             if(confirm("¿Estás seguro de demoler este recuerdo? 🗑️")) {
                 try {
                     document.getElementById('btn-eliminar').innerText = "Eliminando...";
                     await deleteDoc(doc(db, "recuerdos", idDocumentoActual));
                     
-                    // Limpiar la memoria del teléfono
                     let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
                     completadas = completadas.filter(item => item !== idx);
                     localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));

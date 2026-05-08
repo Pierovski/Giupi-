@@ -79,16 +79,11 @@
         <div style="width: 45px;"></div>
     </header>
 
-    <main class="grid-misiones" id="contenedor-cartas">
-        </main>
+    <main class="grid-misiones" id="contenedor-cartas"></main>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const categoriaActual = urlParams.get('cat') || 'distancia'; 
-        
-        // --- RESET TEMPORAL (Borra esta línea después de abrir la app una vez) ---
-        // localStorage.removeItem('misiones_' + categoriaActual); 
-        // ------------------------------------------------------------------------
 
         const imagenesGiupi = {
             'distancia': 'giupi-viajero.png',
@@ -235,18 +230,16 @@
             `;
         }
 
-                function gestionarClic(i, textoMision) {
+        function gestionarClic(i, textoMision) {
             const el = document.getElementById('carta-' + i);
             
             if (!el.classList.contains('volteada')) {
-                // PRIMER CLIC: Solo se voltea para leer la misión (NO se guarda en la memoria aún)
                 el.classList.remove('highlight');
                 el.classList.add('volteada');
             } else {
-                // SEGUNDO CLIC: Va al registro y envía qué número de carta es
                 localStorage.setItem('misionActual', textoMision);
-                localStorage.setItem('misionIndex', i); // Enviamos el número
-                localStorage.setItem('misionCategoria', categoriaActual); // Enviamos la categoría
+                localStorage.setItem('misionIndex', i); 
+                localStorage.setItem('misionCategoria', categoriaActual); 
                 window.location.href = 'registro.html';
             }
         }
@@ -263,12 +256,14 @@
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             el.classList.add('highlight');
             
+            // Aquí está el arreglo: Suena primero el audio, espera medio segundo, y luego sale la alerta
+            sonidoGiupi.play().catch(e => console.log("Audio bloqueado"));
+            
             setTimeout(() => {
-                sonidoGiupi.play().catch(e => console.log("Audio bloqueado"));
                 alert("Giupi ha elegido la cita número " + (elegido + 1) + " para hoy. ✨");
-            }, 800);
+            }, 300);
         }
-                // FORZAR RECARGA SI EL USUARIO REGRESA SIN SELLAR
+        
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
                 window.location.reload();
