@@ -26,13 +26,41 @@
             }
         }
     </style>
+        <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <link rel="apple-touch-icon" href="giupi-icon.png">
+
+    <script>
+        // Registrar el Service Worker para permitir la instalación
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('Motor PWA activado', reg);
+                }).catch(err => {
+                    console.log('Error en PWA', err);
+                });
+            });
+        }
+    </script>
+        <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <link rel="apple-touch-icon" href="giupi-icon.png">
+
+    <script>
+        // Registrar el Service Worker para permitir la instalación
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(reg => {
+                    console.log('Motor PWA activado', reg);
+                }).catch(err => {
+                    console.log('Error en PWA', err);
+                });
+            });
+        }
+    </script>
 </head>
 <body style="margin: 0; overflow: hidden; background: #020617;">
     
-    <audio id="musica-fondo" loop>
-        <source src="musica.mp3" type="audio/mpeg">
-    </audio>
-
     <div id="pantalla-login" class="pantalla-ingreso">
         <main class="contenedor-splash">
             <img src="giupi.png" alt="Giupi" class="mascota-giupi" id="mascota">
@@ -69,11 +97,21 @@
         const mascota = document.getElementById('mascota');
         const cajaPin = document.getElementById('caja-pin');
         const pinInput = document.getElementById('pin-input');
-        const musica = document.getElementById('musica-fondo');
         const pantallaLogin = document.getElementById('pantalla-login');
         const marcoApp = document.getElementById('marco-app');
         const teclado = document.getElementById('teclado');
         
+        // --- NUEVO MOTOR DE AUDIO ALEATORIO ---
+        const playlist = ["musica-1.mp3", "musica-2.mp3", "musica-3.mp3"];
+        const musica = new Audio();
+        
+        // Hacer que cuando termine una canción, siga otra al azar
+        musica.addEventListener('ended', () => {
+            const indiceAleatorio = Math.floor(Math.random() * playlist.length);
+            musica.src = playlist[indiceAleatorio];
+            musica.play().catch(e => console.log("Esperando..."));
+        });
+
         let pinActual = "";
         const PIN_CORRECTO = "2925";
         let musicaIniciada = false;
@@ -82,10 +120,12 @@
             mascota.classList.add('mascota-arriba');
             cajaPin.classList.remove('oculto');
             cajaPin.classList.add('mostrar-fade');
-        }, 1200);
+        }, 800);
 
         function activarMusica() {
             if (!musicaIniciada) {
+                const indiceAleatorio = Math.floor(Math.random() * playlist.length);
+                musica.src = playlist[indiceAleatorio];
                 musica.play().catch(e => console.log("Esperando..."));
                 musicaIniciada = true;
             }
@@ -145,6 +185,8 @@
                 pinInput.style.color = "#fbbf24";
                 
                 // ¡EFECTO MAGICO!
+                const sonidoGiupi = new Audio('giupi.mp3');
+                sonidoGiupi.play();
                 teclado.style.transition = "opacity 0.5s ease, transform 0.5s ease";
                 teclado.style.opacity = "0";
                 teclado.style.transform = "scale(0.8)";
@@ -183,4 +225,3 @@
     </script>
 </body>
 </html>
- 

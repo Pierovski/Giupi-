@@ -2,34 +2,198 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar - Giupi</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Giupi - Sellar Misión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 50px; color: #f1f5f9; overflow-x: hidden; }
+
+        /* CABECERA */
+        .header-registro {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 25px 20px 10px; background: transparent;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .btn-volver {
+            background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%;
+            width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; text-decoration: none;
+        }
+
+        .contenedor-scrapbook { padding: 10px 20px; display: flex; flex-direction: column; gap: 20px; }
+
+        /* TÍTULO ESTILO ESCRITO A MANO */
+        .titulo-mision {
+            font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #00d2ff;
+            margin: 0; text-shadow: 0 2px 5px rgba(0, 210, 255, 0.3); line-height: 1.1;
+        }
+        .iconos-top { font-size: 1.5rem; letter-spacing: 5px; opacity: 0.8; }
+
+        /* MARCOS DE FOTO ESTILO SCRAPBOOK (POLAROID) */
+        .zona-fotos { display: flex; justify-content: center; position: relative; height: 260px; margin-top: 10px; }
+        
+        .marco-foto {
+            background: #f8fafc; padding: 10px 10px 30px 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            position: absolute; display: flex; align-items: center; justify-content: center;
+            flex-direction: column; cursor: pointer; transition: transform 0.3s;
+        }
+        .marco-foto:active { transform: scale(0.95) !important; }
+        
+        /* Foto 1 (Fondo, ligeramente inclinada) */
+        .foto-1 {
+            width: 160px; height: 200px; transform: rotate(-8deg); left: 10px; top: 20px; z-index: 1;
+            border: 1px solid #cbd5e1;
+        }
+        /* Foto 2 (Frente, recta) */
+        .foto-2 {
+            width: 180px; height: 220px; transform: rotate(4deg); right: 10px; top: 0; z-index: 2;
+            border: 1px solid #fbbf24;
+        }
+
+        .area-imagen { width: 100%; height: 100%; background: #e2e8f0; object-fit: cover; border: 1px dashed #94a3b8; }
+        .texto-foto { color: #64748b; font-size: 0.7rem; margin-top: 10px; font-weight: 600; text-transform: uppercase; }
+
+        /* INPUTS TIPO LÍNEA (FECHA Y LUGAR) */
+        .zona-datos { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
+        .dato-linea { display: flex; align-items: flex-end; gap: 10px; }
+        .dato-linea label { color: #fbbf24; font-weight: 600; font-size: 0.9rem; }
+        .dato-linea input {
+            flex-grow: 1; background: transparent; border: none; border-bottom: 2px solid rgba(251, 191, 36, 0.4);
+            color: #f8fafc; font-size: 1rem; padding: 5px; outline: none; font-family: 'Dancing Script', cursive; font-size: 1.4rem;
+        }
+        .dato-linea input:focus { border-bottom-color: #00d2ff; }
+
+        /* ÁREA DE TEXTO (LÍNEAS DE CUADERNO) */
+        .titulo-sentimientos { color: #00d2ff; font-weight: 600; font-size: 1.1rem; margin: 20px 0 5px; display: flex; align-items: center; justify-content: space-between; }
+        
+        .cuaderno-lineas {
+            width: 100%; height: 130px; background-color: transparent;
+            /* Magia CSS para crear las líneas */
+            background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.2) 35px);
+            line-height: 35px; border: none; color: #f8fafc; font-size: 1rem;
+            resize: none; outline: none; padding: 0 5px; font-family: 'Poppins', sans-serif;
+        }
+
+        /* BOTÓN DE GUARDAR */
+        .btn-guardar {
+            background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px;
+            font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%;
+        }
+
+        .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; }
+        @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
+    </style>
 </head>
 <body>
-    <main class="contenedor-registro">
-        <input type="file" id="camara" accept="image/*" capture="environment" hidden>
-        <label for="camara" id="label-camara" class="boton-camara-gigante">📷 Toca para foto</label>
+
+    <header class="header-registro">
+        <a href="#" class="btn-volver" onclick="history.back(); return false;">←</a>
+    </header>
+
+    <main class="contenedor-scrapbook">
         
-        <textarea placeholder="Nota opcional..." class="caja-notas"></textarea>
-        <button id="btnGuardar" class="btn-guardar">Guardar Recuerdo</button>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <h1 class="titulo-mision" id="txt-mision">Cargando...</h1>
+            <span class="iconos-top">🥂✨</span>
+        </div>
+
+        <input type="file" id="input-foto1" accept="image/*" style="display: none;">
+        <input type="file" id="input-foto2" accept="image/*" style="display: none;">
+
+        <div class="zona-fotos">
+            <div class="marco-foto foto-1" onclick="document.getElementById('input-foto1').click()">
+                <img src="" class="area-imagen" id="prev-foto1" style="opacity: 0;">
+                <span class="texto-foto" id="txt-foto1">FOTO 1</span>
+            </div>
+            <div class="marco-foto foto-2" onclick="document.getElementById('input-foto2').click()">
+                <img src="" class="area-imagen" id="prev-foto2" style="opacity: 0;">
+                <span class="texto-foto" id="txt-foto2">FOTO 2</span>
+            </div>
+        </div>
+
+        <div class="zona-datos">
+            <div class="dato-linea">
+                <label>Fecha:</label>
+                <input type="text" placeholder="Ej: 29 de Mayo">
+            </div>
+            <div class="dato-linea">
+                <label>Lugar:</label>
+                <input type="text" placeholder="¿Dónde estuvimos?">
+            </div>
+        </div>
+
+        <div>
+            <h3 class="titulo-sentimientos">¿Cómo nos sentimos? <span style="font-size: 1.2rem;">📝💭</span></h3>
+            <textarea class="cuaderno-lineas" placeholder="Escribe aquí su historia..."></textarea>
+        </div>
+
+        <button class="btn-guardar" id="btn-submit" onclick="guardarRecuerdo(event)">SELLAR RECUERDO</button>
+
     </main>
 
-    <script type="module">
-        import "./app.js";
-        const params = new URLSearchParams(window.location.search);
-        const cat = params.get('cat') || 'general';
+    <script>
+        // 1. CARGAR EL NOMBRE DE LA MISIÓN
+        const misionActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
+        document.getElementById('txt-mision').innerText = misionActual;
 
-        document.getElementById('btnGuardar').onclick = async () => {
-            const foto = document.getElementById('camara').files[0];
-            const nota = document.querySelector('.caja-notas').value;
-            if(!foto) return alert("Sube una foto");
-            
-            document.getElementById('btnGuardar').disabled = true;
-            document.getElementById('btnGuardar').innerText = "Subiendo...";
-            
-            await window.guardarCita("Nueva Experiencia", 5, nota, foto, cat);
-        };
+        // 2. LÓGICA PARA DOS FOTOS
+        const sonidoGiupi = new Audio('giupi.mp3');
+
+        function configurarInputFoto(inputId, prevId, txtId) {
+            document.getElementById(inputId).addEventListener('change', function() {
+                const archivo = this.files[0];
+                if (archivo) {
+                    const lector = new FileReader();
+                    lector.onload = function(e) {
+                        const img = document.getElementById(prevId);
+                        img.src = e.target.result;
+                        img.style.opacity = '1';
+                        img.style.border = 'none'; // Quita el borde punteado
+                        document.getElementById(txtId).style.display = 'none'; // Oculta el texto "FOTO 1"
+                    }
+                    lector.readAsDataURL(archivo);
+                }
+            });
+        }
+
+        configurarInputFoto('input-foto1', 'prev-foto1', 'txt-foto1');
+        configurarInputFoto('input-foto2', 'prev-foto2', 'txt-foto2');
+
+        // 3. LÓGICA DE GUARDADO
+        function guardarRecuerdo(evento) {
+            const boton = document.getElementById('btn-submit');
+            boton.innerText = "GUARDANDO...";
+            boton.disabled = true;
+
+            setTimeout(() => {
+                sonidoGiupi.play().catch(e => console.log("Audio bloqueado"));
+                crearExplosionCorazones(evento.clientX, evento.clientY);
+                
+                boton.innerText = "¡RECUERDO SELLADO!";
+                boton.style.background = "linear-gradient(135deg, #fbbf24, #f59e0b)";
+                
+                setTimeout(() => history.back(), 1500);
+            }, 1200);
+        }
+
+        function crearExplosionCorazones(x, y) {
+            const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
+            for (let i = 0; i < 30; i++) {
+                const c = document.createElement('div');
+                c.className = 'corazon-particula';
+                c.innerHTML = '❤';
+                c.style.color = colores[Math.floor(Math.random() * colores.length)];
+                c.style.left = x + 'px'; c.style.top = y + 'px';
+                c.style.setProperty('--x', (Math.random() - 0.5) * 400 + 'px');
+                c.style.setProperty('--y', (Math.random() - 0.5) * 400 + 'px');
+                c.style.setProperty('--duracion', (Math.random() * 0.5 + 0.5) + 's');
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 1200);
+            }
+        }
     </script>
 </body>
 </html>

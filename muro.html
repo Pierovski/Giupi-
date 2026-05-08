@@ -4,105 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Nuestro Muro</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="cuerpo-muro">
-    <header class="header-principal">
-        <div class="avatar-giupi">
-            <img src="giupi.png" alt="Giupi Anfitrión" class="img-giupi-mini">
-        </div>
-        <div class="saludo">
-            <h1>Hola, Piero</h1>
-            <p>¿Qué aventura guardamos hoy?</p>
-        </div>
-    </header>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        /* Añadí padding-top 40px para que los botones no se peguen al techo del celular */
+        body { background: #020617; min-height: 100vh; padding: 40px 0 50px; margin: 0; transition: opacity 0.5s ease; overflow-x: hidden; }
+        
+        .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
 
+        /* ÁLBUM COMPLETO - MINIMALISTA */
+        .cajon-album-pequeno {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 18px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            width: fit-content;
+            margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+        /* Textos en mayúsculas con espaciado elegante */
+        .cajon-album-pequeno h3 { font-size: 0.85rem; color: #94a3b8; margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .icono-fotos { font-size: 1rem; }
+
+        /* CATEGORÍAS PRINCIPALES */
+        .cajon-premium {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        /* Textos en mayúsculas */
+        .cajon-premium h3 { font-size: 0.85rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.2px; }
+
+        /* BOTÓN RECUERDO AL AZAR */
+        .btn-random {
+            margin-top: 25px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(0, 210, 255, 0.05));
+            border: 1px dashed rgba(251, 191, 36, 0.3);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            color: #fbbf24;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* ANIMACIONES */
+        @keyframes flotar-suave {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; }
+        
+        .grid-2x2 a:nth-child(1) .img-cat { animation-delay: 0s; }
+        .grid-2x2 a:nth-child(2) .img-cat { animation-delay: 0.5s; }
+        .grid-2x2 a:nth-child(3) .img-cat { animation-delay: 1s; }
+        .grid-2x2 a:nth-child(4) .img-cat { animation-delay: 1.5s; }
+
+        .corazon-particula {
+            position: fixed; pointer-events: none; z-index: 1000;
+            animation: volar-particula var(--duracion) ease-out forwards;
+        }
+        @keyframes volar-particula {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body id="cuerpo">
     <main class="panel-cajones">
-        <a href="categoria.html?cat=todas" class="cajon-premium largo">
-            <span class="emoji">📚</span>
-            <div class="texto">
-                <h3>Álbum Completo</h3>
-                <p>Todos nuestros momentos</p>
-            </div>
+        <a href="categoria.html?cat=todas" class="cajon-album-pequeno">
+            <span class="icono-fotos">🖼️</span>
+            <h3>Álbum</h3>
         </a>
 
         <div class="grid-2x2">
             <a href="categoria.html?cat=distancia" class="cajon-premium">
-                <span class="emoji">✈️</span>
-                <h3>A Distancia</h3>
+                <img src="giupi-viajero.png" alt="Distancia" class="img-cat">
+                <h3>A DISTANCIA</h3>
             </a>
             <a href="categoria.html?cat=reencuentro" class="cajon-premium">
-                <span class="emoji">🥂</span>
-                <h3>Reencuentro</h3>
+                <img src="giupi-elegante.png" alt="Reencuentro" class="img-cat">
+                <h3>REENCUENTRO</h3>
             </a>
             <a href="categoria.html?cat=casa" class="cajon-premium">
-                <span class="emoji">🛋️</span>
-                <h3>En Casa</h3>
+                <img src="giupi-chef.png" alt="En Casa" class="img-cat">
+                <h3>EN CASA</h3>
             </a>
             <a href="categoria.html?cat=airelibre" class="cajon-premium">
-                <span class="emoji">🐾</span>
-                <h3>Aire Libre</h3>
+                <img src="giupi-explorador.png" alt="Aire Libre" class="img-cat">
+                <h3>AIRE LIBRE</h3>
             </a>
+        </div>
+
+        <div class="btn-random" id="btn-recuerdo">
+            ✨ RECORDAR AL AZAR
         </div>
     </main>
 
-    <style>
-        .cuerpo-muro {
-            background: #020617;
-            padding-bottom: 50px;
+    <script>
+        function crearCorazones(x, y) {
+            const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
+            for (let i = 0; i < 20; i++) {
+                const c = document.createElement('div');
+                c.className = 'corazon-particula';
+                c.innerHTML = '❤';
+                c.style.color = colores[Math.floor(Math.random() * colores.length)];
+                c.style.left = x + 'px';
+                c.style.top = y + 'px';
+                c.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
+                c.style.setProperty('--y', (Math.random() - 0.5) * 300 + 'px');
+                c.style.setProperty('--duracion', (Math.random() * 0.5 + 0.5) + 's');
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 1000);
+            }
         }
-        .header-principal {
-            display: flex;
-            align-items: center;
-            padding: 40px 25px;
-            gap: 15px;
-        }
-        .img-giupi-mini {
-            width: 70px;
-            height: auto;
-            filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.3));
-        }
-        .saludo h1 {
-            font-size: 1.5rem;
-            color: #00d2ff;
-            margin: 0;
-        }
-        .saludo p {
-            color: #94a3b8;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        .cajon-premium {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-        .cajon-premium.largo {
-            flex-direction: row;
-            text-align: left;
-            padding: 25px;
-        }
-        .cajon-premium:active {
-            transform: scale(0.95);
-            background: rgba(0, 210, 255, 0.1);
-            border-color: #00d2ff;
-        }
-        .grid-2x2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 0 20px;
-        }
-        .emoji { font-size: 1.8rem; }
-        .cajon-premium h3 { font-size: 1rem; margin: 0; }
-    </style>
+
+        document.querySelectorAll('.cajon-premium, .cajon-album-pequeno').forEach(b => {
+            b.addEventListener('click', function(e) {
+                e.preventDefault();
+                crearCorazones(e.clientX, e.clientY);
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => window.location.href = this.getAttribute('href'), 500);
+            });
+        });
+
+        const recuerdos = [
+            "¿Te acuerdas de nuestra primera cita? ✨",
+            "Esa cena en casa fue increíble 🍝",
+            "¡Qué bien la pasamos aquel día al aire libre! 🌳",
+            "La distancia no es nada comparado con esto ❤"
+        ];
+
+        document.getElementById('btn-recuerdo').addEventListener('click', function(e) {
+            crearCorazones(e.clientX, e.clientY);
+            const frase = recuerdos[Math.floor(Math.random() * recuerdos.length)];
+            this.innerText = "BUSCANDO...";
+            setTimeout(() => {
+                alert(frase);
+                this.innerText = "✨ RECORDAR AL AZAR";
+            }, 800);
+        });
+    </script>
 </body>
 </html>
