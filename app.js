@@ -4,7 +4,7 @@ import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimest
 const firebaseConfig = {
   apiKey: "AIzaSyAqTSfh1jANA3uAR7SNExOSXDmFJLS637U",
   authDomain: "giupi-app.firebaseapp.com",
-  projectId: "giupi-app",
+  projectId: "giupi-630e4",
   storageBucket: "giupi-app.firebasestorage.app",
   messagingSenderId: "744722050677",
   appId: "1:744722050677:web:2c9d14a75cd940f21c123c"

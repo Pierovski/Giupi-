@@ -9,7 +9,6 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 50px; color: #f1f5f9; overflow-x: hidden; }
 
-        /* CABECERA MINIMALISTA */
         .header-categoria {
             display: flex; align-items: center; justify-content: space-between;
             padding: 25px 20px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px);
@@ -21,7 +20,6 @@
             font-size: 1.5rem; cursor: pointer; text-decoration: none;
         }
 
-        /* BOTÓN DE AZAR SUPERIOR */
         .btn-random-top {
             background: linear-gradient(135deg, #fbbf24, #d97706);
             color: #020617; border: none; padding: 12px 25px; border-radius: 30px;
@@ -30,7 +28,6 @@
             text-transform: uppercase;
         }
 
-        /* TABLERO DE CARTAS */
         .grid-misiones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
         .carta { perspective: 1000px; aspect-ratio: 3/4; cursor: pointer; }
         .carta-inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
@@ -42,7 +39,6 @@
             overflow: hidden;
         }
         
-        /* DISEÑO FRONTAL: GIUPI Y ORO */
         .carta-frente { 
             background: #0f172a; 
             border: 1px solid rgba(251, 191, 36, 0.2);
@@ -60,21 +56,13 @@
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
 
-        /* DISEÑO TRASERO: LA CITA */
         .carta-atras { 
             background: linear-gradient(135deg, #1e293b, #0f172a); 
             color: #f8fafc; transform: rotateY(180deg); 
-            border: 2px solid #fbbf24; flex-direction: column; padding: 15px;
+            border: 2px solid #fbbf24; flex-direction: column; padding: 12px;
         }
-        .mision-txt { font-size: 0.8rem; font-weight: 600; line-height: 1.3; margin-top: 10px; text-align: center; }
-        .btn-completar {
-            margin-top: 15px; background: #00d2ff; color: #020617;
-            border: none; padding: 8px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;
-            cursor: pointer; transition: transform 0.2s;
-        }
-        .btn-completar:active { transform: scale(0.9); }
+        .mision-txt { font-size: 0.75rem; font-weight: 600; line-height: 1.2; margin-top: 5px; text-align: center; }
 
-        /* ANIMACIÓN DE BRILLO (HIGHLIGHT) */
         .highlight { animation: pulso-oro 1.5s infinite; }
         @keyframes pulso-oro {
             0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
@@ -88,16 +76,20 @@
     <header class="header-categoria">
         <a href="muro.html" class="btn-volver">←</a>
         <button class="btn-random-top" onclick="escogerPorMi()">¿QUÉ HACEMOS HOY?</button>
-        <div style="width: 45px;"></div> </header>
+        <div style="width: 45px;"></div>
+    </header>
 
     <main class="grid-misiones" id="contenedor-cartas">
         </main>
 
     <script>
-        // 1. LECTURA DE CATEGORÍA E IMAGEN DE FONDO
         const urlParams = new URLSearchParams(window.location.search);
         const categoriaActual = urlParams.get('cat') || 'distancia'; 
         
+        // --- RESET TEMPORAL (Borra esta línea después de abrir la app una vez) ---
+        // localStorage.removeItem('misiones_' + categoriaActual); 
+        // ------------------------------------------------------------------------
+
         const imagenesGiupi = {
             'distancia': 'giupi-viajero.png',
             'reencuentro': 'giupi-elegante.png',
@@ -105,22 +97,119 @@
             'airelibre': 'giupi-explorador.png'
         };
         const imagenFondo = imagenesGiupi[categoriaActual];
-
-        // 2. MOTOR DE AUDIO
         const sonidoGiupi = new Audio('giupi.mp3');
 
-        // ====================================================================
-        // AQUÍ ES DONDE AGREGARÁS TUS 25 CITAS MANUALMENTE 
-        // ====================================================================
         const baseDeDatos = {
-            'distancia': ["Cena por videollamada", "Ver peli juntos", "Enviar un regalo"],
-            'reencuentro': ["Abrazo de 1 minuto", "Cena romántica", "Paseo de la mano"],
-            'casa': ["Noche de pizza", "Maratón de series", "Día de spa"],
-            'airelibre': ["Pícnic en el parque", "Caminata al amanecer", "Volar el dron"]
+            'distancia': [
+                "Ver la misma película sincronizados presionando 'play' al mismo tiempo",
+                "Enviar una sorpresa por delivery usando PedidosYa directamente a su casa",
+                "Cena por videollamada vestidos de forma elegante",
+                "Jugar algún videojuego cooperativo online",
+                "Tour virtual por algún museo internacional usando Google Arts",
+                "Armar una lista de reproducción compartida",
+                "Leer el mismo capítulo de un libro y comentarlo",
+                "Reto de fotos: enviarse 5 fotos de su día a día",
+                "Enviar un audio cantando una nota de voz sin vergüenza",
+                "Pedir exactamente el mismo snack en sus respectivas ciudades y comerlo en cámara",
+                "Hacer un test de personalidad online (MBTI) juntos",
+                "Planear un viaje futuro viendo mapas y presupuestos",
+                "Ver el atardecer juntos por videollamada",
+                "Escribir una historia de a dos por WhatsApp (una oración cada uno)",
+                "Descubrir música nueva recomendándose 3 canciones",
+                "Estudiar un idioma juntos (Duolingo en equipo)",
+                "Juego de 'Las 36 preguntas para enamorarse'",
+                "Enviar un pequeño detalle por correo tradicional",
+                "Dormir con la videollamada encendida",
+                "Maratón de series compartiendo pantalla",
+                "Hacerse dibujos rápidos y mostrarlos en cámara",
+                "Escuchar el mismo podcast al mismo tiempo",
+                "Sesión de 'verdad o reto' a distancia",
+                "Meditar juntos con el mismo audio de fondo",
+                "Grabar un mini-vlog de su día exclusivo para el otro"
+            ],
+            'reencuentro': [
+                "El abrazo largo sin prisa en el terminal o aeropuerto",
+                "Ir por un desayuno de panes o empanadas recién horneadas",
+                "Estrenar una fragancia pensada específicamente para el clima de ese día",
+                "Cena de celebración en un lugar elegante",
+                "Noche de hotel en la propia ciudad solo para desconectar",
+                "Intercambio de los regalos que acumularon en la distancia",
+                "Un brindis con copas por estar juntos de nuevo",
+                "Desayuno en la cama preparado por el anfitrión",
+                "Caminata sin rumbo solo para hablar",
+                "Visitar el lugar exacto de su primera cita",
+                "Sesión de fotos juntos para actualizar los fondos de pantalla",
+                "Tarde completa sin mirar el celular",
+                "Cocinar un plato laborioso juntos post-viaje",
+                "Tarde de spa y masajes en casa",
+                "Salir a bailar o a un bar con buena música",
+                "Acostarse a ver las estrellas si el cielo está despejado",
+                "Desempacar las maletas juntos con música de fondo",
+                "Ir por un helado artesanal",
+                "Noche de cobijas y películas",
+                "Baño relajante o ducha juntos",
+                "Probar un restaurante totalmente nuevo",
+                "'Cita a ciegas': uno elige todo el itinerario y el otro solo se deja llevar",
+                "Escribir una carta sobre lo que sintieron al verse",
+                "Hacer una lista de metas a corto plazo",
+                "Comprar un recuerdo físico del día del reencuentro"
+            ],
+            'casa': [
+                "Noche de cocina: Preparar un buen chaufa de pollo desde cero",
+                "Sesión musical: Escuchar los últimos arreglos o maquetas de 'Amor sin interés' o 'Calma'",
+                "Hacer una rutina de ejercicios o día de pierna en la sala",
+                "Noche de juegos de mesa o cartas",
+                "Maratón de la saga de películas favorita de uno de los dos",
+                "Armar un rompecabezas grande",
+                "Cata de cervezas o vinos comprados en el supermercado",
+                "Tarde de pintura (incluso si pintan mal)",
+                "Preparar un postre horneado",
+                "Reorganizar un cuarto o la decoración juntos",
+                "Noche de karaoke en YouTube",
+                "Leer un artículo largo o un cuento en voz alta",
+                "Hacer un picnic en el piso de la sala",
+                "Fondue de chocolate o queso casero",
+                "Bailar en la sala sin música de fondo",
+                "Armar un álbum de fotos físico",
+                "Hacer pizzas caseras armando cada uno su mitad",
+                "Sesión profunda de estiramientos",
+                "Competencia de videojuegos",
+                "Revisar y organizar las finanzas de la casa",
+                "Hacer alguna manualidad sencilla (origami, arcilla)",
+                "Guerra de almohadas clásica",
+                "Contarse anécdotas de la infancia que nunca se hayan dicho",
+                "Preparar cócteles o bebidas creativas",
+                "Acampar en la sala con sábanas y luces"
+            ],
+            'airelibre': [
+                "Salir a volar el dron (el Mini o el Mavic) para hacer tomas aéreas de un paisaje",
+                "Tarde deportiva: Ver un partido de fútbol amateur desde la tribuna o jugar juntos en cancha sintética",
+                "Hacer una ruta o escape rápido por la región montañosa local",
+                "Tomar un paseo en bote por un río o laguna",
+                "Buscar el mejor 'huarique' para comer ceviche mixto",
+                "Ciclismo urbano (salir a pedalear por la ciudad)",
+                "Caminata arquitectónica por el centro histórico",
+                "Madrugar para ver el amanecer desde un punto alto",
+                "Visitar ruinas, huacas o zonas arqueológicas",
+                "Viaje corto a la playa a caminar por la arena",
+                "Armar una carpa y acampar una noche",
+                "Subir a un mirador de la ciudad",
+                "Tarde de fotografía callejera con el celular",
+                "Visitar un pueblito cercano al que nunca hayan ido",
+                "Ir a los juegos mecánicos o parque de diversiones",
+                "Tomar una clase al aire libre",
+                "Observación de aves o buscar animales en un bosque",
+                "Ir a un cine al aire libre o evento público",
+                "Hacer una fogata pequeña (donde sea permitido) y quemar malvaviscos",
+                "Volar una cometa",
+                "Visitar un jardín botánico o vivero",
+                "Salir a pasear al perro (Keylor, si está con ustedes) por un parque grande",
+                "Recorrer una feria local de artesanos",
+                "Hacer una ruta buscando murales o graffitis urbanos",
+                "Sentarse en una plaza simplemente a ver pasar a la gente con un café"
+            ]
         };
-        // ====================================================================
 
-        // 3. GENERADOR DE CARTAS
         const lista = baseDeDatos[categoriaActual] || [];
         const contenedor = document.getElementById('contenedor-cartas');
         let volteadas = JSON.parse(localStorage.getItem('misiones_' + categoriaActual)) || [];
@@ -130,42 +219,38 @@
             const esVolteada = volteadas.includes(i) ? 'volteada' : '';
 
             contenedor.innerHTML += `
-                <div class="carta ${esVolteada}" id="carta-${i}" onclick="voltear(${i})">
+                <div class="carta ${esVolteada}" id="carta-${i}" onclick="gestionarClic(${i}, '${mision.replace(/'/g, "\\'")}')">
                     <div class="carta-inner">
                         <div class="carta-frente">
                             <img src="${imagenFondo}" class="giupi-sello" alt="">
                             <span class="numero-carta">${i + 1}</span>
                         </div>
                         <div class="carta-atras">
-                            <span style="color:#fbbf24; font-size:0.6rem; letter-spacing:2px">NUESTRA CITA</span>
+                            <span style="color:#fbbf24; font-size:0.5rem; letter-spacing:2px">NUESTRA CITA</span>
                             <span class="mision-txt">${mision}</span>
-                            <button class="btn-completar" onclick="irARegistro(event, '${mision}')">SELLAR MISIÓN</button>
+                            <span style="color:#00d2ff; font-size:0.5rem; margin-top:10px; font-weight:bold">TAP PARA SELLAR</span>
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // 4. LÓGICA DE VOLTEO MANUAL
-        function voltear(i) {
+                function gestionarClic(i, textoMision) {
             const el = document.getElementById('carta-' + i);
-            if (el.classList.contains('volteada')) return; // Si ya se volteó, no hace nada
             
-            el.classList.remove('highlight');
-            el.classList.add('volteada');
-            
-            volteadas.push(i);
-            localStorage.setItem('misiones_' + categoriaActual, JSON.stringify(volteadas));
+            if (!el.classList.contains('volteada')) {
+                // PRIMER CLIC: Solo se voltea para leer la misión (NO se guarda en la memoria aún)
+                el.classList.remove('highlight');
+                el.classList.add('volteada');
+            } else {
+                // SEGUNDO CLIC: Va al registro y envía qué número de carta es
+                localStorage.setItem('misionActual', textoMision);
+                localStorage.setItem('misionIndex', i); // Enviamos el número
+                localStorage.setItem('misionCategoria', categoriaActual); // Enviamos la categoría
+                window.location.href = 'registro.html';
+            }
         }
 
-        // 5. FUNCIÓN PUENTE: ENVIAR DATOS A REGISTRO.HTML
-        function irARegistro(evento, textoMision) {
-            evento.stopPropagation(); // Evita que la carta se cierre o buguee al hacer click en el botón
-            localStorage.setItem('misionActual', textoMision); // Guarda el nombre de la cita
-            window.location.href = 'registro.html'; // Viaja a la pantalla de registro
-        }
-
-        // 6. LÓGICA DE AZAR CON SUSPENSO Y SONIDO
         function escogerPorMi() {
             const cerradas = [];
             for(let i=0; i<25; i++) {
@@ -175,19 +260,21 @@
             
             const elegido = cerradas[Math.floor(Math.random() * cerradas.length)];
             const el = document.getElementById('carta-' + elegido);
-            
-            // Navega automáticamente hasta la carta elegida
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            
-            // Activa el brillo dorado para crear expectativa
             el.classList.add('highlight');
             
-            // Espera 800ms antes de gritar "Yupi" y mostrar el mensaje
             setTimeout(() => {
-                sonidoGiupi.play().catch(e => console.log("Audio bloqueado por el navegador"));
+                sonidoGiupi.play().catch(e => console.log("Audio bloqueado"));
                 alert("Giupi ha elegido la cita número " + (elegido + 1) + " para hoy. ✨");
             }, 800);
         }
+                // FORZAR RECARGA SI EL USUARIO REGRESA SIN SELLAR
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
+
     </script>
 </body>
 </html>

@@ -6,94 +6,68 @@
     <title>Giupi - Nuestro Muro</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        /* Añadí padding-top 40px para que los botones no se peguen al techo del celular */
         body { background: #020617; min-height: 100vh; padding: 40px 0 50px; margin: 0; transition: opacity 0.5s ease; overflow-x: hidden; }
         
         .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
 
-        /* ÁLBUM COMPLETO - MINIMALISTA */
-        .cajon-album-pequeno {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 18px;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            width: fit-content;
-            margin: 0 auto 10px;
-            transition: all 0.3s ease;
-        }
-        /* Textos en mayúsculas con espaciado elegante */
-        .cajon-album-pequeno h3 { font-size: 0.85rem; color: #94a3b8; margin: 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-        .icono-fotos { font-size: 1rem; }
-
         /* CATEGORÍAS PRINCIPALES */
         .cajon-premium {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none;
+            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none;
         }
         .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        /* Textos en mayúsculas */
         .cajon-premium h3 { font-size: 0.85rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.2px; }
 
-        /* BOTÓN RECUERDO AL AZAR */
+        /* BOTÓN REVIVIR AL AZAR */
         .btn-random {
-            margin-top: 25px;
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(0, 210, 255, 0.05));
-            border: 1px dashed rgba(251, 191, 36, 0.3);
-            border-radius: 20px;
-            padding: 15px;
-            text-align: center;
-            color: #fbbf24;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
+            margin-top: 10px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(0, 210, 255, 0.05));
+            border: 1px dashed rgba(251, 191, 36, 0.3); border-radius: 20px; padding: 18px;
+            text-align: center; color: #fbbf24; font-size: 0.85rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+            transition: transform 0.2s, background 0.3s;
+        }
+        .btn-random:active { transform: scale(0.95); background: rgba(251, 191, 36, 0.15); }
+
+        /* BARRA DE PROGRESO DE LA HISTORIA */
+        .contenedor-progreso {
+            margin-top: 25px; padding: 20px; background: rgba(15, 23, 42, 0.5);
+            border-radius: 20px; border: 1px solid rgba(255,255,255,0.03);
+        }
+        .texto-progreso { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .label-progreso { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+        .num-progreso { color: #00d2ff; font-weight: 700; font-size: 0.9rem; }
+        
+        .barra-fondo { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 10px; position: relative; }
+        .barra-llena { 
+            height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #fbbf24); 
+            border-radius: 10px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; 
+        }
+        .giupi-corredor {
+            position: absolute; right: -15px; top: -14px; width: 32px; height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); animation: flotar-suave 2s infinite ease-in-out;
         }
 
         /* ANIMACIONES */
-        @keyframes flotar-suave {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
+        @keyframes flotar-suave { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
         .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; }
-        
         .grid-2x2 a:nth-child(1) .img-cat { animation-delay: 0s; }
         .grid-2x2 a:nth-child(2) .img-cat { animation-delay: 0.5s; }
         .grid-2x2 a:nth-child(3) .img-cat { animation-delay: 1s; }
         .grid-2x2 a:nth-child(4) .img-cat { animation-delay: 1.5s; }
+                /* EFECTO CORAZONES */
+        .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; font-size: 1.2rem; }
+        @keyframes volar-particula { 
+            0% { transform: translate(0, 0) scale(1); opacity: 1; } 
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } 
+        }
 
-        .corazon-particula {
-            position: fixed; pointer-events: none; z-index: 1000;
-            animation: volar-particula var(--duracion) ease-out forwards;
-        }
-        @keyframes volar-particula {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
-        }
     </style>
 </head>
 <body id="cuerpo">
     <main class="panel-cajones">
-        <a href="categoria.html?cat=todas" class="cajon-album-pequeno">
-            <span class="icono-fotos">🖼️</span>
-            <h3>Álbum</h3>
-        </a>
-
+        
         <div class="grid-2x2">
             <a href="categoria.html?cat=distancia" class="cajon-premium">
                 <img src="giupi-viajero.png" alt="Distancia" class="img-cat">
@@ -113,12 +87,180 @@
             </a>
         </div>
 
-        <div class="btn-random" id="btn-recuerdo">
-            ✨ RECORDAR AL AZAR
+        <div class="contenedor-progreso">
+            <div class="texto-progreso">
+                <span class="label-progreso">Nuestra Historia</span>
+                <span class="num-progreso" id="contador-progreso">0 / 100</span>
+            </div>
+            <div class="barra-fondo">
+                <div class="barra-llena" id="barra-progreso">
+                    <img src="giupi.png" class="giupi-corredor" alt="Giupi Tracker">
+                </div>
+            </div>
         </div>
+
+        <div class="btn-random" id="btn-revivir">
+            ✨ REVIVIR UN INSTANTE ALEATORIO
+        </div>
+
     </main>
 
     <script>
+        // BASE DE DATOS MAESTRA PARA SABER LOS NOMBRES DE LAS CITAS
+        // (Asegúrate de que estos nombres coincidan con los que pondrás en categoria.html)
+                const baseDeDatos = {
+            'distancia': [
+                "Ver la misma película sincronizados presionando 'play' al mismo tiempo",
+                "Enviar una sorpresa por delivery usando PedidosYa directamente a su casa",
+                "Cena por videollamada vestidos de forma elegante",
+                "Jugar algún videojuego cooperativo online",
+                "Tour virtual por algún museo internacional usando Google Arts",
+                "Armar una lista de reproducción compartida",
+                "Leer el mismo capítulo de un libro y comentarlo",
+                "Reto de fotos: enviarse 5 fotos de su día a día",
+                "Enviar un audio cantando una nota de voz sin vergüenza",
+                "Pedir exactamente el mismo snack en sus respectivas ciudades y comerlo en cámara",
+                "Hacer un test de personalidad online (MBTI) juntos",
+                "Planear un viaje futuro viendo mapas y presupuestos",
+                "Ver el atardecer juntos por videollamada",
+                "Escribir una historia de a dos por WhatsApp (una oración cada uno)",
+                "Descubrir música nueva recomendándose 3 canciones",
+                "Estudiar un idioma juntos (Duolingo en equipo)",
+                "Juego de 'Las 36 preguntas para enamorarse'",
+                "Enviar un pequeño detalle por correo tradicional",
+                "Dormir con la videollamada encendida",
+                "Maratón de series compartiendo pantalla",
+                "Hacerse dibujos rápidos y mostrarlos en cámara",
+                "Escuchar el mismo podcast al mismo tiempo",
+                "Sesión de 'verdad o reto' a distancia",
+                "Meditar juntos con el mismo audio de fondo",
+                "Grabar un mini-vlog de su día exclusivo para el otro"
+            ],
+            'reencuentro': [
+                "El abrazo largo sin prisa en el terminal o aeropuerto",
+                "Ir por un desayuno de panes o empanadas recién horneadas",
+                "Estrenar una fragancia pensada específicamente para el clima de ese día",
+                "Cena de celebración en un lugar elegante",
+                "Noche de hotel en la propia ciudad solo para desconectar",
+                "Intercambio de los regalos que acumularon en la distancia",
+                "Un brindis con copas por estar juntos de nuevo",
+                "Desayuno en la cama preparado por el anfitrión",
+                "Caminata sin rumbo solo para hablar",
+                "Visitar el lugar exacto de su primera cita",
+                "Sesión de fotos juntos para actualizar los fondos de pantalla",
+                "Tarde completa sin mirar el celular",
+                "Cocinar un plato laborioso juntos post-viaje",
+                "Tarde de spa y masajes en casa",
+                "Salir a bailar o a un bar con buena música",
+                "Acostarse a ver las estrellas si el cielo está despejado",
+                "Desempacar las maletas juntos con música de fondo",
+                "Ir por un helado artesanal",
+                "Noche de cobijas y películas",
+                "Baño relajante o ducha juntos",
+                "Probar un restaurante totalmente nuevo",
+                "'Cita a ciegas': uno elige todo el itinerario y el otro solo se deja llevar",
+                "Escribir una carta sobre lo que sintieron al verse",
+                "Hacer una lista de metas a corto plazo",
+                "Comprar un recuerdo físico del día del reencuentro"
+            ],
+            'casa': [
+                "Noche de cocina: Preparar un buen chaufa de pollo desde cero",
+                "Sesión musical: Escuchar los últimos arreglos o maquetas de 'Amor sin interés' o 'Calma'",
+                "Hacer una rutina de ejercicios o día de pierna en la sala",
+                "Noche de juegos de mesa o cartas",
+                "Maratón de la saga de películas favorita de uno de los dos",
+                "Armar un rompecabezas grande",
+                "Cata de cervezas o vinos comprados en el supermercado",
+                "Tarde de pintura (incluso si pintan mal)",
+                "Preparar un postre horneado",
+                "Reorganizar un cuarto o la decoración juntos",
+                "Noche de karaoke en YouTube",
+                "Leer un artículo largo o un cuento en voz alta",
+                "Hacer un picnic en el piso de la sala",
+                "Fondue de chocolate o queso casero",
+                "Bailar en la sala sin música de fondo",
+                "Armar un álbum de fotos físico",
+                "Hacer pizzas caseras armando cada uno su mitad",
+                "Sesión profunda de estiramientos",
+                "Competencia de videojuegos",
+                "Revisar y organizar las finanzas de la casa",
+                "Hacer alguna manualidad sencilla (origami, arcilla)",
+                "Guerra de almohadas clásica",
+                "Contarse anécdotas de la infancia que nunca se hayan dicho",
+                "Preparar cócteles o bebidas creativas",
+                "Acampar en la sala con sábanas y luces"
+            ],
+            'airelibre': [
+                "Salir a volar el dron (el Mini o el Mavic) para hacer tomas aéreas de un paisaje",
+                "Tarde deportiva: Ver un partido de fútbol amateur desde la tribuna o jugar juntos en cancha sintética",
+                "Hacer una ruta o escape rápido por la región montañosa local",
+                "Tomar un paseo en bote por un río o laguna",
+                "Buscar el mejor 'huarique' para comer ceviche mixto",
+                "Ciclismo urbano (salir a pedalear por la ciudad)",
+                "Caminata arquitectónica por el centro histórico",
+                "Madrugar para ver el amanecer desde un punto alto",
+                "Visitar ruinas, huacas o zonas arqueológicas",
+                "Viaje corto a la playa a caminar por la arena",
+                "Armar una carpa y acampar una noche",
+                "Subir a un mirador de la ciudad",
+                "Tarde de fotografía callejera con el celular",
+                "Visitar un pueblito cercano al que nunca hayan ido",
+                "Ir a los juegos mecánicos o parque de diversiones",
+                "Tomar una clase al aire libre",
+                "Observación de aves o buscar animales en un bosque",
+                "Ir a un cine al aire libre o evento público",
+                "Hacer una fogata pequeña (donde sea permitido) y quemar malvaviscos",
+                "Volar una cometa",
+                "Visitar un jardín botánico o vivero",
+                "Salir a pasear al perro (Keylor, si está con ustedes) por un parque grande",
+                "Recorrer una feria local de artesanos",
+                "Hacer una ruta buscando murales o graffitis urbanos",
+                "Sentarse en una plaza simplemente a ver pasar a la gente con un café"
+            ]
+        };
+
+        // 1. CALCULAR EL PROGRESO
+        let misionesCompletadas = [];
+        const categorias = ['distancia', 'reencuentro', 'casa', 'airelibre'];
+        let totalCompletadas = 0;
+
+        categorias.forEach(cat => {
+            const volteadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+            totalCompletadas += volteadas.length;
+            
+            // Guardamos el texto de cada misión completada para el botón aleatorio
+            volteadas.forEach(indice => {
+                if(baseDeDatos[cat] && baseDeDatos[cat][indice]) {
+                    misionesCompletadas.push(baseDeDatos[cat][indice]);
+                }
+            });
+        });
+
+        // 2. ACTUALIZAR LA BARRA VISUAL (Asumiendo 100 citas en total)
+        setTimeout(() => {
+            const porcentaje = (totalCompletadas / 100) * 100;
+            document.getElementById('barra-progreso').style.width = porcentaje + '%';
+            document.getElementById('contador-progreso').innerText = totalCompletadas + " / 100";
+        }, 300); // Pequeño retraso para que la animación de llenado se vea bonita al entrar
+
+        // 3. FUNCIÓN: REVIVIR INSTANTE ALEATORIO
+        document.getElementById('btn-revivir').addEventListener('click', function(e) {
+            if(misionesCompletadas.length === 0) {
+                alert("Aún no han sellado ningún recuerdo. ¡Vayan a completar su primera cita!");
+                return;
+            }
+
+            this.innerText = "VIAJANDO EN EL TIEMPO...";
+            
+            // Elige una cita que ya hayan hecho al azar
+            const recuerdoElegido = misionesCompletadas[Math.floor(Math.random() * misionesCompletadas.length)];
+            
+            setTimeout(() => {
+                localStorage.setItem('misionActual', recuerdoElegido); // Le dice al registro qué cita mostrar
+                window.location.href = 'registro.html'; // Viaja directo al registro
+            }, 800);
+        });
+                // 4. EFECTO DE CORAZONES AL ENTRAR A UNA CATEGORÍA
         function crearCorazones(x, y) {
             const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
             for (let i = 0; i < 20; i++) {
@@ -136,30 +278,22 @@
             }
         }
 
-        document.querySelectorAll('.cajon-premium, .cajon-album-pequeno').forEach(b => {
-            b.addEventListener('click', function(e) {
-                e.preventDefault();
+        // Le devolvemos la orden a los botones de las categorías
+        document.querySelectorAll('.cajon-premium').forEach(boton => {
+            boton.addEventListener('click', function(e) {
+                e.preventDefault(); // Detiene el viaje inmediato
+                
+                // Explota los corazones en la posición del dedo
                 crearCorazones(e.clientX, e.clientY);
-                this.style.transform = 'scale(0.9)';
-                setTimeout(() => window.location.href = this.getAttribute('href'), 500);
+                
+                // Efecto de hundimiento
+                this.style.transform = 'scale(0.9)'; 
+                
+                // Espera medio segundo (500ms) para que se vea la animación y luego viaja
+                setTimeout(() => {
+                    window.location.href = this.getAttribute('href');
+                }, 500);
             });
-        });
-
-        const recuerdos = [
-            "¿Te acuerdas de nuestra primera cita? ✨",
-            "Esa cena en casa fue increíble 🍝",
-            "¡Qué bien la pasamos aquel día al aire libre! 🌳",
-            "La distancia no es nada comparado con esto ❤"
-        ];
-
-        document.getElementById('btn-recuerdo').addEventListener('click', function(e) {
-            crearCorazones(e.clientX, e.clientY);
-            const frase = recuerdos[Math.floor(Math.random() * recuerdos.length)];
-            this.innerText = "BUSCANDO...";
-            setTimeout(() => {
-                alert(frase);
-                this.innerText = "✨ RECORDAR AL AZAR";
-            }, 800);
         });
     </script>
 </body>
