@@ -10,78 +10,41 @@
         body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 50px; color: #f1f5f9; overflow-x: hidden; }
 
         /* CABECERA */
-        .header-registro {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 25px 20px 10px; background: transparent;
-            position: sticky; top: 0; z-index: 100;
-        }
-        .btn-volver {
-            background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%;
-            width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; cursor: pointer; text-decoration: none;
-        }
+        .header-registro { display: flex; align-items: center; justify-content: space-between; padding: 25px 20px 10px; background: transparent; position: sticky; top: 0; z-index: 100; }
+        .btn-volver { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; text-decoration: none; }
 
         .contenedor-scrapbook { padding: 10px 20px; display: flex; flex-direction: column; gap: 20px; }
 
-        /* TÍTULO ESTILO ESCRITO A MANO */
-        .titulo-mision {
-            font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #00d2ff;
-            margin: 0; text-shadow: 0 2px 5px rgba(0, 210, 255, 0.3); line-height: 1.1;
-        }
+        /* TÍTULOS */
+        .titulo-mision { font-family: 'Dancing Script', cursive; font-size: 2.5rem; color: #00d2ff; margin: 0; text-shadow: 0 2px 5px rgba(0, 210, 255, 0.3); line-height: 1.1; }
         .iconos-top { font-size: 1.5rem; letter-spacing: 5px; opacity: 0.8; }
 
-        /* MARCOS DE FOTO ESTILO SCRAPBOOK (POLAROID) */
+        /* MARCOS DE FOTO */
         .zona-fotos { display: flex; justify-content: center; position: relative; height: 260px; margin-top: 10px; }
-        
-        .marco-foto {
-            background: #f8fafc; padding: 10px 10px 30px 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            position: absolute; display: flex; align-items: center; justify-content: center;
-            flex-direction: column; cursor: pointer; transition: transform 0.3s;
-        }
+        .marco-foto { background: #f8fafc; padding: 10px 10px 30px 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; transition: transform 0.3s; }
         .marco-foto:active { transform: scale(0.95) !important; }
-        
-        /* Foto 1 (Fondo, ligeramente inclinada) */
-        .foto-1 {
-            width: 160px; height: 200px; transform: rotate(-8deg); left: 10px; top: 20px; z-index: 1;
-            border: 1px solid #cbd5e1;
-        }
-        /* Foto 2 (Frente, recta) */
-        .foto-2 {
-            width: 180px; height: 220px; transform: rotate(4deg); right: 10px; top: 0; z-index: 2;
-            border: 1px solid #fbbf24;
-        }
-
+        .foto-1 { width: 160px; height: 200px; transform: rotate(-8deg); left: 10px; top: 20px; z-index: 1; border: 1px solid #cbd5e1; }
+        .foto-2 { width: 180px; height: 220px; transform: rotate(4deg); right: 10px; top: 0; z-index: 2; border: 1px solid #fbbf24; }
         .area-imagen { width: 100%; height: 100%; background: #e2e8f0; object-fit: cover; border: 1px dashed #94a3b8; }
         .texto-foto { color: #64748b; font-size: 0.7rem; margin-top: 10px; font-weight: 600; text-transform: uppercase; }
 
-        /* INPUTS TIPO LÍNEA (FECHA Y LUGAR) */
+        /* DATOS DE TEXTO */
         .zona-datos { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
         .dato-linea { display: flex; align-items: flex-end; gap: 10px; }
         .dato-linea label { color: #fbbf24; font-weight: 600; font-size: 0.9rem; }
-        .dato-linea input {
-            flex-grow: 1; background: transparent; border: none; border-bottom: 2px solid rgba(251, 191, 36, 0.4);
-            color: #f8fafc; font-size: 1rem; padding: 5px; outline: none; font-family: 'Dancing Script', cursive; font-size: 1.4rem;
-        }
+        .dato-linea input { flex-grow: 1; background: transparent; border: none; border-bottom: 2px solid rgba(251, 191, 36, 0.4); color: #f8fafc; padding: 5px; outline: none; font-family: 'Dancing Script', cursive; font-size: 1.4rem; }
         .dato-linea input:focus { border-bottom-color: #00d2ff; }
 
-        /* ÁREA DE TEXTO (LÍNEAS DE CUADERNO) */
         .titulo-sentimientos { color: #00d2ff; font-weight: 600; font-size: 1.1rem; margin: 20px 0 5px; display: flex; align-items: center; justify-content: space-between; }
-        
-        .cuaderno-lineas {
-            width: 100%; height: 130px; background-color: transparent;
-            /* Magia CSS para crear las líneas */
-            background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.2) 35px);
-            line-height: 35px; border: none; color: #f8fafc; font-size: 1rem;
-            resize: none; outline: none; padding: 0 5px; font-family: 'Poppins', sans-serif;
-        }
+        .cuaderno-lineas { width: 100%; height: 130px; background-color: transparent; background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.2) 35px); line-height: 35px; border: none; color: #f8fafc; font-size: 1rem; resize: none; outline: none; padding: 0 5px; }
 
-        /* BOTÓN DE GUARDAR */
-        .btn-guardar {
-            background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px;
-            font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s;
-            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%;
-        }
+        /* BOTONES */
+        .btn-guardar { background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s; box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%; cursor: pointer; }
+        .btn-eliminar { display: none; background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; }
+
+        /* VISOR DE FOTOS PANTALLA COMPLETA */
+        .visor-pantalla-completa { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; }
+        .img-ampliada { max-width: 95%; max-height: 85%; border-radius: 10px; border: 2px solid #fbbf24; }
 
         .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; }
         @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
@@ -90,7 +53,7 @@
 <body>
 
     <header class="header-registro">
-        <a href="#" class="btn-volver" onclick="history.back(); return false;">←</a>
+        <button class="btn-volver" onclick="history.back()">←</button>
     </header>
 
     <main class="contenedor-scrapbook">
@@ -104,11 +67,11 @@
         <input type="file" id="input-foto2" accept="image/*" style="display: none;">
 
         <div class="zona-fotos">
-            <div class="marco-foto foto-1" onclick="document.getElementById('input-foto1').click()">
+            <div class="marco-foto foto-1" id="marco-1" onclick="document.getElementById('input-foto1').click()">
                 <img src="" class="area-imagen" id="prev-foto1" style="opacity: 0;">
                 <span class="texto-foto" id="txt-foto1">FOTO 1</span>
             </div>
-            <div class="marco-foto foto-2" onclick="document.getElementById('input-foto2').click()">
+            <div class="marco-foto foto-2" id="marco-2" onclick="document.getElementById('input-foto2').click()">
                 <img src="" class="area-imagen" id="prev-foto2" style="opacity: 0;">
                 <span class="texto-foto" id="txt-foto2">FOTO 2</span>
             </div>
@@ -117,111 +80,148 @@
         <div class="zona-datos">
             <div class="dato-linea">
                 <label>Fecha:</label>
-                <input type="text" placeholder="Ej: 29 de Mayo">
+                <input type="text" id="input-fecha" placeholder="Ej: 29 de Mayo">
             </div>
             <div class="dato-linea">
                 <label>Lugar:</label>
-                <input type="text" placeholder="¿Dónde estuvimos?">
+                <input type="text" id="input-lugar" placeholder="¿Dónde estuvimos?">
             </div>
         </div>
 
         <div>
             <h3 class="titulo-sentimientos">¿Cómo nos sentimos? <span style="font-size: 1.2rem;">📝💭</span></h3>
-            <textarea class="cuaderno-lineas" placeholder="Escribe aquí su historia..."></textarea>
+            <textarea class="cuaderno-lineas" id="input-nota" placeholder="Escribe aquí su historia..."></textarea>
         </div>
 
-        <button class="btn-guardar" id="btn-submit" onclick="guardarRecuerdo(event)">SELLAR RECUERDO</button>
+        <button class="btn-guardar" id="btn-submit">SELLAR RECUERDO</button>
+        <button class="btn-eliminar" id="btn-eliminar">🗑️ DEMOLER ESTE RECUERDO</button>
 
     </main>
 
-        <script type="module">
-        import { db } from './firebase-config.js';
-        // Añadimos getDocs, query y where para poder buscar en la base de datos
-        import { collection, addDoc, serverTimestamp, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <div class="visor-pantalla-completa" id="visor" onclick="this.style.display='none'">
+        <img src="" class="img-ampliada" id="img-ampliada">
+        <p style="color:white; margin-top:15px; font-weight:600;">Toca la pantalla para cerrar</p>
+    </div>
 
-        // 1. CARGAR DATOS DE LA MISIÓN
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // VARIABLES DE ESTADO
         const misionActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
         const cat = localStorage.getItem('misionCategoria');
         const idx = parseInt(localStorage.getItem('misionIndex'));
         document.getElementById('txt-mision').innerText = misionActual;
+        let idDocumentoActual = null; 
+        let archivoFoto1 = null; 
+        let archivoFoto2 = null;
 
-        // 2. ESCÁNER DE EMOJIS
+        // 1. ASIGNAR EMOJI
         function obtenerIconoContextual(texto) {
             const t = texto.toLowerCase();
             if(t.includes('película') || t.includes('cine')) return '🍿🎬';
             if(t.includes('cena') || t.includes('chaufa')) return '🍕🍷';
             if(t.includes('dron') || t.includes('tomas')) return '🚁📸';
             if(t.includes('playa') || t.includes('arena')) return '🏖️🌊';
-            if(t.includes('abrazo') || t.includes('beso')) return '🫂❤️';
             if(t.includes('fútbol') || t.includes('pierna')) return '⚽🏋️‍♂️';
             if(t.includes('viaje') || t.includes('acamp')) return '🏕️🎒';
-            if(t.includes('música') || t.includes('karaoke')) return '🎵🎤';
-            if(t.includes('foto')) return '📸✨';
             return '🥂✨';
         }
         document.querySelector('.iconos-top').innerText = obtenerIconoContextual(misionActual);
 
-        // ==========================================
-        // NUEVO: SENSOR DE LECTURA (Traer las fotos)
-        // ==========================================
+        // 2. FUNCIÓN DE COMPRESIÓN (Client-Side)
+        function comprimirImagen(archivo) {
+            return new Promise((resolve) => {
+                const lector = new FileReader();
+                lector.readAsDataURL(archivo);
+                lector.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; // Resolución ideal y ligera
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > MAX_WIDTH) {
+                            height *= (MAX_WIDTH / width);
+                            width = MAX_WIDTH;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convertimos a archivo (Blob) con 70% de calidad
+                        canvas.toBlob((blob) => { resolve(blob); }, 'image/jpeg', 0.7);
+                    };
+                };
+            });
+        }
+
+        // 3. LECTURA: ¿YA EXISTE ESTE RECUERDO?
         async function verificarRecuerdo() {
             if (!cat || isNaN(idx)) return;
-
             try {
-                // Buscamos si esta cita exacta ya tiene datos guardados
-                const q = query(
-                    collection(db, "recuerdos"),
-                    where("categoria", "==", cat),
-                    where("citaNumero", "==", idx)
-                );
+                const q = query(collection(db, "recuerdos"), where("categoria", "==", cat), where("citaNumero", "==", idx));
                 const querySnapshot = await getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    const datos = querySnapshot.docs[0].data();
+                    const docRef = querySnapshot.docs[0];
+                    const datos = docRef.data();
+                    idDocumentoActual = docRef.id;
+
+                    // Llenar inputs y bloquearlos
+                    document.getElementById('input-fecha').value = datos.fechaTexto || "";
+                    document.getElementById('input-fecha').readOnly = true;
+                    document.getElementById('input-lugar').value = datos.lugar || "";
+                    document.getElementById('input-lugar').readOnly = true;
+                    document.getElementById('input-nota').value = datos.nota || "";
+                    document.getElementById('input-nota').readOnly = true;
+
+                    // Llenar fotos y cambiar función al hacer clic (abrir visor)
+                    const marco1 = document.getElementById('marco-1');
+                    const marco2 = document.getElementById('marco-2');
                     
-                    // Mostrar Foto 1 si existe
+                    marco1.onclick = null; 
+                    marco2.onclick = null;
+
                     if (datos.foto1) {
                         const img1 = document.getElementById('prev-foto1');
                         img1.src = datos.foto1;
                         img1.style.opacity = '1';
                         document.getElementById('txt-foto1').style.display = 'none';
+                        marco1.onclick = () => abrirVisor(datos.foto1);
                     }
-                    
-                    // Mostrar Foto 2 si existe
                     if (datos.foto2) {
                         const img2 = document.getElementById('prev-foto2');
                         img2.src = datos.foto2;
                         img2.style.opacity = '1';
                         document.getElementById('txt-foto2').style.display = 'none';
+                        marco2.onclick = () => abrirVisor(datos.foto2);
                     }
 
-                    // Mostrar el texto y bloquear edición
-                    const areaTexto = document.querySelector('textarea');
-                    if (areaTexto) {
-                        areaTexto.value = datos.nota || "";
-                        areaTexto.readOnly = true; 
-                    }
-
-                    // Cambiar el botón para indicar que ya está sellado
-                    const btn = document.getElementById('btn-submit');
-                    if (btn) {
-                        btn.innerText = "RECUERDO SELLADO ✨";
-                        btn.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
-                        btn.disabled = true;
-                    }
+                    // Cambiar botón a modo Sellado
+                    const btnGuardar = document.getElementById('btn-submit');
+                    btnGuardar.innerText = "RECUERDO SELLADO ✨";
+                    btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
+                    btnGuardar.disabled = true;
+                    
+                    // Mostrar botón eliminar
+                    document.getElementById('btn-eliminar').style.display = 'block';
                 }
             } catch (error) {
-                console.error("Error al buscar el recuerdo:", error);
+                console.error("Error al hidratar datos:", error);
             }
         }
-        
-        // Ejecutamos la búsqueda apenas abre la página
         verificarRecuerdo();
 
-        // 3. CAPTURA DE FOTOS EN MEMORIA
-        let archivoFoto1 = null;
-        let archivoFoto2 = null;
+        function abrirVisor(url) {
+            document.getElementById('img-ampliada').src = url;
+            document.getElementById('visor').style.display = 'flex';
+        }
 
+        // 4. PREVISUALIZAR FOTOS AL SELECCIONARLAS
         function configurarInputFoto(inputId, prevId, txtId, numFoto) {
             const input = document.getElementById(inputId);
             if(input) {
@@ -230,13 +230,11 @@
                     if (archivo) {
                         if(numFoto === 1) archivoFoto1 = archivo;
                         if(numFoto === 2) archivoFoto2 = archivo;
-
                         const lector = new FileReader();
                         lector.onload = function(e) {
                             const img = document.getElementById(prevId);
                             img.src = e.target.result;
                             img.style.opacity = '1';
-                            img.style.border = 'none';
                             document.getElementById(txtId).style.display = 'none';
                         }
                         lector.readAsDataURL(archivo);
@@ -247,50 +245,45 @@
         configurarInputFoto('input-foto1', 'prev-foto1', 'txt-foto1', 1);
         configurarInputFoto('input-foto2', 'prev-foto2', 'txt-foto2', 2);
 
-        // 4. EL MOTOR DE SUBIDA (ImgBB)
+        // 5. SUBIDA A LA NUBE (Con foto ya comprimida)
         const IMGBB_API_KEY = '055cde6238b2cefe13e31dc43f2b2570';
-
-        async function subirFotoAImgBB(archivo) {
-            if (!archivo) return null;
+        async function subirFotoAImgBB(blob) {
+            if (!blob) return null;
             const formData = new FormData();
-            formData.append('image', archivo);
-            
+            formData.append('image', blob, 'foto.jpg');
             try {
-                const respuesta = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
+                const respuesta = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
                 const datos = await respuesta.json();
                 return datos.data.url; 
-            } catch (error) {
-                console.error("Error en topografía de imagen:", error);
-                return null;
-            }
+            } catch (error) { return null; }
         }
 
-        // 5. GUARDADO OFICIAL (Conexión Firebase + ImgBB)
+        // 6. GUARDAR RECUERDO
         const botonGuardar = document.getElementById('btn-submit');
         if(botonGuardar) {
             botonGuardar.addEventListener('click', async (evento) => {
                 evento.preventDefault();
-                botonGuardar.innerText = "SUBIENDO FOTOS... ⏳";
+                botonGuardar.innerText = "COMPRIMIENDO... ⏳";
                 botonGuardar.disabled = true;
 
                 try {
-                    const urlFoto1 = await subirFotoAImgBB(archivoFoto1);
-                    const urlFoto2 = await subirFotoAImgBB(archivoFoto2);
+                    // Pasamos las fotos por el compresor antes de enviarlas
+                    const blob1 = archivoFoto1 ? await comprimirImagen(archivoFoto1) : null;
+                    const blob2 = archivoFoto2 ? await comprimirImagen(archivoFoto2) : null;
+
+                    botonGuardar.innerText = "SUBIENDO FOTOS... 🚀";
+                    const urlFoto1 = await subirFotoAImgBB(blob1);
+                    const urlFoto2 = await subirFotoAImgBB(blob2);
 
                     botonGuardar.innerText = "SELLANDO EN FIREBASE... 🔐";
-
-                    const nota = document.querySelector('textarea') ? document.querySelector('textarea').value : ""; 
+                    const nota = document.getElementById('input-nota').value; 
+                    const fechaF = document.getElementById('input-fecha').value;
+                    const lugarF = document.getElementById('input-lugar').value;
 
                     await addDoc(collection(db, "recuerdos"), {
-                        categoria: cat,
-                        citaNumero: idx,
-                        mision: misionActual,
-                        nota: nota,
-                        foto1: urlFoto1 || "",
-                        foto2: urlFoto2 || "",
+                        categoria: cat, citaNumero: idx, mision: misionActual,
+                        nota: nota, fechaTexto: fechaF, lugar: lugarF,
+                        foto1: urlFoto1 || "", foto2: urlFoto2 || "",
                         fecha: serverTimestamp() 
                     });
 
@@ -305,40 +298,54 @@
                     botonGuardar.innerText = "¡RECUERDO INMORTALIZADO! ✨";
                     botonGuardar.style.background = "linear-gradient(135deg, #fbbf24, #f59e0b)";
                     
+                    // Explosión de corazones
                     const x = evento.clientX || window.innerWidth / 2;
                     const y = evento.clientY || window.innerHeight / 2;
-                    crearExplosionCorazones(x, y);
+                    const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
+                    for (let i = 0; i < 30; i++) {
+                        const c = document.createElement('div');
+                        c.className = 'corazon-particula';
+                        c.innerHTML = '❤';
+                        c.style.color = colores[Math.floor(Math.random() * colores.length)];
+                        c.style.left = x + 'px'; c.style.top = y + 'px';
+                        c.style.setProperty('--x', (Math.random() - 0.5) * 400 + 'px');
+                        c.style.setProperty('--y', (Math.random() - 0.5) * 400 + 'px');
+                        c.style.setProperty('--duracion', (Math.random() * 0.5 + 0.5) + 's');
+                        document.body.appendChild(c);
+                        setTimeout(() => c.remove(), 1200);
+                    }
                     
                     const sonidoGiupi = new Audio('giupi.mp3');
-                    sonidoGiupi.play().catch(e => console.log("Audio bloqueado"));
+                    sonidoGiupi.play().catch(e => console.log("Audio"));
 
                     setTimeout(() => history.back(), 2000);
-
                 } catch (error) {
-                    alert("Hubo un error de conexión. Intenta de nuevo.");
-                    console.error("Falla estructural en el guardado:", error);
+                    alert("Error en la conexión. Intenta de nuevo.");
                     botonGuardar.innerText = "INTENTAR DE NUEVO";
                     botonGuardar.disabled = false;
                 }
             });
         }
 
-        // 6. ANIMACIÓN DE CORAZONES
-        function crearExplosionCorazones(x, y) {
-            const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
-            for (let i = 0; i < 30; i++) {
-                const c = document.createElement('div');
-                c.className = 'corazon-particula';
-                c.innerHTML = '❤';
-                c.style.color = colores[Math.floor(Math.random() * colores.length)];
-                c.style.left = x + 'px'; c.style.top = y + 'px';
-                c.style.setProperty('--x', (Math.random() - 0.5) * 400 + 'px');
-                c.style.setProperty('--y', (Math.random() - 0.5) * 400 + 'px');
-                c.style.setProperty('--duracion', (Math.random() * 0.5 + 0.5) + 's');
-                document.body.appendChild(c);
-                setTimeout(() => c.remove(), 1200);
+        // 7. ELIMINAR RECUERDO
+        document.getElementById('btn-eliminar').addEventListener('click', async () => {
+            if(confirm("¿Estás seguro de demoler este recuerdo? 🗑️")) {
+                try {
+                    document.getElementById('btn-eliminar').innerText = "Eliminando...";
+                    await deleteDoc(doc(db, "recuerdos", idDocumentoActual));
+                    
+                    // Limpiar la memoria del teléfono
+                    let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+                    completadas = completadas.filter(item => item !== idx);
+                    localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
+
+                    alert("El recuerdo ha sido eliminado de la base de datos.");
+                    history.back();
+                } catch (error) {
+                    alert("No se pudo eliminar el registro.");
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
