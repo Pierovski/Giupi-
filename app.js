@@ -2,12 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAqTSfh1jANA3uAR7SNExOSXDmFJLS637U",
-  authDomain: "giupi-app.firebaseapp.com",
-  projectId: "giupi-630e4",
-  storageBucket: "giupi-app.firebasestorage.app",
-  messagingSenderId: "744722050677",
-  appId: "1:744722050677:web:2c9d14a75cd940f21c123c"
+  apiKey: "AIzaSyDPmqGx16QGTABPxZXnem1RCtJbBOMhRVo",
+  authDomain: "giupi-app-b4dcf.firebaseapp.com",
+  projectId: "giupi-app-b4dcf",
+  storageBucket: "giupi-app-b4dcf.firebasestorage.app",
+  messagingSenderId: "808595553543",
+  appId: "1:808595553543:web:e07d9b920cc6d3799599a2"
 };
 
 const app = initializeApp(firebaseConfig);

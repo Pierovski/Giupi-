@@ -1,5 +1,5 @@
 // sw.js - El motor de Giupi
-const CACHE_NAME = 'giupi-v1.2';
+const CACHE_NAME = 'giupi-v1.2.1';
 const assets = [
   '/',
   '/index.html',

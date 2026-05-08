@@ -4,10 +4,11 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebas
 
 const firebaseConfig = {
   apiKey: "AIzaSyDPmqGx16QGTABPxZXnem1RCtJbBOMhRVo",
-  projectId: "giupi-630e4",
-  storageBucket: "giupi-630e4.firebasestorage.app",
-  messagingSenderId: "1000387161",
-  appId: "1:1000387161:web:6513476f498c894235e165"
+  authDomain: "giupi-app-b4dcf.firebaseapp.com",
+  projectId: "giupi-app-b4dcf",
+  storageBucket: "giupi-app-b4dcf.firebasestorage.app",
+  messagingSenderId: "808595553543",
+  appId: "1:808595553543:web:e07d9b920cc6d3799599a2"
 };
 
 // Inicializamos Firebase
