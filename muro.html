@@ -296,5 +296,85 @@
             });
         });
     </script>
+        <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        async function revisarPendientes() {
+            try {
+                // Buscamos todos los recuerdos en la base de datos
+                const q = query(collection(db, "recuerdos"));
+                const querySnapshot = await getDocs(q);
+                let pendientes = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const datos = doc.data();
+                    
+                    // Verificamos el estado de las fotos
+                    const tieneFoto1 = datos.foto1 && datos.foto1 !== "";
+                    const tieneFoto2 = datos.foto2 && datos.foto2 !== "";
+                    
+                    // Si el documento tiene una foto, pero le falta la otra, es una tarea pendiente
+                    if ((tieneFoto1 && !tieneFoto2) || (!tieneFoto1 && tieneFoto2)) {
+                        pendientes++;
+                    }
+                });
+
+                // Si hay pendientes, mostramos el aviso visual
+                if (pendientes > 0) {
+                    mostrarNotificacionInApp(pendientes);
+                }
+            } catch (error) {
+                console.error("Error al buscar notificaciones:", error);
+            }
+        }
+
+        function mostrarNotificacionInApp(cantidad) {
+            const alerta = document.createElement('div');
+            const textoCita = cantidad === 1 ? "cita" : "citas";
+            
+            // Mensaje que aparecerá en pantalla
+            alerta.innerHTML = `🔔 <b>¡Atención!</b> Tienen ${cantidad} ${textoCita} esperando una foto para ser sellada por completo.`;
+            
+            // Estilos del banner (Diseño limpio y moderno)
+            Object.assign(alerta.style, {
+                background: "linear-gradient(135deg, #ef4444, #b91c1c)",
+                color: "#ffffff",
+                padding: "18px",
+                textAlign: "center",
+                fontSize: "0.95rem",
+                borderRadius: "0 0 20px 20px",
+                position: "fixed",
+                top: "0",
+                left: "0",
+                width: "100%",
+                zIndex: "1000",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
+                cursor: "pointer",
+                animation: "bajarAlerta 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+            });
+            
+            // Al tocar la alerta, se oculta hacia arriba
+            alerta.onclick = () => {
+                alerta.style.animation = "subirAlerta 0.4s ease-in forwards";
+                setTimeout(() => alerta.remove(), 400);
+            };
+
+            // Inyectamos las animaciones de movimiento al CSS
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes bajarAlerta { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+                @keyframes subirAlerta { from { transform: translateY(0); } to { transform: translateY(-100%); } }
+            `;
+            document.head.appendChild(style);
+            
+            // Colocamos la alerta en la pantalla
+            document.body.appendChild(alerta);
+        }
+
+        // Ejecutamos la función de inmediato al cargar el muro
+        revisarPendientes();
+    </script>
+
 </body>
 </html>

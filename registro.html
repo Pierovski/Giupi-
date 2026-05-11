@@ -100,8 +100,8 @@
     </div>
 
     <script type="module">
-        import { db } from './firebase-config.js';
-        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+                import { db } from './firebase-config.js';
+        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const misionActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
         const cat = localStorage.getItem('misionCategoria');
@@ -124,7 +124,6 @@
         }
         document.querySelector('.iconos-top').innerText = obtenerIconoContextual(misionActual);
 
-        // MOTOR OPTIMIZADO CORREGIDO (Sin limpieza agresiva que rompía la imagen)
         function comprimirImagen(archivo) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -154,7 +153,7 @@
             });
         }
 
-        // LECTURA DE DATOS
+        // LECTURA DE DATOS: AHORA VERIFICA CUÁNTAS FOTOS HAY
         async function verificarRecuerdo() {
             if (!cat || isNaN(idx)) return;
             try {
@@ -167,37 +166,45 @@
                     idDocumentoActual = docRef.id;
 
                     document.getElementById('input-fecha').value = datos.fechaTexto || "";
-                    document.getElementById('input-fecha').readOnly = true;
                     document.getElementById('input-lugar').value = datos.lugar || "";
-                    document.getElementById('input-lugar').readOnly = true;
                     document.getElementById('input-nota').value = datos.nota || "";
-                    document.getElementById('input-nota').readOnly = true;
 
                     const marco1 = document.getElementById('marco-1');
                     const marco2 = document.getElementById('marco-2');
                     
-                    marco1.onclick = null; 
-                    marco2.onclick = null;
+                    let fotosCompletas = 0;
 
-                    if (datos.foto1) {
+                    if (datos.foto1 && datos.foto1 !== "") {
                         const img1 = document.getElementById('prev-foto1');
                         img1.src = datos.foto1;
                         img1.style.opacity = '1';
                         document.getElementById('txt-foto1').style.display = 'none';
-                        marco1.onclick = () => abrirVisor(datos.foto1);
+                        marco1.onclick = () => abrirVisor(datos.foto1); // Cambia a solo visor
+                        fotosCompletas++;
                     }
-                    if (datos.foto2) {
+                    if (datos.foto2 && datos.foto2 !== "") {
                         const img2 = document.getElementById('prev-foto2');
                         img2.src = datos.foto2;
                         img2.style.opacity = '1';
                         document.getElementById('txt-foto2').style.display = 'none';
-                        marco2.onclick = () => abrirVisor(datos.foto2);
+                        marco2.onclick = () => abrirVisor(datos.foto2); // Cambia a solo visor
+                        fotosCompletas++;
                     }
 
                     const btnGuardar = document.getElementById('btn-submit');
-                    btnGuardar.innerText = "RECUERDO SELLADO ✨";
-                    btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
-                    btnGuardar.disabled = true;
+                    
+                    // Si ya están las dos fotos, bloqueamos todo para evitar sobreescritura accidental
+                    if (fotosCompletas === 2) {
+                        document.getElementById('input-fecha').readOnly = true;
+                        document.getElementById('input-lugar').readOnly = true;
+                        document.getElementById('input-nota').readOnly = true;
+                        btnGuardar.innerText = "RECUERDO SELLADO ✨";
+                        btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
+                        btnGuardar.disabled = true;
+                    } else {
+                        // Si falta una foto, permitimos que el otro la suba
+                        btnGuardar.innerText = "ACTUALIZAR RECUERDO ✍️";
+                    }
                     
                     document.getElementById('btn-eliminar').style.display = 'block';
                 }
@@ -212,7 +219,6 @@
             document.getElementById('visor').style.display = 'flex';
         }
 
-        // PREVISUALIZAR FOTOS CORREGIDO
         function configurarInputFoto(inputId, prevId, txtId, numFoto) {
             const input = document.getElementById(inputId);
             if(input) {
@@ -233,7 +239,6 @@
         configurarInputFoto('input-foto1', 'prev-foto1', 'txt-foto1', 1);
         configurarInputFoto('input-foto2', 'prev-foto2', 'txt-foto2', 2);
 
-        // SUBIDA
         const IMGBB_API_KEY = '055cde6238b2cefe13e31dc43f2b2570';
         async function subirFotoAImgBB(blob) {
             if (!blob) return null;
@@ -246,7 +251,7 @@
             } catch (error) { return null; }
         }
 
-        // GUARDAR RECUERDO
+        // GUARDAR O ACTUALIZAR RECUERDO
         const botonGuardar = document.getElementById('btn-submit');
         if(botonGuardar) {
             botonGuardar.addEventListener('click', async (evento) => {
@@ -259,26 +264,44 @@
                     const blob2 = archivoFoto2 ? await comprimirImagen(archivoFoto2) : null;
 
                     botonGuardar.innerText = "SUBIENDO FOTOS... 🚀";
-                    const urlFoto1 = await subirFotoAImgBB(blob1);
-                    const urlFoto2 = await subirFotoAImgBB(blob2);
+                    const urlFoto1 = blob1 ? await subirFotoAImgBB(blob1) : null;
+                    const urlFoto2 = blob2 ? await subirFotoAImgBB(blob2) : null;
 
-                    botonGuardar.innerText = "SELLANDO EN FIREBASE... 🔐";
-                    const nota = document.getElementById('input-nota').value; 
+                    botonGuardar.innerText = idDocumentoActual ? "ACTUALIZANDO EN FIREBASE... 🔄" : "SELLANDO EN FIREBASE... 🔐";
+                    
+                    const notaF = document.getElementById('input-nota').value; 
                     const fechaF = document.getElementById('input-fecha').value;
                     const lugarF = document.getElementById('input-lugar').value;
 
-                    await addDoc(collection(db, "recuerdos"), {
-                        categoria: cat, citaNumero: idx, mision: misionActual,
-                        nota: nota, fechaTexto: fechaF, lugar: lugarF,
-                        foto1: urlFoto1 || "", foto2: urlFoto2 || "",
-                        fecha: serverTimestamp() 
-                    });
+                    if (idDocumentoActual) {
+                        // ACTUALIZAR DOCUMENTO EXISTENTE
+                        const docRefToUpdate = doc(db, "recuerdos", idDocumentoActual);
+                        const dataToUpdate = {
+                            nota: notaF,
+                            fechaTexto: fechaF,
+                            lugar: lugarF
+                        };
+                        
+                        // Solo agregamos la URL si se subió una nueva foto en esta acción
+                        if (urlFoto1) dataToUpdate.foto1 = urlFoto1;
+                        if (urlFoto2) dataToUpdate.foto2 = urlFoto2;
 
-                    if (cat && !isNaN(idx)) {
-                        let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
-                        if (!completadas.includes(idx)) {
-                            completadas.push(idx);
-                            localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
+                        await updateDoc(docRefToUpdate, dataToUpdate);
+                    } else {
+                        // CREAR NUEVO DOCUMENTO
+                        await addDoc(collection(db, "recuerdos"), {
+                            categoria: cat, citaNumero: idx, mision: misionActual,
+                            nota: notaF, fechaTexto: fechaF, lugar: lugarF,
+                            foto1: urlFoto1 || "", foto2: urlFoto2 || "",
+                            fecha: serverTimestamp() 
+                        });
+
+                        if (cat && !isNaN(idx)) {
+                            let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+                            if (!completadas.includes(idx)) {
+                                completadas.push(idx);
+                                localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
+                            }
                         }
                     }
 
@@ -307,7 +330,7 @@
                     setTimeout(() => history.back(), 2000);
                 } catch (error) {
                     alert("Error en la conexión. Intenta de nuevo.");
-                    botonGuardar.innerText = "INTENTAR DE NUEVO";
+                    botonGuardar.innerText = idDocumentoActual ? "ACTUALIZAR RECUERDO ✍️" : "INTENTAR DE NUEVO";
                     botonGuardar.disabled = false;
                 }
             });
@@ -331,6 +354,7 @@
                 }
             }
         });
+
     </script>
 </body>
 </html>
