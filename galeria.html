@@ -71,10 +71,8 @@
            REGLAS EXCLUSIVAS PARA EXPORTAR A PDF
            ========================================= */
         .modo-exportacion {
-            width: 800px !important;
-            max-width: 800px !important;
-            margin: 0 auto !important;
-            padding: 20px !important;
+            min-width: 800px !important; /* Forzamos proporciones de PC pero dejamos que html2pdf lo escale */
+            padding: 30px !important;
             background-color: #020617 !important;
         }
 
@@ -86,11 +84,9 @@
         .modo-exportacion .lugar-txt { color: #94a3b8 !important; }
         .modo-exportacion .polaroid-mini { background: #ffffff !important; border: 1px solid #cbd5e1 !important; }
         
-        /* Aseguramos que la imagen se vea en el PDF al 100% */
         .modo-exportacion .polaroid-mini img { opacity: 1 !important; display: block !important; }
         .modo-exportacion .skeleton { display: none !important; }
         
-        /* Evita que las tarjetas se corten a la mitad en el salto de página */
         .modo-exportacion > div,
         .modo-exportacion .tarjeta-cita,
         .modo-exportacion .hito-timeline,
@@ -155,7 +151,6 @@
                         const idRandom1 = 'img-' + Math.random().toString(36).substr(2, 5);
                         const idRandom2 = 'img-' + Math.random().toString(36).substr(2, 5);
 
-                        // crossorigin='anonymous' es vital para que html2pdf no bloquee las fotos
                         if (datos.foto1) {
                             htmlFotos += `
                                 <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')">
@@ -206,7 +201,7 @@
             document.getElementById('visor-g').style.display = 'flex';
         };
 
-        // LÓGICA DE EXPORTACIÓN DEFINITIVA
+        // LÓGICA DE EXPORTACIÓN CORREGIDA
         document.getElementById('btn-exportar').addEventListener('click', function() {
             const btn = this;
             
@@ -217,58 +212,39 @@
 
             btn.innerText = "Generando PDF...";
             btn.style.pointerEvents = "none";
+            
             document.getElementById('cabecera-pdf').style.display = 'block';
             
             const elementoAImprimir = document.getElementById('area-impresion');
-            elementoAImprimir.classList.add('modo-exportacion');
-            
-            // 1. Guardamos configuraciones originales de la pantalla
-            const overflowOriginal = document.body.style.overflowX;
-            const widthOriginal = elementoAImprimir.style.width;
-            const maxWidthOriginal = elementoAImprimir.style.maxWidth;
-            
-            // 2. Simulamos ancho de PC para evitar que el PDF salga aplastado
-            document.body.style.overflowX = 'visible'; 
-            elementoAImprimir.style.width = '800px';
-            elementoAImprimir.style.maxWidth = '800px';
+            elementoAImprimir.classList.add('modo-exportacion'); // Solo inyectamos la clase, nada de trucos raros con el body
 
             const opciones = {
-                margin:       [15, 0, 15, 0], 
+                margin:       10, // Margen uniforme y normal
                 filename:     'Nuestro_Libro_Giupi.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
-                    useCORS: true,           // Permite importar fotos externas
-                    allowTaint: false,
-                    backgroundColor: '#020617',
-                    windowWidth: 800,        // Mantiene la proporción de PC
-                    width: 800,
-                    imageTimeout: 15000      // Da tiempo suficiente para cargar imágenes pesadas
+                    useCORS: true,
+                    windowWidth: 800 // Simula una ventana de escritorio de 800px para que encaje la clase min-width
                 }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 3. Pausa de medio segundo para que el navegador "respire" y asiente el CSS antes de la foto
             setTimeout(() => {
                 html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
                     restaurarVista();
                 }).catch(error => {
                     console.error("Error PDF:", error);
-                    alert("Hubo un problema al generar el libro. Revisa tu conexión a internet.");
+                    alert("Hubo un problema al generar el libro.");
                     restaurarVista();
                 });
             }, 600);
             
-            // 4. Función para regresar el celular a la normalidad
             function restaurarVista() {
                 btn.innerText = "PDF 📖";
                 btn.style.pointerEvents = "auto";
                 document.getElementById('cabecera-pdf').style.display = 'none';
                 elementoAImprimir.classList.remove('modo-exportacion');
-                
-                document.body.style.overflowX = overflowOriginal;
-                elementoAImprimir.style.width = widthOriginal;
-                elementoAImprimir.style.maxWidth = maxWidthOriginal;
             }
         });
 
