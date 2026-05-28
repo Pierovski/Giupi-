@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Nuestra Línea de Tiempo</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 60px; color: #f1f5f9; overflow-x: hidden; }
@@ -18,14 +17,6 @@
         }
         .btn-volver { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; text-decoration: none; }
         .titulo-header { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #00d2ff; margin: 0; }
-
-        .btn-exportar {
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white;
-            border: none; padding: 10px 15px; border-radius: 20px;
-            font-size: 0.8rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
-            transition: transform 0.2s;
-        }
-        .btn-exportar:active { transform: scale(0.95); }
 
         .contenedor-timeline { padding: 20px; display: flex; flex-direction: column; gap: 35px; position: relative; }
         .contenedor-timeline::before { content: ''; position: absolute; left: 30px; top: 40px; bottom: 20px; width: 2px; background: linear-gradient(to bottom, #00d2ff, #fbbf24, rgba(255,255,255,0.05)); opacity: 0.3; }
@@ -55,7 +46,7 @@
             position: relative; transition: transform 0.2s;
         }
         .polaroid-mini:active { transform: scale(0.95); }
-        .polaroid-mini img { width: 100%; height: 100%; object-fit: cover; border: 1px solid #cbd5e1; transition: opacity 0.3s; }
+        .polaroid-mini img { width: 100%; height: 100%; object-fit: cover; border: 1px solid #cbd5e1; }
         
         .nota-txt { font-family: 'Dancing Script', cursive; font-size: 1.3rem; color: #00d2ff; margin: 8px 0 0 0; line-height: 1.2; white-space: pre-line; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px; }
 
@@ -66,35 +57,6 @@
         .img-visor { max-width: 95%; max-height: 85%; border-radius: 8px; border: 2px solid #fbbf24; }
         
         .estado-vacio { text-align: center; padding: 60px 20px; color: #64748b; font-weight: 600; font-size: 0.9rem; }
-
-        /* =========================================
-           REGLAS EXCLUSIVAS PARA EXPORTAR A PDF
-           ========================================= */
-        .modo-exportacion {
-            min-width: 800px !important; /* Forzamos proporciones de PC pero dejamos que html2pdf lo escale */
-            padding: 30px !important;
-            background-color: #020617 !important;
-        }
-
-        .modo-exportacion * { box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-        .modo-exportacion .tarjeta-recuerdo { background-color: #0f172a !important; border: 1px solid #334155 !important; }
-        .modo-exportacion .mision-titulo { color: #f8fafc !important; }
-        .modo-exportacion .nota-txt { color: #00d2ff !important; }
-        .modo-exportacion .fecha-txt { color: #fbbf24 !important; }
-        .modo-exportacion .lugar-txt { color: #94a3b8 !important; }
-        .modo-exportacion .polaroid-mini { background: #ffffff !important; border: 1px solid #cbd5e1 !important; }
-        
-        .modo-exportacion .polaroid-mini img { opacity: 1 !important; display: block !important; }
-        .modo-exportacion .skeleton { display: none !important; }
-        
-        .modo-exportacion > div,
-        .modo-exportacion .tarjeta-cita,
-        .modo-exportacion .hito-timeline,
-        .modo-exportacion img {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            margin-bottom: 15px !important;
-        }
     </style>
 </head>
 <body>
@@ -102,22 +64,14 @@
     <header class="header-galeria">
         <a href="muro.html" class="btn-volver">←</a>
         <h1 class="titulo-header">Nuestra Historia</h1>
-        <button id="btn-exportar" class="btn-exportar">PDF 📖</button>
-    </header>
+        <div></div> </header>
 
-    <div id="area-impresion">
-        <div id="cabecera-pdf" style="display: none; text-align: center; padding: 20px; font-family: 'Dancing Script', cursive; font-size: 2rem; color: #fbbf24;">Nuestro Libro de Recuerdos ✨</div>
-        <main class="contenedor-timeline" id="timeline-principal">
-            <div class="hito-timeline" id="load-skeleton-1" style="opacity: 1; transform:none;">
-                <div class="burbuja-fecha"></div>
-                <div class="tarjeta-recuerdo skeleton" style="height: 180px;"></div>
-            </div>
-            <div class="hito-timeline" id="load-skeleton-2" style="opacity: 1; transform:none;">
-                <div class="burbuja-fecha"></div>
-                <div class="tarjeta-recuerdo skeleton" style="height: 180px;"></div>
-            </div>
-        </main>
-    </div>
+    <main class="contenedor-timeline" id="timeline-principal">
+        <div class="hito-timeline" id="load-skeleton-1" style="opacity: 1; transform:none;">
+            <div class="burbuja-fecha"></div>
+            <div class="tarjeta-recuerdo skeleton" style="height: 180px;"></div>
+        </div>
+    </main>
 
     <div class="visor-galeria" id="visor-g" onclick="this.style.display='none'">
         <img src="" class="img-visor" id="img-v">
@@ -148,24 +102,12 @@
                     
                     if (datos.foto1 || datos.foto2) {
                         let htmlFotos = "";
-                        const idRandom1 = 'img-' + Math.random().toString(36).substr(2, 5);
-                        const idRandom2 = 'img-' + Math.random().toString(36).substr(2, 5);
-
+                        
                         if (datos.foto1) {
-                            htmlFotos += `
-                                <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')">
-                                    <div class="skeleton" id="sk-${idRandom1}" style="position:absolute; width:100%; height:100%; top:0; left:0;"></div>
-                                    <img src="${datos.foto1}" crossorigin="anonymous" onload="document.getElementById('sk-${idRandom1}').style.display='none'">
-                                </div>
-                            `;
+                            htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')"><img src="${datos.foto1}"></div>`;
                         }
                         if (datos.foto2) {
-                            htmlFotos += `
-                                <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto2}')" style="transform: rotate(3deg);">
-                                    <div class="skeleton" id="sk-${idRandom2}" style="position:absolute; width:100%; height:100%; top:0; left:0;"></div>
-                                    <img src="${datos.foto2}" crossorigin="anonymous" onload="document.getElementById('sk-${idRandom2}').style.display='none'">
-                                </div>
-                            `;
+                            htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto2}')" style="transform: rotate(3deg);"><img src="${datos.foto2}"></div>`;
                         }
 
                         contenedor.innerHTML += `
@@ -200,53 +142,6 @@
             document.getElementById('img-v').src = url;
             document.getElementById('visor-g').style.display = 'flex';
         };
-
-        // LÓGICA DE EXPORTACIÓN CORREGIDA
-        document.getElementById('btn-exportar').addEventListener('click', function() {
-            const btn = this;
-            
-            if(contenedor.querySelector('.estado-vacio')) {
-                alert("Necesitan guardar recuerdos fotográficos primero para imprimir su libro. 📖");
-                return;
-            }
-
-            btn.innerText = "Generando PDF...";
-            btn.style.pointerEvents = "none";
-            
-            document.getElementById('cabecera-pdf').style.display = 'block';
-            
-            const elementoAImprimir = document.getElementById('area-impresion');
-            elementoAImprimir.classList.add('modo-exportacion'); // Solo inyectamos la clase, nada de trucos raros con el body
-
-            const opciones = {
-                margin:       10, // Margen uniforme y normal
-                filename:     'Nuestro_Libro_Giupi.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true,
-                    windowWidth: 800 // Simula una ventana de escritorio de 800px para que encaje la clase min-width
-                }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            setTimeout(() => {
-                html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
-                    restaurarVista();
-                }).catch(error => {
-                    console.error("Error PDF:", error);
-                    alert("Hubo un problema al generar el libro.");
-                    restaurarVista();
-                });
-            }, 600);
-            
-            function restaurarVista() {
-                btn.innerText = "PDF 📖";
-                btn.style.pointerEvents = "auto";
-                document.getElementById('cabecera-pdf').style.display = 'none';
-                elementoAImprimir.classList.remove('modo-exportacion');
-            }
-        });
 
         cargarLineaTiempo();
     </script>
