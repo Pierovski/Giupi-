@@ -30,7 +30,7 @@
         .contenedor-timeline { padding: 20px; display: flex; flex-direction: column; gap: 35px; position: relative; }
         .contenedor-timeline::before { content: ''; position: absolute; left: 30px; top: 40px; bottom: 20px; width: 2px; background: linear-gradient(to bottom, #00d2ff, #fbbf24, rgba(255,255,255,0.05)); opacity: 0.3; }
 
-        .hito-timeline { display: flex; gap: 20px; position: relative; animation: tarjetaEntrada 0.5s ease-out forwards; opacity: 0; transform: translateY(20px); page-break-inside: avoid; }
+        .hito-timeline { display: flex; gap: 20px; position: relative; animation: tarjetaEntrada 0.5s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes tarjetaEntrada { to { opacity: 1; transform: translateY(0); } }
 
         .burbuja-fecha { min-width: 22px; height: 22px; background: #00d2ff; border-radius: 50%; border: 4px solid #020617; box-shadow: 0 0 10px #00d2ff; margin-top: 5px; z-index: 5; }
@@ -67,22 +67,10 @@
         
         .estado-vacio { text-align: center; padding: 60px 20px; color: #64748b; font-weight: 600; font-size: 0.9rem; }
 
-        /* REGLAS ESTRICTAS PARA PDF: Apaga transparencias y fuerza contraste */
-        .modo-exportacion { background-color: #020617 !important; }
-        .modo-exportacion * { box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-        .modo-exportacion .tarjeta-recuerdo { background-color: #0f172a !important; border: 1px solid #334155 !important; }
-        .modo-exportacion .mision-titulo { color: #f8fafc !important; }
-        .modo-exportacion .nota-txt { color: #00d2ff !important; }
-        .modo-exportacion .fecha-txt { color: #fbbf24 !important; }
-        .modo-exportacion .lugar-txt { color: #94a3b8 !important; }
-        .modo-exportacion .polaroid-mini { background: #ffffff !important; border: 1px solid #cbd5e1 !important; }
-        .modo-exportacion .polaroid-mini img { opacity: 1 !important; display: block !important; }
-        .modo-exportacion .skeleton { display: none !important; }
-                /* =========================================
+        /* =========================================
            REGLAS EXCLUSIVAS PARA EXPORTAR A PDF
            ========================================= */
         .modo-exportacion {
-            /* Forzamos un ancho de escritorio para que el A4 lo tome bien y no se vea aplastado */
             width: 800px !important;
             max-width: 800px !important;
             margin: 0 auto !important;
@@ -90,9 +78,22 @@
             background-color: #020617 !important;
         }
 
-        /* Evita que los recuerdos o tarjetas se corten a la mitad en el salto de página */
+        .modo-exportacion * { box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        .modo-exportacion .tarjeta-recuerdo { background-color: #0f172a !important; border: 1px solid #334155 !important; }
+        .modo-exportacion .mision-titulo { color: #f8fafc !important; }
+        .modo-exportacion .nota-txt { color: #00d2ff !important; }
+        .modo-exportacion .fecha-txt { color: #fbbf24 !important; }
+        .modo-exportacion .lugar-txt { color: #94a3b8 !important; }
+        .modo-exportacion .polaroid-mini { background: #ffffff !important; border: 1px solid #cbd5e1 !important; }
+        
+        /* Aseguramos que la imagen se vea en el PDF al 100% */
+        .modo-exportacion .polaroid-mini img { opacity: 1 !important; display: block !important; }
+        .modo-exportacion .skeleton { display: none !important; }
+        
+        /* Evita que las tarjetas se corten a la mitad en el salto de página */
         .modo-exportacion > div,
         .modo-exportacion .tarjeta-cita,
+        .modo-exportacion .hito-timeline,
         .modo-exportacion img {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
@@ -154,6 +155,7 @@
                         const idRandom1 = 'img-' + Math.random().toString(36).substr(2, 5);
                         const idRandom2 = 'img-' + Math.random().toString(36).substr(2, 5);
 
+                        // crossorigin='anonymous' es vital para que html2pdf no bloquee las fotos
                         if (datos.foto1) {
                             htmlFotos += `
                                 <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')">
@@ -204,24 +206,28 @@
             document.getElementById('visor-g').style.display = 'flex';
         };
 
-        // LÓGICA DE EXPORTACIÓN A PDF CORREGIDA
-   
+        // LÓGICA DE EXPORTACIÓN DEFINITIVA
         document.getElementById('btn-exportar').addEventListener('click', function() {
             const btn = this;
-            btn.innerText = "Generando...";
-            btn.style.pointerEvents = "none";
             
-            document.getElementById('cabecera-pdf').style.display = 'block';
+            if(contenedor.querySelector('.estado-vacio')) {
+                alert("Necesitan guardar recuerdos fotográficos primero para imprimir su libro. 📖");
+                return;
+            }
 
-            const elementoAImprimir = document.getElementById('area-impresion');
+            btn.innerText = "Generando PDF...";
+            btn.style.pointerEvents = "none";
+            document.getElementById('cabecera-pdf').style.display = 'block';
             
-            // --- EL TRUCO PARA MÓVILES ---
-            // Guardamos el estado original para no romper la app después
+            const elementoAImprimir = document.getElementById('area-impresion');
+            elementoAImprimir.classList.add('modo-exportacion');
+            
+            // 1. Guardamos configuraciones originales de la pantalla
             const overflowOriginal = document.body.style.overflowX;
             const widthOriginal = elementoAImprimir.style.width;
             const maxWidthOriginal = elementoAImprimir.style.maxWidth;
             
-            // Liberamos los límites de la pantalla móvil y forzamos el ancho de PC
+            // 2. Simulamos ancho de PC para evitar que el PDF salga aplastado
             document.body.style.overflowX = 'visible'; 
             elementoAImprimir.style.width = '800px';
             elementoAImprimir.style.maxWidth = '800px';
@@ -232,52 +238,38 @@
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
-                    useCORS: true, 
+                    useCORS: true,           // Permite importar fotos externas
+                    allowTaint: false,
                     backgroundColor: '#020617',
-                    windowWidth: 800, // Le dice a la librería que asuma una pantalla de PC
-                    width: 800        // Fuerza el recorte exacto sin aplastar
+                    windowWidth: 800,        // Mantiene la proporción de PC
+                    width: 800,
+                    imageTimeout: 15000      // Da tiempo suficiente para cargar imágenes pesadas
                 }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Generamos el PDF
-            html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
-                // Restauramos la vista móvil a la normalidad
+            // 3. Pausa de medio segundo para que el navegador "respire" y asiente el CSS antes de la foto
+            setTimeout(() => {
+                html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
+                    restaurarVista();
+                }).catch(error => {
+                    console.error("Error PDF:", error);
+                    alert("Hubo un problema al generar el libro. Revisa tu conexión a internet.");
+                    restaurarVista();
+                });
+            }, 600);
+            
+            // 4. Función para regresar el celular a la normalidad
+            function restaurarVista() {
                 btn.innerText = "PDF 📖";
                 btn.style.pointerEvents = "auto";
                 document.getElementById('cabecera-pdf').style.display = 'none';
+                elementoAImprimir.classList.remove('modo-exportacion');
                 
                 document.body.style.overflowX = overflowOriginal;
                 elementoAImprimir.style.width = widthOriginal;
                 elementoAImprimir.style.maxWidth = maxWidthOriginal;
-            }).catch(error => {
-                console.error("Error PDF:", error);
-                alert("Hubo un problema al generar el libro.");
-                
-                // Restauramos también en caso de error
-                btn.innerText = "PDF 📖";
-                btn.style.pointerEvents = "auto";
-                document.getElementById('cabecera-pdf').style.display = 'none';
-                
-                document.body.style.overflowX = overflowOriginal;
-                elementoAImprimir.style.width = widthOriginal;
-                elementoAImprimir.style.maxWidth = maxWidthOriginal;
-            });
-        });
-
-            html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
-                btn.innerText = "PDF 📖";
-                btn.style.pointerEvents = "auto";
-                document.getElementById('cabecera-pdf').style.display = 'none';
-                document.getElementById('area-impresion').classList.remove('modo-exportacion');
-            }).catch(error => {
-                console.error("Error PDF:", error);
-                alert("Hubo un problema al generar el libro.");
-                btn.innerText = "PDF 📖";
-                btn.style.pointerEvents = "auto";
-                document.getElementById('cabecera-pdf').style.display = 'none';
-                document.getElementById('area-impresion').classList.remove('modo-exportacion');
-            });
+            }
         });
 
         cargarLineaTiempo();
