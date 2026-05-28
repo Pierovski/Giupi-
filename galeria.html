@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Giupi - Nuestra Línea de Tiempo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght=700&family=Poppins:wght=400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 60px; color: #f1f5f9; overflow-x: hidden; }
+
+        .header-galeria { 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 20px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .btn-volver { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; text-decoration: none; }
+        .titulo-header { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #00d2ff; margin: 0; }
+
+        /* Estilo del botón de Exportar */
+        .btn-exportar {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white;
+            border: none; padding: 10px 15px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-exportar:active { transform: scale(0.95); }
+
+        .contenedor-timeline { padding: 20px; display: flex; flex-direction: column; gap: 35px; position: relative; }
+        .contenedor-timeline::before { content: ''; position: absolute; left: 30px; top: 40px; bottom: 20px; width: 2px; background: linear-gradient(to bottom, #00d2ff, #fbbf24, rgba(255,255,255,0.05)); opacity: 0.3; }
+
+        .hito-timeline { display: flex; gap: 20px; position: relative; animation: tarjetaEntrada 0.5s ease-out forwards; opacity: 0; transform: translateY(20px); page-break-inside: avoid; }
+        @keyframes tarjetaEntrada { to { opacity: 1; transform: translateY(0); } }
+
+        .burbuja-fecha { min-width: 22px; height: 22px; background: #00d2ff; border-radius: 50%; border: 4px solid #020617; box-shadow: 0 0 10px #00d2ff; margin-top: 5px; z-index: 5; }
+        .hito-timeline:nth-child(even) .burbuja-fecha { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+
+        .tarjeta-recuerdo { 
+            flex-grow: 1; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .meta-recuerdo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .fecha-txt { font-size: 0.8rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px; }
+        .lugar-txt { font-size: 0.75rem; color: #94a3b8; font-weight: 600; }
+        
+        .mision-titulo { font-size: 0.95rem; font-weight: 600; color: #f1f5f9; margin: 0 0 12px 0; line-height: 1.3; }
+
+        .galeria-fotos { display: flex; gap: 15px; justify-content: flex-start; margin: 15px 0; height: 150px; }
+        .polaroid-mini { 
+            background: #f8fafc; padding: 6px 6px 18px 6px; width: 110px; height: 140px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4); border-radius: 2px; cursor: pointer;
+            position: relative; transition: transform 0.2s;
+        }
+        .polaroid-mini:active { transform: scale(0.95); }
+        .polaroid-mini img { width: 100%; height: 100%; object-fit: cover; border: 1px solid #cbd5e1; transition: opacity 0.3s; }
+        
+        .nota-txt { font-family: 'Dancing Script', cursive; font-size: 1.3rem; color: #00d2ff; margin: 8px 0 0 0; line-height: 1.2; white-space: pre-line; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 10px; }
+
+        .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 200% 100%; animation: cargaEsqueleto 1.5s infinite linear; border: none !important; }
+        @keyframes cargaEsqueleto { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .visor-galeria { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; cursor: pointer; }
+        .img-visor { max-width: 95%; max-height: 85%; border-radius: 8px; border: 2px solid #fbbf24; }
+        
+        .estado-vacio { text-align: center; padding: 60px 20px; color: #64748b; font-weight: 600; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header class="header-galeria">
+        <a href="muro.html" class="btn-volver">←</a>
+        <h1 class="titulo-header">Nuestra Historia</h1>
+        <button id="btn-exportar" class="btn-exportar">PDF 📖</button>
+    </header>
+
+    <div id="area-impresion">
+        <div id="cabecera-pdf" style="display: none; text-align: center; padding: 20px; font-family: 'Dancing Script', cursive; font-size: 2rem; color: #fbbf24;">Nuestro Libro de Recuerdos ✨</div>
+        <main class="contenedor-timeline" id="timeline-principal">
+            <div class="hito-timeline" id="load-skeleton-1" style="opacity: 1; transform:none;">
+                <div class="burbuja-fecha"></div>
+                <div class="tarjeta-recuerdo skeleton" style="height: 180px;"></div>
+            </div>
+            <div class="hito-timeline" id="load-skeleton-2" style="opacity: 1; transform:none;">
+                <div class="burbuja-fecha"></div>
+                <div class="tarjeta-recuerdo skeleton" style="height: 180px;"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="visor-galeria" id="visor-g" onclick="this.style.display='none'">
+        <img src="" class="img-visor" id="img-v">
+    </div>
+
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const contenedor = document.getElementById('timeline-principal');
+
+        async function cargarLineaTiempo() {
+            try {
+                const q = query(collection(db, "recuerdos"), orderBy("fecha", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                contenedor.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    contenedor.innerHTML = `<div class="estado-vacio">✨ Tu álbum está listo para ser llenado.<br>¡Añadan su primera foto juntos! 🤍</div>`;
+                    return;
+                }
+
+                let retrasoAnimacion = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const datos = doc.data();
+                    
+                    if (datos.foto1 || datos.foto2) {
+                        let htmlFotos = "";
+                        const idRandom1 = 'img-' + Math.random().toString(36).substr(2, 5);
+                        const idRandom2 = 'img-' + Math.random().toString(36).substr(2, 5);
+
+                        // Es importante colocar crossorigin="anonymous" en las imágenes para que el generador PDF no bloquee por CORS
+                        if (datos.foto1) {
+                            htmlFotos += `
+                                <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')">
+                                    <div class="skeleton" id="sk-${idRandom1}" style="position:absolute; width:100%; height:100%; top:0; left:0;"></div>
+                                    <img src="${datos.foto1}" crossorigin="anonymous" onload="document.getElementById('sk-${idRandom1}').style.display='none'">
+                                </div>
+                            `;
+                        }
+                        if (datos.foto2) {
+                            htmlFotos += `
+                                <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto2}')" style="transform: rotate(3deg);">
+                                    <div class="skeleton" id="sk-${idRandom2}" style="position:absolute; width:100%; height:100%; top:0; left:0;"></div>
+                                    <img src="${datos.foto2}" crossorigin="anonymous" onload="document.getElementById('sk-${idRandom2}').style.display='none'">
+                                </div>
+                            `;
+                        }
+
+                        contenedor.innerHTML += `
+                            <div class="hito-timeline" style="animation-delay: ${retrasoAnimacion}s">
+                                <div class="burbuja-fecha"></div>
+                                <div class="tarjeta-recuerdo">
+                                    <div class="meta-recuerdo">
+                                        <span class="fecha-txt">🗓️ ${datos.fechaTexto || 'Fecha mágica'}</span>
+                                        <span class="lugar-txt">📍 ${datos.lugar || 'En algún lugar'}</span>
+                                    </div>
+                                    <h3 class="mision-titulo">${datos.misiones || datos.mision || 'Cita Lograda'}</h3>
+                                    <div class="galeria-fotos">${htmlFotos}</div>
+                                    <p class="nota-txt">${datos.nota || ''}</p>
+                                </div>
+                            </div>
+                        `;
+                        retrasoAnimacion += 0.15; 
+                    }
+                });
+
+                if(contenedor.innerHTML === "") {
+                    contenedor.innerHTML = `<div class="estado-vacio">✨ Aún no hay recuerdos con imágenes para mostrar aquí.</div>`;
+                }
+
+            } catch (error) {
+                console.error("Error cargando galería:", error);
+                contenedor.innerHTML = `<div class="estado-vacio">❌ Ocurrió un error al conectar con Firebase.</div>`;
+            }
+        }
+
+        window.ampliarFoto = function(url) {
+            document.getElementById('img-v').src = url;
+            document.getElementById('visor-g').style.display = 'flex';
+        };
+
+        // LÓGICA DE EXPORTACIÓN A PDF
+        document.getElementById('btn-exportar').addEventListener('click', () => {
+            const btn = document.getElementById('btn-exportar');
+            
+            // Si el contenedor está vacío o en estado error, no exportar
+            if(contenedor.querySelector('.estado-vacio')) {
+                alert("Necesitan guardar recuerdos fotográficos primero para imprimir su libro. 📖");
+                return;
+            }
+
+            btn.innerText = "⏳ Generando...";
+            btn.style.pointerEvents = "none";
+            document.getElementById('cabecera-pdf').style.display = 'block';
+
+            const elementoAImprimir = document.getElementById('area-impresion');
+            
+            // Configuramos html2pdf
+            const opciones = {
+                margin:       10,
+                filename:     'Nuestro_Libro_Giupi.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617' }, // useCORS true permite bajar de ImgBB
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
+                btn.innerText = "PDF 📖";
+                btn.style.pointerEvents = "auto";
+                document.getElementById('cabecera-pdf').style.display = 'none';
+            }).catch(error => {
+                console.error("Error PDF:", error);
+                alert("Hubo un problema al generar el libro.");
+                btn.innerText = "PDF 📖";
+                btn.style.pointerEvents = "auto";
+                document.getElementById('cabecera-pdf').style.display = 'none';
+            });
+        });
+
+        cargarLineaTiempo();
+    </script>
+</body>
+</html>

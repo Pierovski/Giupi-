@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Sellar Misión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght=700&family=Poppins:wght=400;600&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 50px; color: #f1f5f9; overflow-x: hidden; }
@@ -18,28 +18,54 @@
         .iconos-top { font-size: 1.5rem; letter-spacing: 5px; opacity: 0.8; }
 
         .zona-fotos { display: flex; justify-content: center; position: relative; height: 260px; margin-top: 10px; }
-        .marco-foto { background: #f8fafc; padding: 10px 10px 30px 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; transition: transform 0.3s; }
-        .marco-foto:active { transform: scale(0.95) !important; }
-        .foto-1 { width: 160px; height: 200px; transform: rotate(-8deg); left: 10px; top: 20px; z-index: 1; border: 1px solid #cbd5e1; }
-        .foto-2 { width: 180px; height: 220px; transform: rotate(4deg); right: 10px; top: 0; z-index: 2; border: 1px solid #fbbf24; }
-        .area-imagen { width: 100%; height: 100%; background: #e2e8f0; object-fit: cover; border: 1px dashed #94a3b8; }
-        .texto-foto { color: #64748b; font-size: 0.7rem; margin-top: 10px; font-weight: 600; text-transform: uppercase; }
+        
+        /* FOTOS POLAROID RECONSTRUIDAS: BORDES Y SOMBRAS INCREÍBLES */
+        .marco-foto { 
+            background: #f8fafc; 
+            padding: 10px 10px 32px 10px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 3px 10px rgba(0,0,0,0.4); 
+            position: absolute; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            flex-direction: column; 
+            cursor: pointer; 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .marco-foto:active { transform: scale(0.92) !important; z-index: 10 !important; }
+        
+        .foto-1 { width: 160px; height: 200px; transform: rotate(-7deg); left: 15px; top: 20px; z-index: 1; border: 1px solid #cbd5e1; }
+        .foto-2 { width: 180px; height: 220px; transform: rotate(5deg); right: 15px; top: 5px; z-index: 2; border: 1px solid #fbbf24; }
+        
+        .area-imagen { width: 100%; height: 100%; background: #e2e8f0; object-fit: cover; border: 1px dashed #94a3b8; transition: opacity 0.3s; }
+        .texto-foto { color: #64748b; font-size: 0.65rem; margin-top: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* SKELETON ANIMATION (CARGA PROGRESIVA) */
+        .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+            animation: cargaEsqueleto 1.5s infinite linear;
+            border: none !important;
+        }
+        @keyframes cargaEsqueleto {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
 
         .zona-datos { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
         .dato-linea { display: flex; align-items: flex-end; gap: 10px; }
         .dato-linea label { color: #fbbf24; font-weight: 600; font-size: 0.9rem; }
-        .dato-linea input { flex-grow: 1; background: transparent; border: none; border-bottom: 2px solid rgba(251, 191, 36, 0.4); color: #f8fafc; padding: 5px; outline: none; font-family: 'Dancing Script', cursive; font-size: 1.4rem; }
+        .dato-linea input { flex-grow: 1; background: transparent; border: none; border-bottom: 2px solid rgba(251, 191, 36, 0.3); color: #f8fafc; padding: 5px; outline: none; font-family: 'Dancing Script', cursive; font-size: 1.4rem; }
         .dato-linea input:focus { border-bottom-color: #00d2ff; }
 
         .titulo-sentimientos { color: #00d2ff; font-weight: 600; font-size: 1.1rem; margin: 20px 0 5px; display: flex; align-items: center; justify-content: space-between; }
-        .cuaderno-lineas { width: 100%; height: 130px; background-color: transparent; background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.2) 35px); line-height: 35px; border: none; color: #f8fafc; font-size: 1rem; resize: none; outline: none; padding: 0 5px; }
+        .cuaderno-lineas { width: 100%; height: 130px; background-color: transparent; background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.15) 35px); line-height: 35px; border: none; color: #f8fafc; font-size: 1rem; resize: none; outline: none; padding: 0 5px; }
 
         .btn-guardar { background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s; box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%; cursor: pointer; }
-        
         .btn-eliminar { display: none; background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; }
 
-        .visor-pantalla-completa { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; }
-        .img-ampliada { max-width: 95%; max-height: 85%; border-radius: 10px; border: 2px solid #fbbf24; }
+        .visor-pantalla-completa { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; }
+        .img-ampliada { max-width: 95%; max-height: 80%; border-radius: 12px; border: 2px solid #fbbf24; box-shadow: 0 0 30px rgba(251,191,36,0.3); }
 
         .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; }
         @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
@@ -58,17 +84,18 @@
             <span class="iconos-top">🥂✨</span>
         </div>
 
-                <input type="file" id="input-foto1" accept="image/jpeg, image/png, image/webp" style="display: none;">
+        <input type="file" id="input-foto1" accept="image/jpeg, image/png, image/webp" style="display: none;">
         <input type="file" id="input-foto2" accept="image/jpeg, image/png, image/webp" style="display: none;">
-
 
         <div class="zona-fotos">
             <div class="marco-foto foto-1" id="marco-1" onclick="document.getElementById('input-foto1').click()">
-                <img src="" class="area-imagen" id="prev-foto1" style="opacity: 0;">
+                <div class="area-imagen skeleton" id="skeleton-1" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index:1; display:none;"></div>
+                <img src="" class="area-imagen" id="prev-foto1" style="opacity: 0; z-index:2;">
                 <span class="texto-foto" id="txt-foto1">FOTO 1</span>
             </div>
             <div class="marco-foto foto-2" id="marco-2" onclick="document.getElementById('input-foto2').click()">
-                <img src="" class="area-imagen" id="prev-foto2" style="opacity: 0;">
+                <div class="area-imagen skeleton" id="skeleton-2" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index:1; display:none;"></div>
+                <img src="" class="area-imagen" id="prev-foto2" style="opacity: 0; z-index:2;">
                 <span class="texto-foto" id="txt-foto2">FOTO 2</span>
             </div>
         </div>
@@ -96,17 +123,17 @@
 
     <div class="visor-pantalla-completa" id="visor" onclick="this.style.display='none'">
         <img src="" class="img-ampliada" id="img-ampliada">
-        <p style="color:white; margin-top:15px; font-weight:600;">Toca la pantalla para cerrar</p>
+        <p style="color:white; margin-top:15px; font-weight:600; font-size:0.9rem;">Toca la pantalla para cerrar</p>
     </div>
 
     <script type="module">
-                import { db } from './firebase-config.js';
-        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { db } from './firebase-config.js';
+        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const misionActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
+        const misionesActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
         const cat = localStorage.getItem('misionCategoria');
         const idx = parseInt(localStorage.getItem('misionIndex'));
-        document.getElementById('txt-mision').innerText = misionActual;
+        document.getElementById('txt-mision').innerText = misionesActual;
         
         let idDocumentoActual = null; 
         let archivoFoto1 = null; 
@@ -122,41 +149,36 @@
             if(t.includes('viaje') || t.includes('acamp')) return '🏕️🎒';
             return '🥂✨';
         }
-        document.querySelector('.iconos-top').innerText = obtenerIconoContextual(misionActual);
+        document.querySelector('.iconos-top').innerText = obtenerIconoContextual(misionesActual);
 
         function comprimirImagen(archivo) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = URL.createObjectURL(archivo); 
-                
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 1024; 
                     let width = img.width;
                     let height = img.height;
-
-                    if (width > MAX_WIDTH) {
-                        height *= (MAX_WIDTH / width);
-                        width = MAX_WIDTH;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
+                    if (width > MAX_WIDTH) { height *= (MAX_WIDTH / width); width = MAX_WIDTH; }
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-
-                    canvas.toBlob((blob) => { 
-                        if(blob) resolve(blob);
-                        else reject(new Error("Error al comprimir"));
-                    }, 'image/jpeg', 0.7);
+                    canvas.toBlob((blob) => { if(blob) resolve(blob); else reject(new Error("Err")); }, 'image/jpeg', 0.75);
                 };
-                img.onerror = () => reject(new Error("No se pudo leer la imagen de la cámara."));
+                img.onerror = () => reject(new Error("Error"));
             });
         }
 
-        // LECTURA DE DATOS: AHORA VERIFICA CUÁNTAS FOTOS HAY
         async function verificarRecuerdo() {
             if (!cat || isNaN(idx)) return;
+            
+            // Activamos visualmente los skeletons de carga progresiva
+            document.getElementById('skeleton-1').style.display = 'block';
+            document.getElementById('skeleton-2').style.display = 'block';
+
             try {
+                // UNIFICADO PERFECTAMENTE BAJO LA COLECCIÓN "recuerdos"
                 const q = query(collection(db, "recuerdos"), where("categoria", "==", cat), where("citaNumero", "==", idx));
                 const querySnapshot = await getDocs(q);
 
@@ -166,50 +188,51 @@
                     idDocumentoActual = docRef.id;
 
                     document.getElementById('input-fecha').value = datos.fechaTexto || "";
+                    document.getElementById('input-fecha').readOnly = true;
                     document.getElementById('input-lugar').value = datos.lugar || "";
+                    document.getElementById('input-lugar').readOnly = true;
                     document.getElementById('input-nota').value = datos.nota || "";
+                    document.getElementById('input-nota').readOnly = true;
 
                     const marco1 = document.getElementById('marco-1');
                     const marco2 = document.getElementById('marco-2');
-                    
-                    let fotosCompletas = 0;
+                    marco1.onclick = null; marco2.onclick = null;
 
-                    if (datos.foto1 && datos.foto1 !== "") {
+                    if (datos.foto1) {
                         const img1 = document.getElementById('prev-foto1');
                         img1.src = datos.foto1;
-                        img1.style.opacity = '1';
+                        img1.onload = () => {
+                            document.getElementById('skeleton-1').style.display = 'none'; // Desvanece el esqueleto al descargar
+                            img1.style.opacity = '1';
+                        };
                         document.getElementById('txt-foto1').style.display = 'none';
-                        marco1.onclick = () => abrirVisor(datos.foto1); // Cambia a solo visor
-                        fotosCompletas++;
-                    }
-                    if (datos.foto2 && datos.foto2 !== "") {
+                        marco1.onclick = () => abrirVisor(datos.foto1);
+                    } else { document.getElementById('skeleton-1').style.display = 'none'; }
+
+                    if (datos.foto2) {
                         const img2 = document.getElementById('prev-foto2');
                         img2.src = datos.foto2;
-                        img2.style.opacity = '1';
+                        img2.onload = () => {
+                            document.getElementById('skeleton-2').style.display = 'none';
+                            img2.style.opacity = '1';
+                        };
                         document.getElementById('txt-foto2').style.display = 'none';
-                        marco2.onclick = () => abrirVisor(datos.foto2); // Cambia a solo visor
-                        fotosCompletas++;
-                    }
+                        marco2.onclick = () => abrirVisor(datos.foto2);
+                    } else { document.getElementById('skeleton-2').style.display = 'none'; }
 
                     const btnGuardar = document.getElementById('btn-submit');
-                    
-                    // Si ya están las dos fotos, bloqueamos todo para evitar sobreescritura accidental
-                    if (fotosCompletas === 2) {
-                        document.getElementById('input-fecha').readOnly = true;
-                        document.getElementById('input-lugar').readOnly = true;
-                        document.getElementById('input-nota').readOnly = true;
-                        btnGuardar.innerText = "RECUERDO SELLADO ✨";
-                        btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
-                        btnGuardar.disabled = true;
-                    } else {
-                        // Si falta una foto, permitimos que el otro la suba
-                        btnGuardar.innerText = "ACTUALIZAR RECUERDO ✍️";
-                    }
-                    
+                    btnGuardar.innerText = "RECUERDO SELLADO ✨";
+                    btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
+                    btnGuardar.disabled = true;
                     document.getElementById('btn-eliminar').style.display = 'block';
+                } else {
+                    document.getElementById('skeleton-1').style.display = 'none';
+                    document.getElementById('skeleton-2').style.display = 'none';
                 }
             } catch (error) {
-                console.error("Error al cargar:", error);
+                console.error(error);
+                document.getElementById('skeleton-1').style.display = 'none';
+                document.getElementById('skeleton-2').style.display = 'none';
             }
         }
         verificarRecuerdo();
@@ -227,7 +250,6 @@
                     if (archivo) {
                         if(numFoto === 1) archivoFoto1 = archivo;
                         if(numFoto === 2) archivoFoto2 = archivo;
-                        
                         const img = document.getElementById(prevId);
                         img.src = URL.createObjectURL(archivo);
                         img.style.opacity = '1';
@@ -251,7 +273,6 @@
             } catch (error) { return null; }
         }
 
-        // GUARDAR O ACTUALIZAR RECUERDO
         const botonGuardar = document.getElementById('btn-submit');
         if(botonGuardar) {
             botonGuardar.addEventListener('click', async (evento) => {
@@ -264,44 +285,27 @@
                     const blob2 = archivoFoto2 ? await comprimirImagen(archivoFoto2) : null;
 
                     botonGuardar.innerText = "SUBIENDO FOTOS... 🚀";
-                    const urlFoto1 = blob1 ? await subirFotoAImgBB(blob1) : null;
-                    const urlFoto2 = blob2 ? await subirFotoAImgBB(blob2) : null;
+                    const urlFoto1 = await subirFotoAImgBB(blob1);
+                    const urlFoto2 = await subirFotoAImgBB(blob2);
 
-                    botonGuardar.innerText = idDocumentoActual ? "ACTUALIZANDO EN FIREBASE... 🔄" : "SELLANDO EN FIREBASE... 🔐";
-                    
-                    const notaF = document.getElementById('input-nota').value; 
+                    botonGuardar.innerText = "SELLANDO EN FIREBASE... 🔐";
+                    const nota = document.getElementById('input-nota').value; 
                     const fechaF = document.getElementById('input-fecha').value;
                     const lugarF = document.getElementById('input-lugar').value;
 
-                    if (idDocumentoActual) {
-                        // ACTUALIZAR DOCUMENTO EXISTENTE
-                        const docRefToUpdate = doc(db, "recuerdos", idDocumentoActual);
-                        const dataToUpdate = {
-                            nota: notaF,
-                            fechaTexto: fechaF,
-                            lugar: lugarF
-                        };
-                        
-                        // Solo agregamos la URL si se subió una nueva foto en esta acción
-                        if (urlFoto1) dataToUpdate.foto1 = urlFoto1;
-                        if (urlFoto2) dataToUpdate.foto2 = urlFoto2;
+                    // UNIFICACIÓN DE COLECCIÓN COMPLETA
+                    await addDoc(collection(db, "recuerdos"), {
+                        categoria: cat, citaNumero: idx, misiones: misionesActual,
+                        nota: nota, fechaTexto: fechaF, lugar: lugarF,
+                        foto1: urlFoto1 || "", foto2: urlFoto2 || "",
+                        fecha: serverTimestamp() 
+                    });
 
-                        await updateDoc(docRefToUpdate, dataToUpdate);
-                    } else {
-                        // CREAR NUEVO DOCUMENTO
-                        await addDoc(collection(db, "recuerdos"), {
-                            categoria: cat, citaNumero: idx, mision: misionActual,
-                            nota: notaF, fechaTexto: fechaF, lugar: lugarF,
-                            foto1: urlFoto1 || "", foto2: urlFoto2 || "",
-                            fecha: serverTimestamp() 
-                        });
-
-                        if (cat && !isNaN(idx)) {
-                            let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
-                            if (!completadas.includes(idx)) {
-                                completadas.push(idx);
-                                localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
-                            }
+                    if (cat && !isNaN(idx)) {
+                        let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+                        if (!completadas.includes(idx)) {
+                            completadas.push(idx);
+                            localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
                         }
                     }
 
@@ -330,13 +334,12 @@
                     setTimeout(() => history.back(), 2000);
                 } catch (error) {
                     alert("Error en la conexión. Intenta de nuevo.");
-                    botonGuardar.innerText = idDocumentoActual ? "ACTUALIZAR RECUERDO ✍️" : "INTENTAR DE NUEVO";
+                    botonGuardar.innerText = "INTENTAR DE NUEVO";
                     botonGuardar.disabled = false;
                 }
             });
         }
 
-        // ELIMINAR RECUERDO
         document.getElementById('btn-eliminar').addEventListener('click', async () => {
             if(confirm("¿Estás seguro de demoler este recuerdo? 🗑️")) {
                 try {
@@ -347,14 +350,11 @@
                     completadas = completadas.filter(item => item !== idx);
                     localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
 
-                    alert("El recuerdo ha sido eliminado de la base de datos.");
+                    alert("El recuerdo ha sido eliminado.");
                     history.back();
-                } catch (error) {
-                    alert("No se pudo eliminar el registro.");
-                }
+                } catch (error) { alert("No se pudo eliminar."); }
             }
         });
-
     </script>
 </body>
 </html>

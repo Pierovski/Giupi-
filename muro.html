@@ -6,63 +6,117 @@
     <title>Giupi - Nuestro Muro</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #020617; min-height: 100vh; padding: 40px 0 50px; margin: 0; transition: opacity 0.5s ease; overflow-x: hidden; }
+        
+        body { 
+            background: #020617; 
+            min-height: 100vh; 
+            padding: 40px 0 80px; 
+            margin: 0; 
+            overflow-x: hidden;
+            animation: entradaSuave 0.6s ease-out;
+        }
+
+        @keyframes entradaSuave {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
         .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
 
-        /* CATEGORÍAS PRINCIPALES */
         .cajon-premium {
-            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none;
+            background: rgba(15, 23, 42, 0.45); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07); 
+            border-radius: 24px; 
+            padding: 20px 15px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            text-decoration: none;
         }
+        
+        .cajon-premium:active {
+            transform: scale(0.95);
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(0, 210, 255, 0.3);
+        }
+
         .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .cajon-premium h3 { font-size: 0.85rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.2px; }
+        .cajon-premium h3 { font-size: 0.8rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-        /* BOTÓN REVIVIR AL AZAR */
-        .btn-random {
-            margin-top: 10px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(0, 210, 255, 0.05));
-            border: 1px dashed rgba(251, 191, 36, 0.3); border-radius: 20px; padding: 18px;
-            text-align: center; color: #fbbf24; font-size: 0.85rem; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
-            transition: transform 0.2s, background 0.3s;
+        /* NUEVA CATEGORÍA SECRETA */
+        .cajon-secreto {
+            flex-direction: row; padding: 18px; margin-top: 5px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            transition: all 0.5s ease;
         }
-        .btn-random:active { transform: scale(0.95); background: rgba(251, 191, 36, 0.15); }
+        .cajon-secreto.bloqueado {
+            filter: grayscale(100%); cursor: not-allowed;
+            color: #64748b;
+        }
+        .cajon-secreto.bloqueado h3 { color: #64748b; text-shadow: none; }
+        .cajon-secreto.desbloqueado {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(0, 0, 0, 0.8));
+            border: 1px solid #8b5cf6; filter: grayscale(0%);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); cursor: pointer;
+        }
+        .cajon-secreto.desbloqueado h3 { color: #c4b5fd; text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+        .candado-icono { font-size: 1.8rem; }
 
-        /* BARRA DE PROGRESO DE LA HISTORIA */
+        .btn-random {
+            margin-top: 10px; 
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.03), rgba(0, 210, 255, 0.03));
+            border: 1px dashed rgba(251, 191, 36, 0.25); border-radius: 20px; 
+            padding: 18px; text-align: center; color: #fbbf24; 
+            font-size: 0.85rem; cursor: pointer; text-transform: uppercase; 
+            letter-spacing: 1px; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-random:active { transform: scale(0.96); background: rgba(251, 191, 36, 0.1); }
+
         .contenedor-progreso {
-            margin-top: 25px; padding: 20px; background: rgba(15, 23, 42, 0.5);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.03);
+            margin-top: 25px; padding: 20px; 
+            background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(10px);
+            border-radius: 24px; border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         .texto-progreso { display: flex; justify-content: space-between; margin-bottom: 12px; }
         .label-progreso { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
         .num-progreso { color: #00d2ff; font-weight: 700; font-size: 0.9rem; }
         
-        .barra-fondo { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 10px; position: relative; }
+        .barra-fondo { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 10px; position: relative; }
         .barra-llena { 
             height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #fbbf24); 
             border-radius: 10px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; 
         }
         .giupi-corredor {
-            position: absolute; right: -15px; top: -14px; width: 32px; height: auto;
+            position: absolute; right: -15px; top: -12px; width: 32px; height: auto;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); animation: flotar-suave 2s infinite ease-in-out;
         }
 
-        /* ANIMACIONES */
+        .btn-flotante-galeria {
+            position: fixed; bottom: 25px; right: 25px; width: 45px; height: 45px;
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); cursor: pointer; z-index: 1000; transition: all 0.2s ease;
+        }
+        .btn-flotante-galeria:active { transform: scale(0.9); background: rgba(30, 41, 59, 0.95); border-color: #fbbf24; }
+
         @keyframes flotar-suave { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
-        .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; }
+        .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3)); }
         .grid-2x2 a:nth-child(1) .img-cat { animation-delay: 0s; }
         .grid-2x2 a:nth-child(2) .img-cat { animation-delay: 0.5s; }
         .grid-2x2 a:nth-child(3) .img-cat { animation-delay: 1s; }
         .grid-2x2 a:nth-child(4) .img-cat { animation-delay: 1.5s; }
-                /* EFECTO CORAZONES */
+        
         .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; font-size: 1.2rem; }
-        @keyframes volar-particula { 
-            0% { transform: translate(0, 0) scale(1); opacity: 1; } 
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } 
-        }
-
+        @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
     </style>
 </head>
 <body id="cuerpo">
@@ -87,6 +141,11 @@
             </a>
         </div>
 
+        <a href="#" id="cajon-secreto" class="cajon-premium cajon-secreto bloqueado">
+            <div class="candado-icono" id="icono-secreto">🔒</div>
+            <h3 id="texto-secreto" style="margin-left: 15px; text-align: left;">NIVEL SECRETO<br><span style="font-size: 0.6rem; opacity: 0.7;">Desbloqueo a los 50 recuerdos</span></h3>
+        </a>
+
         <div class="contenedor-progreso">
             <div class="texto-progreso">
                 <span class="label-progreso">Nuestra Historia</span>
@@ -105,162 +164,75 @@
 
     </main>
 
-    <script>
-        // BASE DE DATOS MAESTRA PARA SABER LOS NOMBRES DE LAS CITAS
-        // (Asegúrate de que estos nombres coincidan con los que pondrás en categoria.html)
-                const baseDeDatos = {
-            'distancia': [
-                "Ver la misma película sincronizados presionando 'play' al mismo tiempo",
-                "Enviar una sorpresa por delivery usando PedidosYa directamente a su casa",
-                "Cena por videollamada vestidos de forma elegante",
-                "Jugar algún videojuego cooperativo online",
-                "Tour virtual por algún museo internacional usando Google Arts",
-                "Armar una lista de reproducción compartida",
-                "Leer el mismo capítulo de un libro y comentarlo",
-                "Reto de fotos: enviarse 5 fotos de su día a día",
-                "Enviar un audio cantando una nota de voz sin vergüenza",
-                "Pedir exactamente el mismo snack en sus respectivas ciudades y comerlo en cámara",
-                "Hacer un test de personalidad online (MBTI) juntos",
-                "Planear un viaje futuro viendo mapas y presupuestos",
-                "Ver el atardecer juntos por videollamada",
-                "Escribir una historia de a dos por WhatsApp (una oración cada uno)",
-                "Descubrir música nueva recomendándose 3 canciones",
-                "Estudiar un idioma juntos (Duolingo en equipo)",
-                "Juego de 'Las 36 preguntas para enamorarse'",
-                "Enviar un pequeño detalle por correo tradicional",
-                "Dormir con la videollamada encendida",
-                "Maratón de series compartiendo pantalla",
-                "Hacerse dibujos rápidos y mostrarlos en cámara",
-                "Escuchar el mismo podcast al mismo tiempo",
-                "Sesión de 'verdad o reto' a distancia",
-                "Meditar juntos con el mismo audio de fondo",
-                "Grabar un mini-vlog de su día exclusivo para el otro"
-            ],
-            'reencuentro': [
-                "El abrazo largo sin prisa en el terminal o aeropuerto",
-                "Ir por un desayuno de panes o empanadas recién horneadas",
-                "Estrenar una fragancia pensada específicamente para el clima de ese día",
-                "Cena de celebración en un lugar elegante",
-                "Noche de hotel en la propia ciudad solo para desconectar",
-                "Intercambio de los regalos que acumularon en la distancia",
-                "Un brindis con copas por estar juntos de nuevo",
-                "Desayuno en la cama preparado por el anfitrión",
-                "Caminata sin rumbo solo para hablar",
-                "Visitar el lugar exacto de su primera cita",
-                "Sesión de fotos juntos para actualizar los fondos de pantalla",
-                "Tarde completa sin mirar el celular",
-                "Cocinar un plato laborioso juntos post-viaje",
-                "Tarde de spa y masajes en casa",
-                "Salir a bailar o a un bar con buena música",
-                "Acostarse a ver las estrellas si el cielo está despejado",
-                "Desempacar las maletas juntos con música de fondo",
-                "Ir por un helado artesanal",
-                "Noche de cobijas y películas",
-                "Baño relajante o ducha juntos",
-                "Probar un restaurante totalmente nuevo",
-                "'Cita a ciegas': uno elige todo el itinerario y el otro solo se deja llevar",
-                "Escribir una carta sobre lo que sintieron al verse",
-                "Hacer una lista de metas a corto plazo",
-                "Comprar un recuerdo físico del día del reencuentro"
-            ],
-            'casa': [
-                "Noche de cocina: Preparar un buen chaufa de pollo desde cero",
-                "Sesión musical: Escuchar los últimos arreglos o maquetas de 'Amor sin interés' o 'Calma'",
-                "Hacer una rutina de ejercicios o día de pierna en la sala",
-                "Noche de juegos de mesa o cartas",
-                "Maratón de la saga de películas favorita de uno de los dos",
-                "Armar un rompecabezas grande",
-                "Cata de cervezas o vinos comprados en el supermercado",
-                "Tarde de pintura (incluso si pintan mal)",
-                "Preparar un postre horneado",
-                "Reorganizar un cuarto o la decoración juntos",
-                "Noche de karaoke en YouTube",
-                "Leer un artículo largo o un cuento en voz alta",
-                "Hacer un picnic en el piso de la sala",
-                "Fondue de chocolate o queso casero",
-                "Bailar en la sala sin música de fondo",
-                "Armar un álbum de fotos físico",
-                "Hacer pizzas caseras armando cada uno su mitad",
-                "Sesión profunda de estiramientos",
-                "Competencia de videojuegos",
-                "Revisar y organizar las finanzas de la casa",
-                "Hacer alguna manualidad sencilla (origami, arcilla)",
-                "Guerra de almohadas clásica",
-                "Contarse anécdotas de la infancia que nunca se hayan dicho",
-                "Preparar cócteles o bebidas creativas",
-                "Acampar en la sala con sábanas y luces"
-            ],
-            'airelibre': [
-                "Salir a volar el dron (el Mini o el Mavic) para hacer tomas aéreas de un paisaje",
-                "Tarde deportiva: Ver un partido de fútbol amateur desde la tribuna o jugar juntos en cancha sintética",
-                "Hacer una ruta o escape rápido por la región montañosa local",
-                "Tomar un paseo en bote por un río o laguna",
-                "Buscar el mejor 'huarique' para comer ceviche mixto",
-                "Ciclismo urbano (salir a pedalear por la ciudad)",
-                "Caminata arquitectónica por el centro histórico",
-                "Madrugar para ver el amanecer desde un punto alto",
-                "Visitar ruinas, huacas o zonas arqueológicas",
-                "Viaje corto a la playa a caminar por la arena",
-                "Armar una carpa y acampar una noche",
-                "Subir a un mirador de la ciudad",
-                "Tarde de fotografía callejera con el celular",
-                "Visitar un pueblito cercano al que nunca hayan ido",
-                "Ir a los juegos mecánicos o parque de diversiones",
-                "Tomar una clase al aire libre",
-                "Observación de aves o buscar animales en un bosque",
-                "Ir a un cine al aire libre o evento público",
-                "Hacer una fogata pequeña (donde sea permitido) y quemar malvaviscos",
-                "Volar una cometa",
-                "Visitar un jardín botánico o vivero",
-                "Salir a pasear al perro (Keylor, si está con ustedes) por un parque grande",
-                "Recorrer una feria local de artesanos",
-                "Hacer una ruta buscando murales o graffitis urbanos",
-                "Sentarse en una plaza simplemente a ver pasar a la gente con un café"
-            ]
-        };
+    <div class="btn-flotante-galeria" onclick="window.location.href='galeria.html'">📸</div>
 
-        // 1. CALCULAR EL PROGRESO
+    <script>
         let misionesCompletadas = [];
-        const categorias = ['distancia', 'reencuentro', 'casa', 'airelibre'];
+        const categorias = ['distancia', 'reencuentro', 'casa', 'airelibre', 'secreta'];
+        let conteoCategorias = { 'distancia': 0, 'reencuentro': 0, 'casa': 0, 'airelibre': 0, 'secreta': 0 };
+        const nombresCat = { 'distancia': 'Distancia', 'reencuentro': 'Reencuentro', 'casa': 'En Casa', 'airelibre': 'Aire Libre', 'secreta': 'Secreta' };
         let totalCompletadas = 0;
 
         categorias.forEach(cat => {
             const volteadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+            conteoCategorias[cat] = volteadas.length;
             totalCompletadas += volteadas.length;
-            
-            // Guardamos el texto de cada misión completada para el botón aleatorio
-            volteadas.forEach(indice => {
-                if(baseDeDatos[cat] && baseDeDatos[cat][indice]) {
-                    misionesCompletadas.push(baseDeDatos[cat][indice]);
+        });
+
+        const baseDeDatos = {
+            'distancia': ["Ver la misma película sincronizados presionando 'play' al mismo tiempo", "Enviar una sorpresa por delivery usando PedidosYa directamente a su casa", "Cena por videollamada vestidos de forma elegante", "Jugar algún videojuego cooperativo online", "Tour virtual por algún museo internacional usando Google Arts", "Armar una lista de reproducción compartida", "Leer el mismo capítulo de un libro y comentarlo", "Reto de fotos: enviarse 5 fotos de su día a día", "Enviar un audio cantando una nota de voz sin vergüenza", "Pedir exactamente el mismo snack en sus respectivas ciudades y comerlo en cámara", "Hacer un test de personalidad online (MBTI) juntos", "Planear un viaje futuro viendo mapas y presupuestos", "Ver el atardecer juntos por videollamada", "Escribir una historia de a dos por WhatsApp (una oración cada uno)", "Descubrir música nueva recomendándose 3 canciones", "Estudiar un idioma juntos (Duolingo en equipo)", "Juego de 'Las 36 preguntas para enamorarse'", "Enviar un pequeño detalle por correo tradicional", "Dormir con la videollamada encendida", "Maratón de series compartiendo pantalla", "Hacerse dibujos rápidos y mostrarlos en cámara", "Escuchar el mismo podcast al mismo tiempo", "Sesión de 'verdad o reto' a distancia", "Meditar juntos con el mismo audio de fondo", "Grabar un mini-vlog de su día exclusivo para el otro"],
+            'reencuentro': ["El abrazo largo sin prisa en el terminal o aeropuerto", "Ir por un desayuno de panes o empanadas recién horneadas", "Estrenar una fragancia pensada específicamente para el clima de ese día", "Cena de celebración en un lugar elegante", "Noche de hotel en la propia ciudad solo para desconectar", "Intercambio de los regalos que acumularon en la distancia", "Un brindis con copas por estar juntos de nuevo", "Desayuno en la cama preparado por el anfitrión", "Caminata sin rumbo solo para hablar", "Visitar el lugar exacto de su primera cita", "Sesión de fotos juntos para actualizar los fondos de pantalla", "Tarde completa sin mirar el celular", "Cocinar un plato laborioso juntos post-viaje", "Tarde de spa y masajes en casa", "Salir a bailar o a un bar con buena música", "Acostarse a ver las estrellas si el cielo está despejado", "Desempacar las maletas juntos con música de fondo", "Ir por un helado artesanal", "Noche de cobijas y películas", "Baño relajante o ducha juntos", "Probar un restaurante totalmente nuevo", "'Cita a ciegas': uno elige todo el itinerario y el otro solo se deja llevar", "Escribir una carta sobre lo que sintieron al verse", "Hacer una lista de metas a corto plazo", "Comprar un recuerdo físico del día del reencuentro"],
+            'casa': ["Noche de cocina: Preparar un buen chaufa de pollo desde cero", "Sesión musical: Escuchar los últimos arreglos o maquetas de 'Amor sin interés' o 'Calma'", "Hacer una rutina de ejercicios o día de pierna en la sala", "Noche de juegos de mesa o cartas", "Maratón de la saga de películas favorita de uno de los dos", "Armar un romabezas grande", "Cata de cervezas o vinos comprados en el supermercado", "Tarde de pintura (incluso si pintan mal)", "Preparar un postre horneado", "Reorganizar un cuarto o la decoración juntos", "Noche de karaoke en YouTube", "Leer un artículo largo o un cuento en voz alta", "Hacer un picnic en el piso de la sala", "Fondue de chocolate o queso casero", "Bailar en la sala sin música de fondo", "Armar un álbum de fotos físico", "Hacer pizzas caseras armando cada uno su mitad", "Sesión profunda de estiramientos", "Competencia de videojuegos", "Revisar y organizar las finanzas de la casa", "Hacer alguna manualidad sencilla (origami, arcilla)", "Guerra de almohadas clásica", "Contarse anécdotas de la infancia que nunca se hayan dicho", "Preparar cócteles o bebidas creativas", "Acampar en la sala con sábanas y luces"],
+            'airelibre': ["Salir a volar el dron (el Mini o el Mavic) para hacer tomas aéreas de un paisaje", "Tarde deportiva: Ver un partido de fútbol amateur desde la tribuna o jugar juntos en cancha sintética", "Hacer una ruta o escape rápido por la región montañosa local", "Tomar un paseo en bote por un río o laguna", "Buscar el mejor 'huarique' para comer ceviche mixto", "Ciclismo urbano (salir a pedalear por la ciudad)", "Caminata arquitectónica por el centro histórico", "Madrugar para ver el amanecer desde un punto alto", "Visitar ruinas, huacas o zonas arqueológicas", "Viaje corto a la playa a caminar por la arena", "Armar una carpa y acampar una noche", "Subir a un mirador de la ciudad", "Tarde de fotografía callejera con el celular", "Visitar un pueblito cercano al que nunca hayan ido", "Ir a los juegos mecánicos o parque de diversiones", "Tomar una clase al aire libre", "Observación de aves o buscar animales en un bosque", "Ir a un cine al aire libre o evento público", "Hacer una fogata pequeña (donde sea permitido) y quemar malvaviscos", "Volar una cometa", "Visitar un jardín botánico o vivero", "Salir a pasear al perro (Keylor, si está con ustedes) por un parque grande", "Recorrer una feria local de artesanos", "Hacer una ruta buscando murales o graffitis urbanos", "Sentarse en una plaza simplemente a ver pasar a la gente con un café"]
+        };
+
+        categorias.forEach(cat => {
+            const indices = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+            indices.forEach(i => {
+                if(baseDeDatos[cat] && baseDeDatos[cat][i]) {
+                    misionesCompletadas.push({texto: baseDeDatos[cat][i], index: i, categoria: cat});
                 }
             });
         });
 
-        // 2. ACTUALIZAR LA BARRA VISUAL (Asumiendo 100 citas en total)
+        // Configurar barra
         setTimeout(() => {
-            const porcentaje = (totalCompletadas / 100) * 100;
+            // Barra Progreso
+            const porcentaje = Math.min((totalCompletadas / 100) * 100, 100);
             document.getElementById('barra-progreso').style.width = porcentaje + '%';
             document.getElementById('contador-progreso').innerText = totalCompletadas + " / 100";
-        }, 300); // Pequeño retraso para que la animación de llenado se vea bonita al entrar
 
-        // 3. FUNCIÓN: REVIVIR INSTANTE ALEATORIO
-        document.getElementById('btn-revivir').addEventListener('click', function(e) {
+            // Desbloqueo de Categoría Secreta
+            const btnSecreto = document.getElementById('cajon-secreto');
+            if (totalCompletadas >= 50) {
+                btnSecreto.classList.remove('bloqueado');
+                btnSecreto.classList.add('desbloqueado');
+                document.getElementById('icono-secreto').innerText = '🔮';
+                document.getElementById('texto-secreto').innerHTML = 'EL REFUGIO SECRETO<br><span style="font-size: 0.6rem; opacity: 0.7; color:#fbbf24;">¡Nivel desbloqueado!</span>';
+                btnSecreto.href = "categoria.html?cat=secreta";
+            } else {
+                btnSecreto.onclick = (e) => { 
+                    e.preventDefault(); 
+                    alert(`Están a ${50 - totalCompletadas} recuerdos de revelar los secretos ocultos. ¡Sigan así! 🔒`); 
+                };
+            }
+        }, 300);
+
+        document.getElementById('btn-revivir').addEventListener('click', function() {
             if(misionesCompletadas.length === 0) {
-                alert("Aún no han sellado ningún recuerdo. ¡Vayan a completar su primera cita!");
+                alert("Aún no han sellado ningún recuerdo. ¡Vayan a completar su primera misión!");
                 return;
             }
-
             this.innerText = "VIAJANDO EN EL TIEMPO...";
-            
-            // Elige una cita que ya hayan hecho al azar
-            const recuerdoElegido = misionesCompletadas[Math.floor(Math.random() * misionesCompletadas.length)];
-            
+            const elegido = misionesCompletadas[Math.floor(Math.random() * misionesCompletadas.length)];
             setTimeout(() => {
-                localStorage.setItem('misionActual', recuerdoElegido); // Le dice al registro qué cita mostrar
-                window.location.href = 'registro.html'; // Viaja directo al registro
+                localStorage.setItem('misionActual', elegido.texto);
+                localStorage.setItem('misionIndex', elegido.index);
+                localStorage.setItem('misionCategoria', elegido.categoria);
+                window.location.href = 'registro.html';
             }, 800);
         });
-                // 4. EFECTO DE CORAZONES AL ENTRAR A UNA CATEGORÍA
+
         function crearCorazones(x, y) {
             const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
             for (let i = 0; i < 20; i++) {
@@ -278,103 +250,15 @@
             }
         }
 
-        // Le devolvemos la orden a los botones de las categorías
-        document.querySelectorAll('.cajon-premium').forEach(boton => {
+        document.querySelectorAll('.cajon-premium:not(.bloqueado)').forEach(boton => {
             boton.addEventListener('click', function(e) {
-                e.preventDefault(); // Detiene el viaje inmediato
-                
-                // Explota los corazones en la posición del dedo
+                if(this.id === 'cajon-secreto' && totalCompletadas < 50) return;
+                e.preventDefault();
                 crearCorazones(e.clientX, e.clientY);
-                
-                // Efecto de hundimiento
-                this.style.transform = 'scale(0.9)'; 
-                
-                // Espera medio segundo (500ms) para que se vea la animación y luego viaja
-                setTimeout(() => {
-                    window.location.href = this.getAttribute('href');
-                }, 500);
+                this.style.transform = 'scale(0.92)'; 
+                setTimeout(() => { window.location.href = this.getAttribute('href'); }, 400);
             });
         });
     </script>
-        <script type="module">
-        import { db } from './firebase-config.js';
-        import { collection, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        async function revisarPendientes() {
-            try {
-                // Buscamos todos los recuerdos en la base de datos
-                const q = query(collection(db, "recuerdos"));
-                const querySnapshot = await getDocs(q);
-                let pendientes = 0;
-
-                querySnapshot.forEach((doc) => {
-                    const datos = doc.data();
-                    
-                    // Verificamos el estado de las fotos
-                    const tieneFoto1 = datos.foto1 && datos.foto1 !== "";
-                    const tieneFoto2 = datos.foto2 && datos.foto2 !== "";
-                    
-                    // Si el documento tiene una foto, pero le falta la otra, es una tarea pendiente
-                    if ((tieneFoto1 && !tieneFoto2) || (!tieneFoto1 && tieneFoto2)) {
-                        pendientes++;
-                    }
-                });
-
-                // Si hay pendientes, mostramos el aviso visual
-                if (pendientes > 0) {
-                    mostrarNotificacionInApp(pendientes);
-                }
-            } catch (error) {
-                console.error("Error al buscar notificaciones:", error);
-            }
-        }
-
-        function mostrarNotificacionInApp(cantidad) {
-            const alerta = document.createElement('div');
-            const textoCita = cantidad === 1 ? "cita" : "citas";
-            
-            // Mensaje que aparecerá en pantalla
-            alerta.innerHTML = `🔔 <b>¡Atención!</b> Tienen ${cantidad} ${textoCita} esperando una foto para ser sellada por completo.`;
-            
-            // Estilos del banner (Diseño limpio y moderno)
-            Object.assign(alerta.style, {
-                background: "linear-gradient(135deg, #ef4444, #b91c1c)",
-                color: "#ffffff",
-                padding: "18px",
-                textAlign: "center",
-                fontSize: "0.95rem",
-                borderRadius: "0 0 20px 20px",
-                position: "fixed",
-                top: "0",
-                left: "0",
-                width: "100%",
-                zIndex: "1000",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
-                cursor: "pointer",
-                animation: "bajarAlerta 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
-            });
-            
-            // Al tocar la alerta, se oculta hacia arriba
-            alerta.onclick = () => {
-                alerta.style.animation = "subirAlerta 0.4s ease-in forwards";
-                setTimeout(() => alerta.remove(), 400);
-            };
-
-            // Inyectamos las animaciones de movimiento al CSS
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @keyframes bajarAlerta { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-                @keyframes subirAlerta { from { transform: translateY(0); } to { transform: translateY(-100%); } }
-            `;
-            document.head.appendChild(style);
-            
-            // Colocamos la alerta en la pantalla
-            document.body.appendChild(alerta);
-        }
-
-        // Ejecutamos la función de inmediato al cargar el muro
-        revisarPendientes();
-    </script>
-
 </body>
 </html>
