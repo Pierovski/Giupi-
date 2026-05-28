@@ -60,10 +60,21 @@
         .cuaderno-lineas { width: 100%; height: 130px; background-color: transparent; background-image: repeating-linear-gradient(transparent, transparent 34px, rgba(251, 191, 36, 0.15) 35px); line-height: 35px; border: none; color: #f8fafc; font-size: 1rem; resize: none; outline: none; padding: 0 5px; }
 
         .btn-guardar { background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s; box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%; cursor: pointer; }
-        .btn-eliminar { display: none; background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; }
         
-        /* Nuevo Botón Editar */
-        .btn-editar { display: none; background: transparent; color: #fbbf24; border: 1px solid #fbbf24; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; transition: background 0.2s; }
+        .btn-eliminar { 
+            display: none; background: transparent; color: #ef4444; border: 1px solid #ef4444; 
+            padding: 8px 20px; border-radius: 12px; font-weight: bold; margin-top: 15px; 
+            cursor: pointer; width: fit-content; margin-left: auto; margin-right: auto;
+            font-size: 0.85rem; transition: background 0.2s;
+        }
+        .btn-eliminar:active { background: rgba(239, 68, 68, 0.1); }
+        
+        .btn-editar { 
+            display: none; background: transparent; color: #fbbf24; border: 1px solid #fbbf24; 
+            padding: 8px 20px; border-radius: 12px; font-weight: bold; margin-top: 15px; 
+            cursor: pointer; width: fit-content; margin-left: auto; margin-right: auto;
+            font-size: 0.85rem; transition: background 0.2s; 
+        }
         .btn-editar:active { background: rgba(251, 191, 36, 0.1); }
 
         .visor-pantalla-completa { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; }

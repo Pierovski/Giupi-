@@ -90,7 +90,10 @@
 
     <main class="grid-misiones" id="contenedor-cartas"></main>
 
-    <script>
+      <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
         const urlParams = new URLSearchParams(window.location.search);
         const categoriaActual = urlParams.get('cat') || 'distancia'; 
 
@@ -99,12 +102,11 @@
             'reencuentro': 'giupi-elegante.png',
             'casa': 'giupi-chef.png',
             'airelibre': 'giupi-explorador.png',
-            'secreta': 'giupi.png' // Icono para la categoría secreta
+            'secreta': 'giupi.png'
         };
         const imagenFondo = imagenesGiupi[categoriaActual] || 'giupi.png';
         const sonidoGiupi = new Audio('giupi.mp3');
 
-        // Base de datos actualizada con las misiones secretas
         const baseDeDatos = {
             'distancia': ["Ver la misma película sincronizados presionando 'play' al mismo tiempo", "Enviar una sorpresa por delivery usando PedidosYa directamente a su casa", "Cena por videollamada vestidos de forma elegante", "Jugar algún videojuego cooperativo online", "Tour virtual por algún museo internacional usando Google Arts", "Armar una lista de reproducción compartida", "Leer el mismo capítulo de un libro y comentarlo", "Reto de fotos: enviarse 5 fotos de su día a día", "Enviar un audio cantando una nota de voz sin vergüenza", "Pedir exactamente el mismo snack en sus respectivas ciudades y comerlo en cámara", "Hacer un test de personalidad online (MBTI) juntos", "Planear un viaje futuro viendo mapas y presupuestos", "Ver el atardecer juntos por videollamada", "Escribir una historia de a dos por WhatsApp (una oración cada uno)", "Descubrir música nueva recomendándose 3 canciones", "Estudiar un idioma juntos (Duolingo en equipo)", "Juego de 'Las 36 preguntas para enamorarse'", "Enviar un pequeño detalle por correo tradicional", "Dormir con la videollamada encendida", "Maratón de series compartiendo pantalla", "Hacerse dibujos rápidos y mostrarlos en cámara", "Escuchar el mismo podcast al mismo tiempo", "Sesión de 'verdad o reto' a distancia", "Meditar juntos con el mismo audio de fondo", "Grabar un mini-vlog de su día exclusivo para el otro"],
             'reencuentro': ["El abrazo largo sin prisa en el terminal o aeropuerto", "Ir por un desayuno de panes o empanadas recién horneadas", "Estrenar una fragancia pensada específicamente para el clima de ese día", "Cena de celebración en un lugar elegante", "Noche de hotel en la propia ciudad solo para desconectar", "Intercambio de los regalos que acumularon en la distancia", "Un brindis con copas por estar juntos de nuevo", "Desayuno en la cama preparado por el anfitrión", "Caminata sin rumbo solo para hablar", "Visitar el lugar exacto de su primera cita", "Sesión de fotos juntos para actualizar los fondos de pantalla", "Tarde completa sin mirar el celular", "Cocinar un plato laborioso juntos post-viaje", "Tarde de spa y masajes en casa", "Salir a bailar o a un bar con buena música", "Acostarse a ver las estrellas si el cielo está despejado", "Desempacar las maletas juntos con música de fondo", "Ir por un helado artesanal", "Noche de cobijas y películas", "Baño relajante o ducha juntos", "Probar un restaurante totalmente nuevo", "'Cita a ciegas': uno elige todo el itinerario y el otro solo se deja llevar", "Escribir una carta sobre lo que sintieron al verse", "Hacer una lista de metas a corto plazo", "Comprar un recuerdo físico del día del reencuentro"],
@@ -117,7 +119,6 @@
         const contenedor = document.getElementById('contenedor-cartas');
         let volteadas = JSON.parse(localStorage.getItem('misiones_' + categoriaActual)) || [];
 
-        // Modificamos el diseño para la categoría secreta si es necesario
         const colorReverso = categoriaActual === 'secreta' ? 'border: 1.5px solid #8b5cf6;' : 'border: 1.5px solid #fbbf24;';
         const textoTop = categoriaActual === 'secreta' ? '<span style="color:#c4b5fd; font-size:0.5rem; letter-spacing:2px">NIVEL SECRETO</span>' : '<span style="color:#fbbf24; font-size:0.5rem; letter-spacing:2px">NUESTRA CITA</span>';
 
@@ -126,7 +127,7 @@
             const esVolteada = volteadas.includes(i) ? 'volteada' : '';
 
             contenedor.innerHTML += `
-                <div class="carta ${esVolteada}" id="carta-${i}" onclick="gestionarClic(${i}, '${misiones.replace(/'/g, "\\'")}')">
+                <div class="carta ${esVolteada}" id="carta-${i}" onclick="window.gestionarClic(${i}, '${misiones.replace(/'/g, "\\'")}')">
                     <div class="carta-inner">
                         <div class="carta-frente">
                             <img src="${imagenFondo}" class="giupi-sello" alt="">
@@ -142,7 +143,8 @@
             `;
         }
 
-        function gestionarClic(i, textoMision) {
+        // Exponemos las funciones al objeto window porque estamos en un módulo
+        window.gestionarClic = function(i, textoMision) {
             const el = document.getElementById('carta-' + i);
             if (!el.classList.contains('volteada')) {
                 el.classList.remove('highlight');
@@ -153,9 +155,9 @@
                 localStorage.setItem('misionCategoria', categoriaActual); 
                 window.location.href = 'registro.html';
             }
-        }
+        };
 
-        function escogerPorMi() {
+        window.escogerPorMi = function() {
             const cerradas = [];
             for(let i=0; i<25; i++) {
                 if(!volteadas.includes(i)) cerradas.push(i);
@@ -171,7 +173,34 @@
             setTimeout(() => {
                 alert("Giupi ha elegido la misión número " + (elegido + 1) + " para hoy. ✨");
             }, 300);
+        };
+
+        // --- NUEVA FUNCIÓN: SINCRONIZAR CON FIREBASE AL CARGAR ---
+        async function sincronizarConFirebase() {
+            try {
+                const q = query(collection(db, "recuerdos"), where("categoria", "==", categoriaActual));
+                const querySnapshot = await getDocs(q);
+                
+                let completadasFB = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    completadasFB.push(data.citaNumero);
+                    
+                    const cartaEl = document.getElementById('carta-' + data.citaNumero);
+                    if (cartaEl && !cartaEl.classList.contains('volteada')) {
+                        cartaEl.classList.add('volteada');
+                    }
+                });
+                
+                // Actualiza caché local para mantener todo sincronizado
+                localStorage.setItem('misiones_' + categoriaActual, JSON.stringify(completadasFB));
+                volteadas = completadasFB;
+            } catch (error) {
+                console.error("Error sincronizando cartas:", error);
+            }
         }
+        
+        sincronizarConFirebase();
     </script>
 </body>
 </html>

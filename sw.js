@@ -1,5 +1,5 @@
 // sw.js - El motor de Giupi (Actualizado para Auto-Updates y Galería)
-const CACHE_NAME = 'giupi-v3.3.2'; // Incrementa este número cuando lances grandes cambios
+const CACHE_NAME = 'giupi-v3.3.3'; // Incrementa este número cuando lances grandes cambios
 
 const assets = [
   '/',

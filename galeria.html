@@ -67,20 +67,17 @@
         
         .estado-vacio { text-align: center; padding: 60px 20px; color: #64748b; font-weight: 600; font-size: 0.9rem; }
 
-        /* MAGIA PARA EL PDF: Elimina las transparencias cuando se está exportando */
-        .modo-exportacion .tarjeta-recuerdo {
-            background-color: #0f172a !important; /* Color oscuro sólido */
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            border: 1px solid #334155 !important;
-            box-shadow: none !important; /* html2canvas odia las sombras complejas */
-        }
-        .modo-exportacion .burbuja-fecha {
-            box-shadow: none !important;
-        }
-        .modo-exportacion .polaroid-mini {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
-        }
+        /* REGLAS ESTRICTAS PARA PDF: Apaga transparencias y fuerza contraste */
+        .modo-exportacion { background-color: #020617 !important; }
+        .modo-exportacion * { box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        .modo-exportacion .tarjeta-recuerdo { background-color: #0f172a !important; border: 1px solid #334155 !important; }
+        .modo-exportacion .mision-titulo { color: #f8fafc !important; }
+        .modo-exportacion .nota-txt { color: #00d2ff !important; }
+        .modo-exportacion .fecha-txt { color: #fbbf24 !important; }
+        .modo-exportacion .lugar-txt { color: #94a3b8 !important; }
+        .modo-exportacion .polaroid-mini { background: #ffffff !important; border: 1px solid #cbd5e1 !important; }
+        .modo-exportacion .polaroid-mini img { opacity: 1 !important; display: block !important; }
+        .modo-exportacion .skeleton { display: none !important; }
     </style>
 </head>
 <body>
@@ -187,7 +184,7 @@
             document.getElementById('visor-g').style.display = 'flex';
         };
 
-        // LÓGICA DE EXPORTACIÓN A PDF MEJORADA
+        // LÓGICA DE EXPORTACIÓN A PDF CORREGIDA
         document.getElementById('btn-exportar').addEventListener('click', () => {
             const btn = document.getElementById('btn-exportar');
             
@@ -200,7 +197,7 @@
             btn.style.pointerEvents = "none";
             document.getElementById('cabecera-pdf').style.display = 'block';
             
-            // Agregamos la clase que quita las transparencias para el PDF
+            // Inyectamos la clase de seguridad para el PDF
             document.getElementById('area-impresion').classList.add('modo-exportacion');
 
             const elementoAImprimir = document.getElementById('area-impresion');
@@ -217,7 +214,6 @@
                 btn.innerText = "PDF 📖";
                 btn.style.pointerEvents = "auto";
                 document.getElementById('cabecera-pdf').style.display = 'none';
-                // Removemos la clase para que tu app vuelva a verse con transparencias
                 document.getElementById('area-impresion').classList.remove('modo-exportacion');
             }).catch(error => {
                 console.error("Error PDF:", error);
