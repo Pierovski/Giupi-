@@ -205,30 +205,65 @@
         };
 
         // LÓGICA DE EXPORTACIÓN A PDF CORREGIDA
-        document.getElementById('btn-exportar').addEventListener('click', () => {
-            const btn = document.getElementById('btn-exportar');
-            
-            if(contenedor.querySelector('.estado-vacio')) {
-                alert("Necesitan guardar recuerdos fotográficos primero para imprimir su libro. 📖");
-                return;
-            }
-
-            btn.innerText = "⏳ Generando...";
+   
+        document.getElementById('btn-exportar').addEventListener('click', function() {
+            const btn = this;
+            btn.innerText = "Generando...";
             btn.style.pointerEvents = "none";
-            document.getElementById('cabecera-pdf').style.display = 'block';
             
-            // Inyectamos la clase de seguridad para el PDF
-            document.getElementById('area-impresion').classList.add('modo-exportacion');
+            document.getElementById('cabecera-pdf').style.display = 'block';
 
             const elementoAImprimir = document.getElementById('area-impresion');
             
-                        const opciones = {
-                margin:       [15, 10, 15, 10], // [arriba, derecha, abajo, izquierda]
+            // --- EL TRUCO PARA MÓVILES ---
+            // Guardamos el estado original para no romper la app después
+            const overflowOriginal = document.body.style.overflowX;
+            const widthOriginal = elementoAImprimir.style.width;
+            const maxWidthOriginal = elementoAImprimir.style.maxWidth;
+            
+            // Liberamos los límites de la pantalla móvil y forzamos el ancho de PC
+            document.body.style.overflowX = 'visible'; 
+            elementoAImprimir.style.width = '800px';
+            elementoAImprimir.style.maxWidth = '800px';
+
+            const opciones = {
+                margin:       [15, 0, 15, 0], 
                 filename:     'Nuestro_Libro_Giupi.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617', windowWidth: 800 }, 
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#020617',
+                    windowWidth: 800, // Le dice a la librería que asuma una pantalla de PC
+                    width: 800        // Fuerza el recorte exacto sin aplastar
+                }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
+
+            // Generamos el PDF
+            html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
+                // Restauramos la vista móvil a la normalidad
+                btn.innerText = "PDF 📖";
+                btn.style.pointerEvents = "auto";
+                document.getElementById('cabecera-pdf').style.display = 'none';
+                
+                document.body.style.overflowX = overflowOriginal;
+                elementoAImprimir.style.width = widthOriginal;
+                elementoAImprimir.style.maxWidth = maxWidthOriginal;
+            }).catch(error => {
+                console.error("Error PDF:", error);
+                alert("Hubo un problema al generar el libro.");
+                
+                // Restauramos también en caso de error
+                btn.innerText = "PDF 📖";
+                btn.style.pointerEvents = "auto";
+                document.getElementById('cabecera-pdf').style.display = 'none';
+                
+                document.body.style.overflowX = overflowOriginal;
+                elementoAImprimir.style.width = widthOriginal;
+                elementoAImprimir.style.maxWidth = maxWidthOriginal;
+            });
+        });
 
             html2pdf().set(opciones).from(elementoAImprimir).save().then(() => {
                 btn.innerText = "PDF 📖";
