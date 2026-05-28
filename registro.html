@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Sellar Misión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght=700&family=Poppins:wght=400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #020617; min-height: 100vh; margin: 0; padding-bottom: 50px; color: #f1f5f9; overflow-x: hidden; }
@@ -19,7 +19,6 @@
 
         .zona-fotos { display: flex; justify-content: center; position: relative; height: 260px; margin-top: 10px; }
         
-        /* FOTOS POLAROID RECONSTRUIDAS: BORDES Y SOMBRAS INCREÍBLES */
         .marco-foto { 
             background: #f8fafc; 
             padding: 10px 10px 32px 10px; 
@@ -40,7 +39,6 @@
         .area-imagen { width: 100%; height: 100%; background: #e2e8f0; object-fit: cover; border: 1px dashed #94a3b8; transition: opacity 0.3s; }
         .texto-foto { color: #64748b; font-size: 0.65rem; margin-top: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* SKELETON ANIMATION (CARGA PROGRESIVA) */
         .skeleton {
             background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
             background-size: 200% 100%;
@@ -63,6 +61,10 @@
 
         .btn-guardar { background: linear-gradient(135deg, #00d2ff, #0077ff); color: #020617; border: none; padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 20px; transition: transform 0.2s; box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); width: 100%; cursor: pointer; }
         .btn-eliminar { display: none; background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; }
+        
+        /* Nuevo Botón Editar */
+        .btn-editar { display: none; background: transparent; color: #fbbf24; border: 1px solid #fbbf24; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 15px; width: 100%; cursor: pointer; transition: background 0.2s; }
+        .btn-editar:active { background: rgba(251, 191, 36, 0.1); }
 
         .visor-pantalla-completa { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; cursor: pointer; }
         .img-ampliada { max-width: 95%; max-height: 80%; border-radius: 12px; border: 2px solid #fbbf24; box-shadow: 0 0 30px rgba(251,191,36,0.3); }
@@ -117,6 +119,7 @@
         </div>
 
         <button class="btn-guardar" id="btn-submit">SELLAR RECUERDO</button>
+        <button class="btn-editar" id="btn-editar">✏️ EDITAR RECUERDO</button>
         <button class="btn-eliminar" id="btn-eliminar">🗑️ DEMOLER ESTE RECUERDO</button>
 
     </main>
@@ -128,7 +131,8 @@
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Agregamos updateDoc a las importaciones
+        import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const misionesActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
         const cat = localStorage.getItem('misionCategoria');
@@ -138,6 +142,7 @@
         let idDocumentoActual = null; 
         let archivoFoto1 = null; 
         let archivoFoto2 = null;
+        let esModoEdicion = false; // Flag para saber si actualizamos o creamos nuevo
 
         function obtenerIconoContextual(texto) {
             const t = texto.toLowerCase();
@@ -173,12 +178,10 @@
         async function verificarRecuerdo() {
             if (!cat || isNaN(idx)) return;
             
-            // Activamos visualmente los skeletons de carga progresiva
             document.getElementById('skeleton-1').style.display = 'block';
             document.getElementById('skeleton-2').style.display = 'block';
 
             try {
-                // UNIFICADO PERFECTAMENTE BAJO LA COLECCIÓN "recuerdos"
                 const q = query(collection(db, "recuerdos"), where("categoria", "==", cat), where("citaNumero", "==", idx));
                 const querySnapshot = await getDocs(q);
 
@@ -202,7 +205,7 @@
                         const img1 = document.getElementById('prev-foto1');
                         img1.src = datos.foto1;
                         img1.onload = () => {
-                            document.getElementById('skeleton-1').style.display = 'none'; // Desvanece el esqueleto al descargar
+                            document.getElementById('skeleton-1').style.display = 'none';
                             img1.style.opacity = '1';
                         };
                         document.getElementById('txt-foto1').style.display = 'none';
@@ -224,7 +227,33 @@
                     btnGuardar.innerText = "RECUERDO SELLADO ✨";
                     btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
                     btnGuardar.disabled = true;
+                    
+                    // Mostrar botones de Eliminar y el nuevo de Editar
                     document.getElementById('btn-eliminar').style.display = 'block';
+                    const btnEditar = document.getElementById('btn-editar');
+                    btnEditar.style.display = 'block';
+
+                    // Lógica para el botón Editar
+                    btnEditar.addEventListener('click', () => {
+                        esModoEdicion = true;
+                        
+                        document.getElementById('input-fecha').readOnly = false;
+                        document.getElementById('input-lugar').readOnly = false;
+                        document.getElementById('input-nota').readOnly = false;
+                        
+                        // Reactivamos los inputs de las fotos
+                        marco1.onclick = () => document.getElementById('input-foto1').click();
+                        marco2.onclick = () => document.getElementById('input-foto2').click();
+
+                        // Restauramos el botón guardar pero para actualizar
+                        btnGuardar.innerText = "ACTUALIZAR RECUERDO 💾";
+                        btnGuardar.style.background = "linear-gradient(135deg, #00d2ff, #0077ff)";
+                        btnGuardar.disabled = false;
+                        
+                        // Ocultamos el botón de editar porque ya estamos en ese modo
+                        btnEditar.style.display = 'none';
+                    });
+
                 } else {
                     document.getElementById('skeleton-1').style.display = 'none';
                     document.getElementById('skeleton-2').style.display = 'none';
@@ -277,39 +306,55 @@
         if(botonGuardar) {
             botonGuardar.addEventListener('click', async (evento) => {
                 evento.preventDefault();
-                botonGuardar.innerText = "COMPRIMIENDO... ⏳";
+                botonGuardar.innerText = "PROCESANDO... ⏳";
                 botonGuardar.disabled = true;
 
                 try {
                     const blob1 = archivoFoto1 ? await comprimirImagen(archivoFoto1) : null;
                     const blob2 = archivoFoto2 ? await comprimirImagen(archivoFoto2) : null;
 
-                    botonGuardar.innerText = "SUBIENDO FOTOS... 🚀";
+                    if(blob1 || blob2) botonGuardar.innerText = "SUBIENDO FOTOS... 🚀";
                     const urlFoto1 = await subirFotoAImgBB(blob1);
                     const urlFoto2 = await subirFotoAImgBB(blob2);
 
-                    botonGuardar.innerText = "SELLANDO EN FIREBASE... 🔐";
+                    botonGuardar.innerText = "GUARDANDO EN FIREBASE... 🔐";
                     const nota = document.getElementById('input-nota').value; 
                     const fechaF = document.getElementById('input-fecha').value;
                     const lugarF = document.getElementById('input-lugar').value;
 
-                    // UNIFICACIÓN DE COLECCIÓN COMPLETA
-                    await addDoc(collection(db, "recuerdos"), {
-                        categoria: cat, citaNumero: idx, misiones: misionesActual,
-                        nota: nota, fechaTexto: fechaF, lugar: lugarF,
-                        foto1: urlFoto1 || "", foto2: urlFoto2 || "",
-                        fecha: serverTimestamp() 
-                    });
+                    if (esModoEdicion && idDocumentoActual) {
+                        // MODO ACTUALIZAR (updateDoc)
+                        const datosUpdate = {
+                            nota: nota,
+                            fechaTexto: fechaF,
+                            lugar: lugarF
+                        };
+                        // Solo mandamos la URL si realmente subieron una foto nueva
+                        if (urlFoto1) datosUpdate.foto1 = urlFoto1;
+                        if (urlFoto2) datosUpdate.foto2 = urlFoto2;
 
-                    if (cat && !isNaN(idx)) {
-                        let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
-                        if (!completadas.includes(idx)) {
-                            completadas.push(idx);
-                            localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
+                        await updateDoc(doc(db, "recuerdos", idDocumentoActual), datosUpdate);
+                        botonGuardar.innerText = "¡ACTUALIZADO! ✨";
+
+                    } else {
+                        // MODO CREAR NUEVO (addDoc)
+                        await addDoc(collection(db, "recuerdos"), {
+                            categoria: cat, citaNumero: idx, misiones: misionesActual,
+                            nota: nota, fechaTexto: fechaF, lugar: lugarF,
+                            foto1: urlFoto1 || "", foto2: urlFoto2 || "",
+                            fecha: serverTimestamp() 
+                        });
+
+                        if (cat && !isNaN(idx)) {
+                            let completadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
+                            if (!completadas.includes(idx)) {
+                                completadas.push(idx);
+                                localStorage.setItem('misiones_' + cat, JSON.stringify(completadas));
+                            }
                         }
+                        botonGuardar.innerText = "¡RECUERDO INMORTALIZADO! ✨";
                     }
 
-                    botonGuardar.innerText = "¡RECUERDO INMORTALIZADO! ✨";
                     botonGuardar.style.background = "linear-gradient(135deg, #fbbf24, #f59e0b)";
                     
                     const x = evento.clientX || window.innerWidth / 2;

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Nuestra Línea de Tiempo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght=700&family=Poppins:wght=400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
@@ -19,7 +19,6 @@
         .btn-volver { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: none; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; text-decoration: none; }
         .titulo-header { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: #00d2ff; margin: 0; }
 
-        /* Estilo del botón de Exportar */
         .btn-exportar {
             background: linear-gradient(135deg, #8b5cf6, #3b82f6); color: white;
             border: none; padding: 10px 15px; border-radius: 20px;
@@ -67,6 +66,21 @@
         .img-visor { max-width: 95%; max-height: 85%; border-radius: 8px; border: 2px solid #fbbf24; }
         
         .estado-vacio { text-align: center; padding: 60px 20px; color: #64748b; font-weight: 600; font-size: 0.9rem; }
+
+        /* MAGIA PARA EL PDF: Elimina las transparencias cuando se está exportando */
+        .modo-exportacion .tarjeta-recuerdo {
+            background-color: #0f172a !important; /* Color oscuro sólido */
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: 1px solid #334155 !important;
+            box-shadow: none !important; /* html2canvas odia las sombras complejas */
+        }
+        .modo-exportacion .burbuja-fecha {
+            box-shadow: none !important;
+        }
+        .modo-exportacion .polaroid-mini {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        }
     </style>
 </head>
 <body>
@@ -123,7 +137,6 @@
                         const idRandom1 = 'img-' + Math.random().toString(36).substr(2, 5);
                         const idRandom2 = 'img-' + Math.random().toString(36).substr(2, 5);
 
-                        // Es importante colocar crossorigin="anonymous" en las imágenes para que el generador PDF no bloquee por CORS
                         if (datos.foto1) {
                             htmlFotos += `
                                 <div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')">
@@ -174,11 +187,10 @@
             document.getElementById('visor-g').style.display = 'flex';
         };
 
-        // LÓGICA DE EXPORTACIÓN A PDF
+        // LÓGICA DE EXPORTACIÓN A PDF MEJORADA
         document.getElementById('btn-exportar').addEventListener('click', () => {
             const btn = document.getElementById('btn-exportar');
             
-            // Si el contenedor está vacío o en estado error, no exportar
             if(contenedor.querySelector('.estado-vacio')) {
                 alert("Necesitan guardar recuerdos fotográficos primero para imprimir su libro. 📖");
                 return;
@@ -187,15 +199,17 @@
             btn.innerText = "⏳ Generando...";
             btn.style.pointerEvents = "none";
             document.getElementById('cabecera-pdf').style.display = 'block';
+            
+            // Agregamos la clase que quita las transparencias para el PDF
+            document.getElementById('area-impresion').classList.add('modo-exportacion');
 
             const elementoAImprimir = document.getElementById('area-impresion');
             
-            // Configuramos html2pdf
             const opciones = {
                 margin:       10,
                 filename:     'Nuestro_Libro_Giupi.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617' }, // useCORS true permite bajar de ImgBB
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617' }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
@@ -203,12 +217,15 @@
                 btn.innerText = "PDF 📖";
                 btn.style.pointerEvents = "auto";
                 document.getElementById('cabecera-pdf').style.display = 'none';
+                // Removemos la clase para que tu app vuelva a verse con transparencias
+                document.getElementById('area-impresion').classList.remove('modo-exportacion');
             }).catch(error => {
                 console.error("Error PDF:", error);
                 alert("Hubo un problema al generar el libro.");
                 btn.innerText = "PDF 📖";
                 btn.style.pointerEvents = "auto";
                 document.getElementById('cabecera-pdf').style.display = 'none';
+                document.getElementById('area-impresion').classList.remove('modo-exportacion');
             });
         });
 
