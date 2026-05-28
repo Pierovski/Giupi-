@@ -78,6 +78,26 @@
         .modo-exportacion .polaroid-mini { background: #ffffff !important; border: 1px solid #cbd5e1 !important; }
         .modo-exportacion .polaroid-mini img { opacity: 1 !important; display: block !important; }
         .modo-exportacion .skeleton { display: none !important; }
+                /* =========================================
+           REGLAS EXCLUSIVAS PARA EXPORTAR A PDF
+           ========================================= */
+        .modo-exportacion {
+            /* Forzamos un ancho de escritorio para que el A4 lo tome bien y no se vea aplastado */
+            width: 800px !important;
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+            background-color: #020617 !important;
+        }
+
+        /* Evita que los recuerdos o tarjetas se corten a la mitad en el salto de página */
+        .modo-exportacion > div,
+        .modo-exportacion .tarjeta-cita,
+        .modo-exportacion img {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            margin-bottom: 15px !important;
+        }
     </style>
 </head>
 <body>
@@ -202,11 +222,11 @@
 
             const elementoAImprimir = document.getElementById('area-impresion');
             
-            const opciones = {
-                margin:       10,
+                        const opciones = {
+                margin:       [15, 10, 15, 10], // [arriba, derecha, abajo, izquierda]
                 filename:     'Nuestro_Libro_Giupi.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617' }, 
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#020617', windowWidth: 800 }, 
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
