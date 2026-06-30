@@ -49,7 +49,7 @@
         .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .cajon-premium h3 { font-size: 0.8rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-        /* NUEVA CATEGORÍA SECRETA */
+        /* CATEGORÍA SECRETA */
         .cajon-secreto {
             flex-direction: row; padding: 18px; margin-top: 5px;
             background: rgba(0, 0, 0, 0.6);
@@ -117,11 +117,34 @@
         
         .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; font-size: 1.2rem; }
         @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
+
+        /* NUEVA ANIMACIÓN PARA EL REGALO TEMPORAL */
+        @keyframes pulso-oro {
+            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); transform: scale(1); }
+            70% { box-shadow: 0 0 0 12px rgba(251, 191, 36, 0); transform: scale(1.03); }
+            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); transform: scale(1); }
+        }
     </style>
 </head>
 <body id="cuerpo">
     <main class="panel-cajones">
         
+        <!-- INICIO CAJA SORPRESA TEMPORAL -->
+        <div id="caja-sorpresa-temporal" style="display: none; margin-bottom: 20px;">
+            <a href="sorpresa.html" style="display: flex; align-items: center; justify-content: center; gap: 15px; background: linear-gradient(135deg, #fbbf24, #d97706); padding: 18px; border-radius: 20px; color: #020617; font-weight: 700; text-decoration: none; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); animation: pulso-oro 2s infinite;">
+                <span style="font-size: 1.5rem;">🎁</span> 
+                <span>¡TIENES UN REGALO AQUÍ!</span>
+            </a>
+        </div>
+        
+        <script>
+            // Lógica para mostrar la caja solo si no se ha visto la sorpresa
+            if (!localStorage.getItem('sorpresa_cumple_vista')) {
+                document.getElementById('caja-sorpresa-temporal').style.display = 'block';
+            }
+        </script>
+        <!-- FIN CAJA SORPRESA TEMPORAL -->
+
         <div class="grid-2x2">
             <a href="categoria.html?cat=distancia" class="cajon-premium">
                 <img src="giupi-viajero.png" alt="Distancia" class="img-cat">

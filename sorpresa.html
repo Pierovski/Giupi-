@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Una Sorpresa para Ti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { margin: 0; background: #020617; color: #f8fafc; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+        /* PANTALLA DE INTERACCIÓN */
+        #pantalla-desbloqueo {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #020617; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease;
+        }
+        
+        .btn-abrir-regalo {
+            background: linear-gradient(135deg, #fbbf24, #d97706); border: none;
+            padding: 20px 45px; border-radius: 40px; color: #020617; font-weight: 700;
+            font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); cursor: pointer;
+            animation: pulso-oro 2s infinite; transition: transform 0.2s;
+        }
+        .btn-abrir-regalo:active { transform: scale(0.95); }
+
+        @keyframes pulso-oro {
+            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); }
+            70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+        }
+
+        /* Motor visual del Slideshow (Crossfade Real) */
+        .visor-slideshow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #020617; }
+        
+        .capa-foto {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: contain; 
+            background-position: center top 10%; 
+            background-repeat: no-repeat;
+            transition: opacity 2.5s ease-in-out; /* Transición muy lenta y sedosa */
+            opacity: 0; /* Invisibles por defecto */
+        }
+
+        /* Tarjeta de Agradecimiento */
+        .contenido-frente {
+            position: absolute; bottom: 0; left: 0; width: 100%; z-index: 10; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 20px 20px 35px 20px; text-align: center;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        .texto-mensaje { 
+            font-size: 1.05rem; line-height: 1.6; color: #f8fafc; font-weight: 500; 
+            margin: 0 0 20px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.9); 
+            max-width: 400px;
+        }
+
+        .btn-sellar {
+            background: linear-gradient(135deg, #00d2ff, #0077ff); border: none;
+            padding: 15px 30px; border-radius: 30px; color: #020617; font-weight: 700;
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 6px 15px rgba(0, 210, 255, 0.4); cursor: pointer; transition: transform 0.2s;
+        }
+        .btn-sellar:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+
+    <audio id="audio-sorpresa" src="sorpresa.mp3" preload="auto"></audio>
+
+    <div id="pantalla-desbloqueo">
+        <button class="btn-abrir-regalo" id="btn-iniciar">Abrir Regalo 🎁</button>
+    </div>
+
+    <div class="visor-slideshow">
+        <div id="capa-1" class="capa-foto"></div>
+        <div id="capa-2" class="capa-foto"></div>
+    </div>
+
+    <div class="contenido-frente">
+        <p class="texto-mensaje">
+            Gracias por la sorpresa mi amor ❤️ me encantó y me hizo sentir cosas que nunca experimenté. Eres muy linda amor de mi vida , y estaré siempre agradecido por este momento inolvidable.<br>
+            <span style="font-family: 'Dancing Script', cursive; font-size: 2.3rem; color: #fbbf24; display: block; margin-top: 10px;">Te amo</span>
+        </p>
+
+        <button class="btn-sellar" onclick="sellarYVolver()">Guardar en el corazón 🔒</button>
+    </div>
+
+    <script>
+        // 1. Silenciar música del index.html
+        window.onload = () => {
+            try {
+                if (window.parent && window.parent.musica) {
+                    window.parent.musica.pause();
+                }
+            } catch (e) {}
+        };
+
+        // 2. Botón Iniciar
+        document.getElementById('btn-iniciar').addEventListener('click', function() {
+            const bloqueo = document.getElementById('pantalla-desbloqueo');
+            bloqueo.style.opacity = '0';
+            setTimeout(() => { bloqueo.style.display = 'none'; }, 800);
+
+            const musicaSorpresa = document.getElementById('audio-sorpresa');
+            musicaSorpresa.volume = 0.8;
+            musicaSorpresa.play();
+
+            const end = Date.now() + 3500;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        });
+
+        // 3. Nuevo Algoritmo Slideshow (Crossfade Verdadero)
+        const totalFotos = 11;
+        let mazo = [];
+        let idx = 0;
+
+        function barajarMazo() {
+            mazo = [];
+            for (let i = 1; i <= totalFotos; i++) mazo.push(`s${i}.jpg`);
+            
+            for (let i = mazo.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mazo[i], mazo[j]] = [mazo[j], mazo[i]];
+            }
+        }
+
+        barajarMazo();
+        const capas = [document.getElementById('capa-1'), document.getElementById('capa-2')];
+        let capaActual = 0;
+
+        // Arrancar primera foto
+        capas[0].style.backgroundImage = `url('${mazo[0]}')`;
+        capas[0].style.opacity = '1';
+        
+        if (totalFotos > 1) {
+            capas[1].style.backgroundImage = `url('${mazo[1]}')`;
+        }
+
+        setInterval(() => {
+            if (totalFotos <= 1) return;
+
+            let capaSiguiente = (capaActual + 1) % 2;
+            
+            // Transición cruzada: una aparece, la otra desaparece
+            capas[capaSiguiente].style.opacity = '1';
+            capas[capaActual].style.opacity = '0';
+
+            // Preparar la foto futura en la sombra
+            setTimeout(() => {
+                idx++;
+                if (idx >= mazo.length - 1) { 
+                    barajarMazo(); 
+                    idx = 0; 
+                }
+                let fotoFutura = mazo[idx + 1];
+                capas[capaActual].style.backgroundImage = `url('${fotoFutura}')`;
+                
+                capaActual = capaSiguiente;
+            }, 2500); 
+            
+        }, 5500); // Cambia cada 5.5 segundos para dar tiempo a leer el texto
+
+        // 4. Volver al Muro y Reactivar Música Principal
+        function sellarYVolver() {
+            localStorage.setItem('sorpresa_cumple_vista', 'true');
+            
+            try {
+                if (window.parent && window.parent.musica) {
+                    window.parent.musica.play(); 
+                }
+            } catch (e) {}
+
+            window.location.href = 'muro.html';
+        }
+    </script>
+</body>
+</html>

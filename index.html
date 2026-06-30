@@ -26,23 +26,8 @@
             }
         }
     </style>
-        <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#020617">
-    <link rel="apple-touch-icon" href="giupi-icon.png">
-
-    <script>
-        // Registrar el Service Worker para permitir la instalación
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    console.log('Motor PWA activado', reg);
-                }).catch(err => {
-                    console.log('Error en PWA', err);
-                });
-            });
-        }
-    </script>
-        <link rel="manifest" href="manifest.json">
+    
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020617">
     <link rel="apple-touch-icon" href="giupi-icon.png">
 
@@ -101,9 +86,12 @@
         const marcoApp = document.getElementById('marco-app');
         const teclado = document.getElementById('teclado');
         
-        // --- NUEVO MOTOR DE AUDIO ALEATORIO ---
-        const playlist = ["musica-1.mp3", "musica-2.mp3", "musica-3.mp3", "musica-4.mp3", "musica-5.mp3",];
+        // --- MOTOR DE AUDIO ALEATORIO ---
+        const playlist = ["musica-1.mp3", "musica-2.mp3", "musica-3.mp3", "musica-4.mp3", "musica-5.mp3"];
         const musica = new Audio();
+        
+        // EXPOSICIÓN GLOBAL PARA QUE EL IFRAME PUEDA PAUSARLA
+        window.musica = musica;
         
         // Hacer que cuando termine una canción, siga otra al azar
         musica.addEventListener('ended', () => {
@@ -122,18 +110,21 @@
             cajaPin.classList.add('mostrar-fade');
         }, 800);
 
-        function activarMusica() {
+        // EXPOSICIÓN GLOBAL PARA QUE EL IFRAME PUEDA REACTIVARLA
+        window.activarMusica = function() {
             if (!musicaIniciada) {
                 const indiceAleatorio = Math.floor(Math.random() * playlist.length);
                 musica.src = playlist[indiceAleatorio];
                 musica.play().catch(e => console.log("Esperando..."));
                 musicaIniciada = true;
+            } else {
+                musica.play().catch(e => console.log("Esperando..."));
             }
-        }
+        };
 
         document.querySelectorAll('.btn-num').forEach(boton => {
             boton.addEventListener('click', (e) => {
-                activarMusica();
+                window.activarMusica();
                 if (pinActual.length < 4) {
                     pinActual += boton.innerText;
                     pinInput.value = pinActual;
