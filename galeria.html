@@ -101,11 +101,9 @@
                 querySnapshot.forEach((doc) => {
                     const datos = doc.data();
                     
-                    // MODIFICACIÓN: Mostrar tarjeta si hay al menos un dato relevante (foto, nota o lugar)
                     if (datos.foto1 || datos.foto2 || datos.nota || datos.lugar) {
                         let htmlFotos = "";
                         
-                        // MODIFICACIÓN: Añadido onerror para ocultar el marco si la URL de ImgBB falla
                         if (datos.foto1) {
                             htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')"><img src="${datos.foto1}" onerror="this.style.display='none'; this.parentElement.style.display='none';"></div>`;
                         }
@@ -137,7 +135,8 @@
 
             } catch (error) {
                 console.error("Error cargando galería:", error);
-                contenedor.innerHTML = `<div class="estado-vacio">❌ Ocurrió un error al conectar con Firebase.</div>`;
+                // MODIFICACIÓN: Impresión visual del error real
+                contenedor.innerHTML = `<div class="estado-vacio">❌ Error Real: <br><b style="color:#ef4444">${error.message}</b></div>`;
             }
         }
 

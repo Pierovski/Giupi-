@@ -211,7 +211,6 @@
                     const marco2 = document.getElementById('marco-2');
                     marco1.onclick = null; marco2.onclick = null;
 
-                    // MODIFICACIÓN: Gestión de errores añadida al evento de carga de foto 1
                     if (datos.foto1) {
                         const img1 = document.getElementById('prev-foto1');
                         img1.src = datos.foto1;
@@ -228,7 +227,6 @@
                         marco1.onclick = () => abrirVisor(datos.foto1);
                     } else { document.getElementById('skeleton-1').style.display = 'none'; }
 
-                    // MODIFICACIÓN: Gestión de errores añadida al evento de carga de foto 2
                     if (datos.foto2) {
                         const img2 = document.getElementById('prev-foto2');
                         img2.src = datos.foto2;
@@ -277,6 +275,9 @@
                 }
             } catch (error) {
                 console.error(error);
+                // MODIFICACIÓN: Impresión visual del error en la pantalla de registro
+                document.getElementById('txt-mision').innerText = "❌ Error: " + error.message;
+                document.getElementById('txt-mision').style.fontSize = "1.2rem";
                 document.getElementById('skeleton-1').style.display = 'none';
                 document.getElementById('skeleton-2').style.display = 'none';
             }
