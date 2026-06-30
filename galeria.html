@@ -64,7 +64,8 @@
     <header class="header-galeria">
         <a href="muro.html" class="btn-volver">←</a>
         <h1 class="titulo-header">Nuestra Historia</h1>
-        <div></div> </header>
+        <div></div> 
+    </header>
 
     <main class="contenedor-timeline" id="timeline-principal">
         <div class="hito-timeline" id="load-skeleton-1" style="opacity: 1; transform:none;">
@@ -100,14 +101,16 @@
                 querySnapshot.forEach((doc) => {
                     const datos = doc.data();
                     
-                    if (datos.foto1 || datos.foto2) {
+                    // MODIFICACIÓN: Mostrar tarjeta si hay al menos un dato relevante (foto, nota o lugar)
+                    if (datos.foto1 || datos.foto2 || datos.nota || datos.lugar) {
                         let htmlFotos = "";
                         
+                        // MODIFICACIÓN: Añadido onerror para ocultar el marco si la URL de ImgBB falla
                         if (datos.foto1) {
-                            htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')"><img src="${datos.foto1}"></div>`;
+                            htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto1}')"><img src="${datos.foto1}" onerror="this.style.display='none'; this.parentElement.style.display='none';"></div>`;
                         }
                         if (datos.foto2) {
-                            htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto2}')" style="transform: rotate(3deg);"><img src="${datos.foto2}"></div>`;
+                            htmlFotos += `<div class="polaroid-mini" onclick="window.ampliarFoto('${datos.foto2}')" style="transform: rotate(3deg);"><img src="${datos.foto2}" onerror="this.style.display='none'; this.parentElement.style.display='none';"></div>`;
                         }
 
                         contenedor.innerHTML += `
@@ -129,7 +132,7 @@
                 });
 
                 if(contenedor.innerHTML === "") {
-                    contenedor.innerHTML = `<div class="estado-vacio">✨ Aún no hay recuerdos con imágenes para mostrar aquí.</div>`;
+                    contenedor.innerHTML = `<div class="estado-vacio">✨ Aún no hay recuerdos para mostrar aquí.</div>`;
                 }
 
             } catch (error) {

@@ -142,7 +142,6 @@
 
     <script type="module">
         import { db } from './firebase-config.js';
-        // Agregamos updateDoc a las importaciones
         import { collection, addDoc, serverTimestamp, getDocs, query, where, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const misionesActual = localStorage.getItem('misionActual') || "Nuestro Recuerdo";
@@ -153,7 +152,7 @@
         let idDocumentoActual = null; 
         let archivoFoto1 = null; 
         let archivoFoto2 = null;
-        let esModoEdicion = false; // Flag para saber si actualizamos o creamos nuevo
+        let esModoEdicion = false; 
 
         function obtenerIconoContextual(texto) {
             const t = texto.toLowerCase();
@@ -212,6 +211,7 @@
                     const marco2 = document.getElementById('marco-2');
                     marco1.onclick = null; marco2.onclick = null;
 
+                    // MODIFICACIÓN: Gestión de errores añadida al evento de carga de foto 1
                     if (datos.foto1) {
                         const img1 = document.getElementById('prev-foto1');
                         img1.src = datos.foto1;
@@ -219,16 +219,27 @@
                             document.getElementById('skeleton-1').style.display = 'none';
                             img1.style.opacity = '1';
                         };
+                        img1.onerror = () => {
+                            document.getElementById('skeleton-1').style.display = 'none';
+                            document.getElementById('txt-foto1').innerText = "FOTO ROTA";
+                            document.getElementById('txt-foto1').style.display = 'block';
+                        };
                         document.getElementById('txt-foto1').style.display = 'none';
                         marco1.onclick = () => abrirVisor(datos.foto1);
                     } else { document.getElementById('skeleton-1').style.display = 'none'; }
 
+                    // MODIFICACIÓN: Gestión de errores añadida al evento de carga de foto 2
                     if (datos.foto2) {
                         const img2 = document.getElementById('prev-foto2');
                         img2.src = datos.foto2;
                         img2.onload = () => {
                             document.getElementById('skeleton-2').style.display = 'none';
                             img2.style.opacity = '1';
+                        };
+                        img2.onerror = () => {
+                            document.getElementById('skeleton-2').style.display = 'none';
+                            document.getElementById('txt-foto2').innerText = "FOTO ROTA";
+                            document.getElementById('txt-foto2').style.display = 'block';
                         };
                         document.getElementById('txt-foto2').style.display = 'none';
                         marco2.onclick = () => abrirVisor(datos.foto2);
@@ -239,12 +250,10 @@
                     btnGuardar.style.background = "linear-gradient(135deg, #4b5563, #1f2937)";
                     btnGuardar.disabled = true;
                     
-                    // Mostrar botones de Eliminar y el nuevo de Editar
                     document.getElementById('btn-eliminar').style.display = 'block';
                     const btnEditar = document.getElementById('btn-editar');
                     btnEditar.style.display = 'block';
 
-                    // Lógica para el botón Editar
                     btnEditar.addEventListener('click', () => {
                         esModoEdicion = true;
                         
@@ -252,16 +261,13 @@
                         document.getElementById('input-lugar').readOnly = false;
                         document.getElementById('input-nota').readOnly = false;
                         
-                        // Reactivamos los inputs de las fotos
                         marco1.onclick = () => document.getElementById('input-foto1').click();
                         marco2.onclick = () => document.getElementById('input-foto2').click();
 
-                        // Restauramos el botón guardar pero para actualizar
                         btnGuardar.innerText = "ACTUALIZAR RECUERDO 💾";
                         btnGuardar.style.background = "linear-gradient(135deg, #00d2ff, #0077ff)";
                         btnGuardar.disabled = false;
                         
-                        // Ocultamos el botón de editar porque ya estamos en ese modo
                         btnEditar.style.display = 'none';
                     });
 
@@ -334,13 +340,11 @@
                     const lugarF = document.getElementById('input-lugar').value;
 
                     if (esModoEdicion && idDocumentoActual) {
-                        // MODO ACTUALIZAR (updateDoc)
                         const datosUpdate = {
                             nota: nota,
                             fechaTexto: fechaF,
                             lugar: lugarF
                         };
-                        // Solo mandamos la URL si realmente subieron una foto nueva
                         if (urlFoto1) datosUpdate.foto1 = urlFoto1;
                         if (urlFoto2) datosUpdate.foto2 = urlFoto2;
 
@@ -348,7 +352,6 @@
                         botonGuardar.innerText = "¡ACTUALIZADO! ✨";
 
                     } else {
-                        // MODO CREAR NUEVO (addDoc)
                         await addDoc(collection(db, "recuerdos"), {
                             categoria: cat, citaNumero: idx, misiones: misionesActual,
                             nota: nota, fechaTexto: fechaF, lugar: lugarF,
