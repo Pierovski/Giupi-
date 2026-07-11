@@ -138,8 +138,9 @@
         </div>
         
         <script>
-            // Lógica para mostrar la caja solo si no se ha visto la sorpresa
-            if (!localStorage.getItem('sorpresa_cumple_vista')) {
+            // Mostrar la caja solo si el mes actual es Julio (mes 6 en JavaScript)
+            const fechaActual = new Date();
+            if (fechaActual.getMonth() === 6) {
                 document.getElementById('caja-sorpresa-temporal').style.display = 'block';
             }
         </script>

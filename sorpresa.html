@@ -171,8 +171,6 @@
 
         // 4. Volver al Muro y Reactivar Música Principal
         function sellarYVolver() {
-            localStorage.setItem('sorpresa_cumple_vista', 'true');
-            
             try {
                 if (window.parent && window.parent.musica) {
                     window.parent.musica.play(); 
