@@ -10,7 +10,6 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { margin: 0; background: #020617; color: #f8fafc; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* PANTALLA DE INTERACCIÓN */
         #pantalla-desbloqueo {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #020617; z-index: 100;
@@ -33,7 +32,6 @@
             100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
         }
 
-        /* Motor visual del Slideshow (Crossfade Real) */
         .visor-slideshow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #020617; }
         
         .capa-foto {
@@ -41,11 +39,10 @@
             background-size: contain; 
             background-position: center top 10%; 
             background-repeat: no-repeat;
-            transition: opacity 2.5s ease-in-out; /* Transición muy lenta y sedosa */
-            opacity: 0; /* Invisibles por defecto */
+            transition: opacity 2.5s ease-in-out;
+            opacity: 0; 
         }
 
-        /* Tarjeta de Agradecimiento */
         .contenido-frente {
             position: absolute; bottom: 0; left: 0; width: 100%; z-index: 10; 
             display: flex; flex-direction: column; align-items: center; 
@@ -91,24 +88,37 @@
     </div>
 
     <script>
-        // 1. Silenciar música del index.html
-        window.onload = () => {
+        // Función dedicada para detener la música del marco principal
+        function silenciarMusicaDeFondo() {
             try {
                 if (window.parent && window.parent.musica) {
                     window.parent.musica.pause();
                 }
-            } catch (e) {}
-        };
+                if (window.top && window.top.musica) {
+                    window.top.musica.pause();
+                }
+            } catch (e) {
+                console.log("No se pudo silenciar el fondo", e);
+            }
+        }
 
-        // 2. Botón Iniciar
+        // 1. Intentar silenciar al cargar la página (puede ser bloqueado por el navegador)
+        window.onload = silenciarMusicaDeFondo;
+
+        // 2. Botón Iniciar - Interacción del usuario garantizada
         document.getElementById('btn-iniciar').addEventListener('click', function() {
+            
+            // Forzar el silencio de la música de fondo justo al hacer clic
+            silenciarMusicaDeFondo();
+
             const bloqueo = document.getElementById('pantalla-desbloqueo');
             bloqueo.style.opacity = '0';
             setTimeout(() => { bloqueo.style.display = 'none'; }, 800);
 
+            // Iniciar la música sorpresa
             const musicaSorpresa = document.getElementById('audio-sorpresa');
             musicaSorpresa.volume = 0.8;
-            musicaSorpresa.play();
+            musicaSorpresa.play().catch(err => console.log("Error al reproducir audio:", err));
 
             const end = Date.now() + 3500;
             (function frame() {
@@ -137,7 +147,6 @@
         const capas = [document.getElementById('capa-1'), document.getElementById('capa-2')];
         let capaActual = 0;
 
-        // Arrancar primera foto
         capas[0].style.backgroundImage = `url('${mazo[0]}')`;
         capas[0].style.opacity = '1';
         
@@ -150,11 +159,9 @@
 
             let capaSiguiente = (capaActual + 1) % 2;
             
-            // Transición cruzada: una aparece, la otra desaparece
             capas[capaSiguiente].style.opacity = '1';
             capas[capaActual].style.opacity = '0';
 
-            // Preparar la foto futura en la sombra
             setTimeout(() => {
                 idx++;
                 if (idx >= mazo.length - 1) { 
@@ -167,13 +174,16 @@
                 capaActual = capaSiguiente;
             }, 2500); 
             
-        }, 5500); // Cambia cada 5.5 segundos para dar tiempo a leer el texto
+        }, 5500);
 
         // 4. Volver al Muro y Reactivar Música Principal
         function sellarYVolver() {
             try {
-                if (window.parent && window.parent.musica) {
-                    window.parent.musica.play(); 
+                // Reactivamos la música del index
+                if (window.parent && window.parent.activarMusica) {
+                    window.parent.activarMusica(); 
+                } else if (window.parent && window.parent.musica) {
+                    window.parent.musica.play();
                 }
             } catch (e) {}
 
