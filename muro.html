@@ -240,7 +240,7 @@
                 // La magia: borrar lo que ya está pintado
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.beginPath();
-                ctx.arc(x, y, 18, 0, Math.PI * 2); // 18 es el tamaño del "borrador"
+                ctx.arc(x, y, 18, 0, Math.PI * 2); 
                 ctx.fill();
             }
 
@@ -256,14 +256,21 @@
 
             if (btnAbrir) {
                 btnAbrir.addEventListener('click', () => {
-                    // 1. Mostrar Modal y Reiniciar Raspadita
+                    // 1. Silenciar música de fondo del index padre
+                    try {
+                        if (window.parent && window.parent.musica) {
+                            window.parent.musica.pause();
+                        }
+                    } catch (e) {}
+
+                    // 2. Mostrar Modal y Reiniciar Raspadita
                     modalPista.style.display = 'flex';
-                    initCanvas(); // Se vuelve a tapar cada vez que abre la ventana
+                    initCanvas(); 
 
                     setTimeout(() => { 
                         modalPista.style.opacity = '1'; 
                         
-                        // 2. Disparar Confeti
+                        // 3. Disparar Confeti
                         if (typeof confetti === 'function') {
                             confetti({
                                 particleCount: 100, spread: 80, origin: { y: 0.5 }, zIndex: 10001,
@@ -272,10 +279,10 @@
                         }
                     }, 10);
                     
-                    // 3. Secuencia de imágenes (Cusco 3s -> Giupi Normal)
+                    // 4. Secuencia de imágenes (Cusco 3s -> Giupi Normal)
                     imgFlash.src = 'cusco.png';
                     imgFlash.style.animation = 'none';
-                    void imgFlash.offsetWidth; // Forzar reflow
+                    void imgFlash.offsetWidth; 
                     imgFlash.style.animation = 'fantasma-cusco 3s forwards';
                     
                     setTimeout(() => {
@@ -283,7 +290,7 @@
                         imgFlash.style.animation = 'aparecer-suave 0.5s forwards';
                     }, 3000); 
                     
-                    // 4. Reproducir música
+                    // 5. Reproducir música andina
                     if (!audioAndino) {
                         audioAndino = new Audio('sonido1.mp3');
                     }
@@ -296,10 +303,20 @@
                     modalPista.style.opacity = '0';
                     setTimeout(() => { modalPista.style.display = 'none'; }, 150); 
                     
+                    // Apagar música andina
                     if (audioAndino) {
                         audioAndino.pause();
                         audioAndino.currentTime = 0; 
                     }
+
+                    // Reactivar música de fondo del index padre
+                    try {
+                        if (window.parent && window.parent.activarMusica) {
+                            window.parent.activarMusica();
+                        } else if (window.parent && window.parent.musica) {
+                            window.parent.musica.play();
+                        }
+                    } catch (e) {}
                 });
             }
         </script>
