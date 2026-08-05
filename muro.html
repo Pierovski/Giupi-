@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Nuestro Muro</title>
+    
+    <!-- Fuentes, Precargas y Confeti -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link rel="preload" href="cusco.png" as="image">
+    <link rel="preload" href="giupi.png" as="image">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         
@@ -19,6 +26,21 @@
         @keyframes entradaSuave {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animación fantasma para la pista de Cusco (Extendida a 3 segundos) */
+        @keyframes fantasma-cusco {
+            0% { opacity: 0; transform: scale(0.5); filter: brightness(2); }
+            10% { opacity: 1; transform: scale(1.1); filter: brightness(1.2); }
+            20% { opacity: 1; transform: scale(1); }
+            85% { opacity: 1; transform: scale(1); } /* Se mantiene visible más tiempo */
+            100% { opacity: 0; transform: scale(0.9); visibility: hidden; }
+        }
+
+        /* Animación para que aparezca el Giupi normal después */
+        @keyframes aparecer-suave {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); visibility: visible; }
         }
         
         .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
@@ -118,33 +140,170 @@
         .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; font-size: 1.2rem; }
         @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
 
-        /* NUEVA ANIMACIÓN PARA EL REGALO TEMPORAL */
-        @keyframes pulso-oro {
-            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); transform: scale(1); }
-            70% { box-shadow: 0 0 0 12px rgba(251, 191, 36, 0); transform: scale(1.03); }
-            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); transform: scale(1); }
+        /* Estilo específico para evitar scroll mientras se raspa en móviles */
+        #scratch-canvas {
+            touch-action: none; 
         }
     </style>
 </head>
 <body id="cuerpo">
     <main class="panel-cajones">
         
-        <!-- INICIO CAJA SORPRESA TEMPORAL -->
-        <div id="caja-sorpresa-temporal" style="display: none; margin-bottom: 20px;">
-            <a href="sorpresa.html" style="display: flex; align-items: center; justify-content: center; gap: 15px; background: linear-gradient(135deg, #fbbf24, #d97706); padding: 18px; border-radius: 20px; color: #020617; font-weight: 700; text-decoration: none; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); animation: pulso-oro 2s infinite;">
-                <span style="font-size: 1.5rem;">🎁</span> 
-                <span>¡TIENES UN REGALO AQUÍ!</span>
-            </a>
+        <!-- INICIO PISTA 1: 4 AL 14 DE AGOSTO -->
+        <div id="caja-pista-1" style="display: none; margin-bottom: 20px;">
+            <button id="btn-abrir-pista" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 15px; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 18px; border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.5); cursor: pointer; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15); transition: transform 0.1s;">
+                <span style="font-size: 1.8rem;">🎂</span> 
+                <span style="font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 3px; background: linear-gradient(90deg, #fbbf24, #fef08a, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;">FALTAN 20 DÍAS</span>
+            </button>
         </div>
-        
+
+        <!-- VENTANA MODAL (Oculta por defecto) -->
+        <div id="modal-pista" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.95); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; opacity: 0; transition: opacity 0.15s ease-out;">
+            
+            <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid #fbbf24; border-radius: 20px; padding: 30px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(251, 191, 36, 0.2); width: 100%;">
+                
+                <!-- Contenedor fijo para la imagen intercambiable -->
+                <div style="height: 120px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
+                    <img src="cusco.png" id="imagen-pista" alt="Pista rápida" style="width: 120px; opacity: 0;">
+                </div>
+                
+                <h2 style="color: #fbbf24; margin-top: -10px; font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 1px;">TU PRIMERA PISTA, MI AMOR ❤️</h2>
+                
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 5px;">DESCUBRE EL CÓDIGO OCULTO:</p>
+                
+                <!-- Contenedor Relativo para la Raspadita -->
+                <div style="position: relative; width: 100%; height: 60px; margin-bottom: 5px; border-radius: 10px; overflow: hidden; background: rgba(0, 0, 0, 0.8); border: 1px dashed #fbbf24; display: flex; justify-content: center; align-items: center;">
+                    <!-- El código real de fondo -->
+                    <code style="color: #00d2ff; font-size: 1.1rem; letter-spacing: 1px;">13°09'47.0"S 72°32'44.0"W</code>
+                    <!-- El lienzo que lo tapa -->
+                    <canvas id="scratch-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"></canvas>
+                </div>
+                <p style="color: #fbbf24; font-size: 0.75rem; margin-bottom: 20px; font-style: italic;">👆 Raspa la tarjeta para revelar</p>
+                
+                <p style="color: #f1f5f9; font-size: 1.05rem; font-style: italic;">"Algo grande se acerca. Prepárate."</p>
+                
+                <button id="btn-cerrar-pista" style="margin-top: 20px; background: transparent; color: #fbbf24; border: 1px solid #fbbf24; padding: 10px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: background 0.1s;">CERRAR</button>
+            </div>
+        </div>
+
         <script>
-            // Mostrar la caja solo si el mes actual es Julio (mes 6 en JavaScript)
-            const fechaActual = new Date();
-            if (fechaActual.getMonth() === 6) {
-                document.getElementById('caja-sorpresa-temporal').style.display = 'block';
+            const hoy = new Date();
+            const mes = hoy.getMonth(); 
+            const dia = hoy.getDate();
+            
+            // Rango: Del 4 al 14 de agosto (Mes 7)
+            if (mes === 7 && dia >= 4 && dia <= 14) {
+                document.getElementById('caja-pista-1').style.display = 'block';
+            }
+
+            const btnAbrir = document.getElementById('btn-abrir-pista');
+            const modalPista = document.getElementById('modal-pista');
+            const btnCerrar = document.getElementById('btn-cerrar-pista');
+            const imgFlash = document.getElementById('imagen-pista');
+            let audioAndino = null;
+
+            // Variables para la Raspadita
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+
+            function initCanvas() {
+                // Ajustar resolución del canvas al tamaño del contenedor
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                
+                // Fondo que tapa el código
+                ctx.fillStyle = '#1e293b'; 
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Texto de intriga encima de la capa
+                ctx.font = 'bold 16px "Segoe UI"';
+                ctx.fillStyle = '#94a3b8';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('???°???\'??.?" ???°???\'??.?"', canvas.width/2, canvas.height/2);
+            }
+
+            function scratch(e) {
+                if (!isDrawing) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                let x, y;
+                if (e.type.includes('touch')) {
+                    x = e.touches[0].clientX - rect.left;
+                    y = e.touches[0].clientY - rect.top;
+                } else {
+                    x = e.clientX - rect.left;
+                    y = e.clientY - rect.top;
+                }
+
+                // La magia: borrar lo que ya está pintado
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI * 2); // 18 es el tamaño del "borrador"
+                ctx.fill();
+            }
+
+            // Eventos del Mouse
+            canvas.addEventListener('mousedown', () => isDrawing = true);
+            window.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mousemove', scratch);
+            
+            // Eventos Táctiles (Celulares)
+            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+            window.addEventListener('touchend', () => isDrawing = false);
+            canvas.addEventListener('touchmove', scratch);
+
+            if (btnAbrir) {
+                btnAbrir.addEventListener('click', () => {
+                    // 1. Mostrar Modal y Reiniciar Raspadita
+                    modalPista.style.display = 'flex';
+                    initCanvas(); // Se vuelve a tapar cada vez que abre la ventana
+
+                    setTimeout(() => { 
+                        modalPista.style.opacity = '1'; 
+                        
+                        // 2. Disparar Confeti
+                        if (typeof confetti === 'function') {
+                            confetti({
+                                particleCount: 100, spread: 80, origin: { y: 0.5 }, zIndex: 10001,
+                                colors: ['#fbbf24', '#00d2ff', '#ff3333', '#ffffff']
+                            });
+                        }
+                    }, 10);
+                    
+                    // 3. Secuencia de imágenes (Cusco 3s -> Giupi Normal)
+                    imgFlash.src = 'cusco.png';
+                    imgFlash.style.animation = 'none';
+                    void imgFlash.offsetWidth; // Forzar reflow
+                    imgFlash.style.animation = 'fantasma-cusco 3s forwards';
+                    
+                    setTimeout(() => {
+                        imgFlash.src = 'giupi.png'; 
+                        imgFlash.style.animation = 'aparecer-suave 0.5s forwards';
+                    }, 3000); 
+                    
+                    // 4. Reproducir música
+                    if (!audioAndino) {
+                        audioAndino = new Audio('sonido1.mp3');
+                    }
+                    audioAndino.play().catch(e => console.log("Error de audio:", e));
+                });
+            }
+
+            if (btnCerrar) {
+                btnCerrar.addEventListener('click', () => {
+                    modalPista.style.opacity = '0';
+                    setTimeout(() => { modalPista.style.display = 'none'; }, 150); 
+                    
+                    if (audioAndino) {
+                        audioAndino.pause();
+                        audioAndino.currentTime = 0; 
+                    }
+                });
             }
         </script>
-        <!-- FIN CAJA SORPRESA TEMPORAL -->
+        <!-- FIN PISTA 1 -->
 
         <div class="grid-2x2">
             <a href="categoria.html?cat=distancia" class="cajon-premium">
