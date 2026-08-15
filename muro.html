@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Giupi - Nuestro Muro</title>
     
-    <!-- Fuentes, Precargas y Confeti -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="preload" href="boleto.png" as="image">
     <link rel="preload" href="cusco.png" as="image">
-    <link rel="preload" href="giupi.png" as="image">
+    <link rel="preload" href="giupisticker.png" as="image">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -21,6 +21,10 @@
             margin: 0; 
             overflow-x: hidden;
             animation: entradaSuave 0.6s ease-out;
+            transition: background 1.5s ease;
+        }
+        body.noche-profunda {
+            background: #000000;
         }
 
         @keyframes entradaSuave {
@@ -28,162 +32,201 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Animación fantasma para la pista de Cusco (Extendida a 3 segundos) */
-        @keyframes fantasma-cusco {
-            0% { opacity: 0; transform: scale(0.5); filter: brightness(2); }
-            10% { opacity: 1; transform: scale(1.1); filter: brightness(1.2); }
-            20% { opacity: 1; transform: scale(1); }
-            85% { opacity: 1; transform: scale(1); } /* Se mantiene visible más tiempo */
-            100% { opacity: 0; transform: scale(0.9); visibility: hidden; }
+        @keyframes pulso-luz {
+            0% { transform: scale(0.8); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0.6; }
         }
 
-        /* Animación para que aparezca el Giupi normal después */
-        @keyframes aparecer-suave {
-            0% { opacity: 0; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); visibility: visible; }
-        }
-        
-        .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
-
-        .cajon-premium {
-            background: rgba(15, 23, 42, 0.45); 
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.07); 
-            border-radius: 24px; 
-            padding: 20px 15px;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 12px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            text-decoration: none;
-        }
-        
-        .cajon-premium:active {
-            transform: scale(0.95);
-            background: rgba(15, 23, 42, 0.7);
-            border-color: rgba(0, 210, 255, 0.3);
+        @keyframes brillo-texto {
+            to { background-position: 200% center; }
         }
 
-        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .cajon-premium h3 { font-size: 0.8rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        /* 
+         * LINTERNA OPTIMIZADA: 
+         * Hereda --x y --y del padre (#modal-pista) para evitar recálculos múltiples 
+         */
+        #modal-pista {
+            --x: 50%;
+            --y: 50%;
+        }
 
-        /* CATEGORÍA SECRETA */
-        .cajon-secreto {
-            flex-direction: row; padding: 18px; margin-top: 5px;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px dashed rgba(255, 255, 255, 0.15);
+        .mascara-linterna {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            pointer-events: none; 
+            z-index: 5;
+            will-change: background;
+        }
+
+        .particulas-polvo {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 6;
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)" opacity="0.6"/%3E%3C/svg%3E');
+            mix-blend-mode: color-dodge;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            -webkit-mask-image: radial-gradient(circle 80px at var(--x), var(--y), black 0%, transparent 100%);
+            mask-image: radial-gradient(circle 80px at var(--x), var(--y), black 0%, transparent 100%);
+            will-change: mask-image;
+        }
+
+        .boleto-fondo {
+            position: absolute; top: 20%; left: 5%; width: 90%; 
+            opacity: 0.3; 
+            filter: brightness(0.15); 
+            z-index: 1;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1);
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        .boleto-fondo.nitido {
+            filter: brightness(1.2); 
+            z-index: 2; 
+            pointer-events: none; 
+            opacity: 0; 
+            -webkit-mask-image: radial-gradient(circle 90px at var(--x) var(--y), black 50%, transparent 100%);
+            mask-image: radial-gradient(circle 90px at var(--x) var(--y), black 50%, transparent 100%);
+            will-change: opacity, mask-image, transform;
+        }
+
+        .boleto-fondo.iluminado, .boleto-fondo.nitido.iluminado {
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.05) translateY(-15px) !important;
+            transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* LINTERNA Y PARTICULAS ACTIVAS */
+        .luz-activa .boleto-fondo.nitido { opacity: 1; }
+        .luz-activa .particulas-polvo { opacity: 0.15; animation: polvo 15s linear infinite; }
+        .luz-activa .mascara-linterna {
+            background: radial-gradient(circle at var(--x) var(--y), rgba(251, 191, 36, 0.2) 0px, transparent 80px, rgba(0, 0, 0, 0.98) 150px);
+        }
+
+        @keyframes polvo {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+
+        #modal-pista {
+            transition: opacity 0.5s ease;
+        }
+        #modal-pista.cerrando {
+            opacity: 0 !important;
+        }
+        #modal-pista.cerrando .boleto-fondo {
+            transform: perspective(1000px) scale(0.8) translateY(30px) !important;
+            opacity: 0;
             transition: all 0.5s ease;
         }
-        .cajon-secreto.bloqueado {
-            filter: grayscale(100%); cursor: not-allowed;
-            color: #64748b;
+
+        #ventana-mensaje, #btn-cerrar-pista { transition: opacity 0.3s ease; }
+        .luz-activa #ventana-mensaje, .luz-activa #btn-cerrar-pista { opacity: 0 !important; pointer-events: none; }
+
+        .texto-traduccion { position: relative; z-index: 10; text-align: center; height: 100px; display: flex; flex-direction: column; justify-content: center; }
+        .txt-q { color: #fbbf24; font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 2px; transition: all 1s; opacity: 1; position: absolute; width: 100%; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+        .txt-q.oculto { opacity: 0; letter-spacing: 15px; filter: blur(5px); transform: scale(1.1); }
+        
+        @keyframes glitch-text {
+            0% { opacity: 1; transform: translateX(0); filter: blur(0px); text-shadow: 2px 0 #ef4444, -2px 0 #00d2ff; }
+            20% { opacity: 0.8; transform: translateX(-2px); filter: blur(1px); text-shadow: -2px 0 #ef4444, 2px 0 #00d2ff; }
+            40% { opacity: 0.9; transform: translateX(2px); filter: blur(0px); text-shadow: 2px 0 #ef4444, -2px 0 #00d2ff; }
+            60% { opacity: 0.7; transform: translateX(-1px); filter: blur(1px); text-shadow: -2px 0 #ef4444, 2px 0 #00d2ff; }
+            80% { opacity: 1; transform: translateX(3px); filter: blur(0px); text-shadow: 2px 0 #ef4444, -2px 0 #00d2ff; }
+            100% { opacity: 0.8; transform: translateX(0); filter: blur(1px); text-shadow: -2px 0 #ef4444, 2px 0 #00d2ff; }
         }
+        .contenedor-decodificando .txt-q { animation: glitch-text 0.15s infinite; color: #ffffff; }
+
+        .txt-e { color: #00d2ff; font-family: 'Dancing Script', cursive; font-size: 2.3rem; letter-spacing: 1px; transition: all 1s; opacity: 0; transform: scale(0.8); position: absolute; width: 100%; text-shadow: 0 0 15px rgba(0, 210, 255, 0.5); font-weight: bold; line-height: 1; }
+        .txt-e.visible { opacity: 1; transform: scale(1); }
+
+        @keyframes latido-btn { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(251, 191, 36, 0.1); } 50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(251, 191, 36, 0.3); } }
+        
+        /* BOTÓN PEQUEÑO TIPO PÍLDORA */
+        .btn-decodificar { 
+            position: relative; z-index: 10; 
+            background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(251, 191, 36, 0.6); 
+            color: #fbbf24; padding: 10px 20px; border-radius: 20px; 
+            font-weight: 600; font-size: 0.75rem; 
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; 
+            backdrop-filter: blur(5px); user-select: none; -webkit-user-select: none; touch-action: none; 
+            animation: latido-btn 2s infinite ease-in-out; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .btn-decodificar:active { animation: none; transform: scale(0.95); background: rgba(251, 191, 36, 0.15); }
+        .btn-decodificar.exito { animation: none; background: #00d2ff; color: #020617; border-color: #00d2ff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.5); pointer-events: none; }
+
+        .sticker-mision { position: absolute; top: -30px; right: -20px; width: 95px; z-index: 20; pointer-events: none; filter: drop-shadow(2px 8px 10px rgba(0,0,0,0.5)); }
+        .sticker-oculto { opacity: 0; transform: translateY(-50px) rotate(-20deg) scale(0.5); }
+        .sticker-revelado { opacity: 1; transform: translateY(0) rotate(15deg) scale(1); transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
+        .cajon-premium { background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 24px; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; }
+        .cajon-premium:active { transform: scale(0.95); background: rgba(15, 23, 42, 0.7); border-color: rgba(0, 210, 255, 0.3); }
+        .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .cajon-premium h3 { font-size: 0.8rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .cajon-secreto { flex-direction: row; padding: 18px; margin-top: 5px; background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(255, 255, 255, 0.15); transition: all 0.5s ease; }
+        .cajon-secreto.bloqueado { filter: grayscale(100%); cursor: not-allowed; color: #64748b; }
         .cajon-secreto.bloqueado h3 { color: #64748b; text-shadow: none; }
-        .cajon-secreto.desbloqueado {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(0, 0, 0, 0.8));
-            border: 1px solid #8b5cf6; filter: grayscale(0%);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); cursor: pointer;
-        }
+        .cajon-secreto.desbloqueado { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(0, 0, 0, 0.8)); border: 1px solid #8b5cf6; filter: grayscale(0%); box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); cursor: pointer; }
         .cajon-secreto.desbloqueado h3 { color: #c4b5fd; text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
         .candado-icono { font-size: 1.8rem; }
-
-        .btn-random {
-            margin-top: 10px; 
-            background: linear-gradient(135deg, rgba(251, 191, 36, 0.03), rgba(0, 210, 255, 0.03));
-            border: 1px dashed rgba(251, 191, 36, 0.25); border-radius: 20px; 
-            padding: 18px; text-align: center; color: #fbbf24; 
-            font-size: 0.85rem; cursor: pointer; text-transform: uppercase; 
-            letter-spacing: 1px; font-weight: 600; transition: all 0.2s;
-        }
+        .btn-random { margin-top: 10px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.03), rgba(0, 210, 255, 0.03)); border: 1px dashed rgba(251, 191, 36, 0.25); border-radius: 20px; padding: 18px; text-align: center; color: #fbbf24; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; transition: all 0.2s; }
         .btn-random:active { transform: scale(0.96); background: rgba(251, 191, 36, 0.1); }
-
-        .contenedor-progreso {
-            margin-top: 25px; padding: 20px; 
-            background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(10px);
-            border-radius: 24px; border: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        }
+        .contenedor-progreso { margin-top: 25px; padding: 20px; background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
         .texto-progreso { display: flex; justify-content: space-between; margin-bottom: 12px; }
         .label-progreso { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
         .num-progreso { color: #00d2ff; font-weight: 700; font-size: 0.9rem; }
-        
         .barra-fondo { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 10px; position: relative; }
-        .barra-llena { 
-            height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #fbbf24); 
-            border-radius: 10px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; 
-        }
-        .giupi-corredor {
-            position: absolute; right: -15px; top: -12px; width: 32px; height: auto;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); animation: flotar-suave 2s infinite ease-in-out;
-        }
-
-        .btn-flotante-galeria {
-            position: fixed; bottom: 25px; right: 25px; width: 45px; height: 45px;
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); cursor: pointer; z-index: 1000; transition: all 0.2s ease;
-        }
+        .barra-llena { height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #fbbf24); border-radius: 10px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .giupi-corredor { position: absolute; right: -15px; top: -12px; width: 32px; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); animation: flotar-suave 2s infinite ease-in-out; }
+        .btn-flotante-galeria { position: fixed; bottom: 25px; right: 25px; width: 45px; height: 45px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); cursor: pointer; z-index: 1000; transition: all 0.2s ease; }
         .btn-flotante-galeria:active { transform: scale(0.9); background: rgba(30, 41, 59, 0.95); border-color: #fbbf24; }
-
-        @keyframes flotar-suave { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-5px); } }
+        @keyframes flotar-suave { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3)); }
         .grid-2x2 a:nth-child(1) .img-cat { animation-delay: 0s; }
         .grid-2x2 a:nth-child(2) .img-cat { animation-delay: 0.5s; }
         .grid-2x2 a:nth-child(3) .img-cat { animation-delay: 1s; }
         .grid-2x2 a:nth-child(4) .img-cat { animation-delay: 1.5s; }
-        
         .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; font-size: 1.2rem; }
         @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
-
-        /* Estilo específico para evitar scroll mientras se raspa en móviles */
-        #scratch-canvas {
-            touch-action: none; 
-        }
     </style>
 </head>
 <body id="cuerpo">
     <main class="panel-cajones">
         
-        <!-- INICIO PISTA 1: 4 AL 14 DE AGOSTO -->
-        <div id="caja-pista-1" style="display: none; margin-bottom: 20px;">
-            <button id="btn-abrir-pista" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 15px; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 18px; border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.5); cursor: pointer; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.15); transition: transform 0.1s;">
-                <span style="font-size: 1.8rem;">🎂</span> 
-                <span style="font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 3px; background: linear-gradient(90deg, #fbbf24, #fef08a, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;">FALTAN 20 DÍAS</span>
-            </button>
+        <div id="caja-pista-2" style="display: none; margin-bottom: 30px; text-align: center; margin-top: 10px;">
+            <div id="btn-abrir-pista" style="cursor: pointer; display: inline-flex; flex-direction: column; align-items: center; position: relative; transition: transform 0.2s;">
+                <div style="position: absolute; width: 120px; height: 120px; background: rgba(0, 210, 255, 0.35); filter: blur(35px); border-radius: 50%; top: 10px; animation: pulso-luz 3s infinite alternate;"></div>
+                <img src="cusco.png" alt="Pista Cusco" style="width: 150px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); position: relative; z-index: 1; animation: flotar-suave 4s infinite ease-in-out;">
+                <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(2, 6, 23, 0.95)); border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 20px; padding: 12px 25px; margin-top: -15px; position: relative; z-index: 2; box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 10px rgba(0, 210, 255, 0.1); backdrop-filter: blur(10px);">
+                    <span id="texto-contador" style="font-family: 'Cinzel', serif; font-size: 1.3rem; background: linear-gradient(90deg, #00d2ff, #ffffff, #00d2ff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; letter-spacing: 2px; animation: brillo-texto 3s linear infinite;"></span>
+                </div>
+            </div>
         </div>
 
-        <!-- VENTANA MODAL (Oculta por defecto) -->
-        <div id="modal-pista" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 23, 0.95); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; opacity: 0; transition: opacity 0.15s ease-out;">
+        <div id="modal-pista" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; opacity: 0; overflow: hidden; touch-action: none;">
             
-            <div style="background: rgba(15, 23, 42, 0.9); border: 1px solid #fbbf24; border-radius: 20px; padding: 30px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(251, 191, 36, 0.2); width: 100%;">
-                
-                <!-- Contenedor fijo para la imagen intercambiable -->
-                <div style="height: 120px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
-                    <img src="cusco.png" id="imagen-pista" alt="Pista rápida" style="width: 120px; opacity: 0;">
+            <img src="boleto.png" id="img-boleto" class="boleto-fondo" alt="Boleto misterioso" onerror="this.style.display='none'">
+            <img src="boleto.png" id="img-boleto-nitido" class="boleto-fondo nitido" alt="Boleto nítido" onerror="this.style.display='none'">
+            <div id="mascara" class="mascara-linterna"></div>
+            <div id="particulas" class="particulas-polvo"></div>
+            
+            <div id="ventana-mensaje" style="position: relative; z-index: 10; text-align: center; width: 100%; max-width: 400px; background: rgba(15, 23, 42, 0.7); padding: 40px 20px; border-radius: 24px; border: 1px solid rgba(251, 191, 36, 0.2); box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.8);">
+                <img src="giupisticker.png" id="sticker-giupi" class="sticker-mision sticker-oculto" alt="Sticker" onerror="this.style.display='none'">
+                <p style="color: #fbbf24; font-size: 0.9rem; letter-spacing: 3px; margin-top: 0; margin-bottom: 30px; font-weight: bold;">✨ MENSAJE OCULTO ✨</p>
+                <div class="texto-traduccion" id="contenedor-textos">
+                    <h2 id="txt-q" class="txt-q">Qanwanqa maypipas</h2>
+                    <h2 id="txt-e" class="txt-e">"Contigo, donde sea"</h2>
                 </div>
-                
-                <h2 style="color: #fbbf24; margin-top: -10px; font-family: 'Cinzel', serif; font-size: 1.3rem; letter-spacing: 1px;">TU PRIMERA PISTA, MI AMOR ❤️</h2>
-                
-                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 5px;">DESCUBRE EL CÓDIGO OCULTO:</p>
-                
-                <!-- Contenedor Relativo para la Raspadita -->
-                <div style="position: relative; width: 100%; height: 60px; margin-bottom: 5px; border-radius: 10px; overflow: hidden; background: rgba(0, 0, 0, 0.8); border: 1px dashed #fbbf24; display: flex; justify-content: center; align-items: center;">
-                    <!-- El código real de fondo -->
-                    <code style="color: #00d2ff; font-size: 1.1rem; letter-spacing: 1px;">13°09'47.0"S 72°32'44.0"W</code>
-                    <!-- El lienzo que lo tapa -->
-                    <canvas id="scratch-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer;"></canvas>
+                <p id="txt-dias-modal" style="color: #f8fafc; font-size: 1rem; font-style: italic; opacity: 0; transition: opacity 1s; margin-top: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></p>
+                <div style="margin-top: 30px;">
+                    <button id="btn-decodificar" class="btn-decodificar">Mantén presionado para descubrir</button>
                 </div>
-                <p style="color: #fbbf24; font-size: 0.75rem; margin-bottom: 20px; font-style: italic;">👆 Raspa la tarjeta para revelar</p>
-                
-                <p style="color: #f1f5f9; font-size: 1.05rem; font-style: italic;">"Algo grande se acerca. Prepárate."</p>
-                
-                <button id="btn-cerrar-pista" style="margin-top: 20px; background: transparent; color: #fbbf24; border: 1px solid #fbbf24; padding: 10px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: background 0.1s;">CERRAR</button>
             </div>
+            
+            <button id="btn-cerrar-pista" style="position: relative; z-index: 10; margin-top: 30px; background: rgba(0,0,0,0.5); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); padding: 10px 25px; border-radius: 20px; font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; backdrop-filter: blur(5px);">CERRAR Y VOLVER</button>
         </div>
 
         <script>
@@ -191,154 +234,214 @@
             const mes = hoy.getMonth(); 
             const dia = hoy.getDate();
             
-            // Rango: Del 4 al 14 de agosto (Mes 7)
-            if (mes === 7 && dia >= 4 && dia <= 14) {
-                document.getElementById('caja-pista-1').style.display = 'block';
+            if (mes === 7 && dia >= 14 && dia <= 24) {
+                document.getElementById('caja-pista-2').style.display = 'block';
+                const diasFaltantes = 25 - dia;
+                const textoContador = diasFaltantes === 1 ? 'FALTA 1 DÍA' : `FALTAN ${diasFaltantes} DÍAS`;
+                document.getElementById('texto-contador').innerText = textoContador;
+                document.getElementById('txt-dias-modal').innerText = "Prepárate. " + textoContador.toLowerCase() + "...";
             }
 
             const btnAbrir = document.getElementById('btn-abrir-pista');
             const modalPista = document.getElementById('modal-pista');
             const btnCerrar = document.getElementById('btn-cerrar-pista');
-            const imgFlash = document.getElementById('imagen-pista');
-            let audioAndino = null;
+            const boleto = document.getElementById('img-boleto');
+            const boletoNitido = document.getElementById('img-boleto-nitido');
+            const txtQ = document.getElementById('txt-q');
+            const txtE = document.getElementById('txt-e');
+            const txtDiasModal = document.getElementById('txt-dias-modal');
+            const btnDecodificar = document.getElementById('btn-decodificar');
+            const contenedorTextos = document.getElementById('contenedor-textos');
+            const stickerGiupi = document.getElementById('sticker-giupi');
+            
+            let audioSorpresa = null;
+            let timerDecodificacion;
+            let vibInterval;
+            let estaDecodificado = false;
+            let linternaTicking = false;
 
-            // Variables para la Raspadita
-            const canvas = document.getElementById('scratch-canvas');
-            const ctx = canvas.getContext('2d');
-            let isDrawing = false;
-
-            function initCanvas() {
-                // Ajustar resolución del canvas al tamaño del contenedor
-                canvas.width = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
-                
-                // Fondo que tapa el código
-                ctx.fillStyle = '#1e293b'; 
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Texto de intriga encima de la capa
-                ctx.font = 'bold 16px "Segoe UI"';
-                ctx.fillStyle = '#94a3b8';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('???°???\'??.?" ???°???\'??.?"', canvas.width/2, canvas.height/2);
+            function fadeOutAudio(audioElement) {
+                if (!audioElement) return;
+                let vol = 1.0;
+                const interval = setInterval(() => {
+                    if (vol > 0.1) { vol -= 0.1; audioElement.volume = vol; } 
+                    else { clearInterval(interval); audioElement.pause(); audioElement.currentTime = 0; audioElement.volume = 1.0; }
+                }, 80);
             }
 
-            function scratch(e) {
-                if (!isDrawing) return;
+            function resetearMision() {
+                estaDecodificado = false;
+                clearTimeout(timerDecodificacion);
+                clearInterval(vibInterval);
                 
-                const rect = canvas.getBoundingClientRect();
-                let x, y;
-                if (e.type.includes('touch')) {
-                    x = e.touches[0].clientX - rect.left;
-                    y = e.touches[0].clientY - rect.top;
-                } else {
-                    x = e.clientX - rect.left;
-                    y = e.clientY - rect.top;
+                boleto.classList.remove('iluminado');
+                boletoNitido.classList.remove('iluminado');
+                txtQ.classList.remove('oculto');
+                txtE.classList.remove('visible');
+                contenedorTextos.classList.remove('contenedor-decodificando');
+                stickerGiupi.classList.remove('sticker-revelado');
+                stickerGiupi.classList.add('sticker-oculto');
+                
+                btnDecodificar.classList.remove('exito');
+                btnDecodificar.innerText = "Mantén presionado para descubrir";
+                btnDecodificar.style.pointerEvents = 'auto'; 
+                
+                txtDiasModal.style.opacity = '0';
+                
+                boleto.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+                boletoNitido.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+                
+                modalPista.style.setProperty('--x', '50%');
+                modalPista.style.setProperty('--y', '50%');
+            }
+
+            function actualizarLinterna(e) {
+                if (e.cancelable && e.type.startsWith('touch')) {
+                    e.preventDefault();
                 }
 
-                // La magia: borrar lo que ya está pintado
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.beginPath();
-                ctx.arc(x, y, 18, 0, Math.PI * 2); 
-                ctx.fill();
+                let x, y;
+                if (e.touches && e.touches.length > 0) { x = e.touches[0].clientX; y = e.touches[0].clientY; } 
+                else { x = e.clientX; y = e.clientY; }
+                
+                if(x !== undefined && y !== undefined) {
+                    if (!linternaTicking) {
+                        window.requestAnimationFrame(function() {
+                            // Ahora se actualiza solo en el padre
+                            modalPista.style.setProperty('--x', x + 'px');
+                            modalPista.style.setProperty('--y', y + 'px');
+
+                            if(!estaDecodificado) {
+                                const centroX = window.innerWidth / 2;
+                                const centroY = window.innerHeight / 2;
+                                const rotX = ((y - centroY) / centroY) * -10; 
+                                const rotY = ((x - centroX) / centroX) * 10;
+                                
+                                const transform3D = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
+                                boleto.style.transform = transform3D;
+                                boletoNitido.style.transform = transform3D;
+                            }
+                            linternaTicking = false;
+                        });
+                        linternaTicking = true;
+                    }
+                }
             }
 
-            // Eventos del Mouse
-            canvas.addEventListener('mousedown', () => isDrawing = true);
-            window.addEventListener('mouseup', () => isDrawing = false);
-            canvas.addEventListener('mousemove', scratch);
-            
-            // Eventos Táctiles (Celulares)
-            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
-            window.addEventListener('touchend', () => isDrawing = false);
-            canvas.addEventListener('touchmove', scratch);
+            function encenderLinterna(e) {
+                if (e.target.closest('#btn-decodificar') || e.target.closest('#btn-cerrar-pista')) return;
+                if (e.cancelable && e.type.startsWith('touch')) { e.preventDefault(); }
+
+                modalPista.classList.add('luz-activa');
+                actualizarLinterna(e); 
+            }
+
+            function apagarLinterna() {
+                modalPista.classList.remove('luz-activa');
+                if(!estaDecodificado) {
+                    boleto.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+                    boletoNitido.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+                }
+            }
+
+            modalPista.addEventListener('mousedown', encenderLinterna);
+            modalPista.addEventListener('touchstart', encenderLinterna, { passive: false });
+            modalPista.addEventListener('mousemove', actualizarLinterna);
+            modalPista.addEventListener('touchmove', actualizarLinterna, { passive: false });
+            modalPista.addEventListener('mouseup', apagarLinterna);
+            modalPista.addEventListener('mouseleave', apagarLinterna);
+            modalPista.addEventListener('touchend', apagarLinterna);
+            modalPista.addEventListener('touchcancel', apagarLinterna);
+
+            function iniciarDecodificacion(e) {
+                if (estaDecodificado) return;
+                if (e.cancelable) e.preventDefault(); 
+                
+                contenedorTextos.classList.add('contenedor-decodificando');
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 100, 100]);
+                    vibInterval = setInterval(() => { navigator.vibrate([100, 100, 100]); }, 800);
+                }
+
+                timerDecodificacion = setTimeout(() => {
+                    estaDecodificado = true;
+                    clearInterval(vibInterval);
+                    contenedorTextos.classList.remove('contenedor-decodificando');
+                    
+                    boleto.style.transform = ''; 
+                    boletoNitido.style.transform = ''; 
+                    boleto.classList.add('iluminado');
+                    boletoNitido.classList.add('iluminado');
+                    
+                    txtQ.classList.add('oculto');
+                    txtE.classList.add('visible');
+                    stickerGiupi.classList.remove('sticker-oculto');
+                    stickerGiupi.classList.add('sticker-revelado');
+                    
+                    btnDecodificar.classList.add('exito');
+                    btnDecodificar.innerText = "¡Misterio revelado!";
+                    btnDecodificar.style.pointerEvents = 'none'; 
+                    txtDiasModal.style.opacity = '1';
+                    
+                    if (typeof confetti === 'function') {
+                        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 }, zIndex: 10001, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
+                    }
+                    if (navigator.vibrate) navigator.vibrate([200, 100, 300, 100, 400]);
+                }, 2500);
+            }
+
+            function detenerDecodificacion(e) {
+                if (estaDecodificado) return;
+                clearTimeout(timerDecodificacion);
+                clearInterval(vibInterval);
+                contenedorTextos.classList.remove('contenedor-decodificando');
+            }
+
+            btnDecodificar.addEventListener('pointerdown', iniciarDecodificacion);
+            btnDecodificar.addEventListener('pointerup', detenerDecodificacion);
+            btnDecodificar.addEventListener('pointerleave', detenerDecodificacion);
+            btnDecodificar.addEventListener('pointercancel', detenerDecodificacion);
 
             if (btnAbrir) {
                 btnAbrir.addEventListener('click', () => {
-                    // 1. Silenciar música de fondo del index padre
-                    try {
-                        if (window.parent && window.parent.musica) {
-                            window.parent.musica.pause();
-                        }
-                    } catch (e) {}
-
-                    // 2. Mostrar Modal y Reiniciar Raspadita
+                    try { if (window.parent && window.parent.musica) window.parent.musica.pause(); } catch (e) {}
+                    resetearMision();
+                    
+                    document.body.classList.add('noche-profunda');
+                    
                     modalPista.style.display = 'flex';
-                    initCanvas(); 
-
-                    setTimeout(() => { 
-                        modalPista.style.opacity = '1'; 
-                        
-                        // 3. Disparar Confeti
-                        if (typeof confetti === 'function') {
-                            confetti({
-                                particleCount: 100, spread: 80, origin: { y: 0.5 }, zIndex: 10001,
-                                colors: ['#fbbf24', '#00d2ff', '#ff3333', '#ffffff']
-                            });
-                        }
-                    }, 10);
-                    
-                    // 4. Secuencia de imágenes (Cusco 3s -> Giupi Normal)
-                    imgFlash.src = 'cusco.png';
-                    imgFlash.style.animation = 'none';
-                    void imgFlash.offsetWidth; 
-                    imgFlash.style.animation = 'fantasma-cusco 3s forwards';
-                    
-                    setTimeout(() => {
-                        imgFlash.src = 'giupi.png'; 
-                        imgFlash.style.animation = 'aparecer-suave 0.5s forwards';
-                    }, 3000); 
-                    
-                    // 5. Reproducir música andina
-                    if (!audioAndino) {
-                        audioAndino = new Audio('sonido1.mp3');
-                    }
-                    audioAndino.play().catch(e => console.log("Error de audio:", e));
+                    setTimeout(() => { modalPista.style.opacity = '1'; }, 10);
+                    if (!audioSorpresa) audioSorpresa = new Audio('sorpresa2.mp3');
+                    audioSorpresa.play().catch(e => console.log("Audio omitido"));
                 });
             }
 
             if (btnCerrar) {
                 btnCerrar.addEventListener('click', () => {
-                    modalPista.style.opacity = '0';
-                    setTimeout(() => { modalPista.style.display = 'none'; }, 150); 
+                    modalPista.classList.add('cerrando');
+                    document.body.classList.remove('noche-profunda');
                     
-                    // Apagar música andina
-                    if (audioAndino) {
-                        audioAndino.pause();
-                        audioAndino.currentTime = 0; 
-                    }
-
-                    // Reactivar música de fondo del index padre
+                    setTimeout(() => { 
+                        modalPista.style.display = 'none'; 
+                        modalPista.classList.remove('cerrando');
+                        resetearMision(); 
+                    }, 500); 
+                    
+                    fadeOutAudio(audioSorpresa);
                     try {
-                        if (window.parent && window.parent.activarMusica) {
-                            window.parent.activarMusica();
-                        } else if (window.parent && window.parent.musica) {
-                            window.parent.musica.play();
-                        }
+                        if (window.parent && window.parent.activarMusica) window.parent.activarMusica();
+                        else if (window.parent && window.parent.musica) window.parent.musica.play();
                     } catch (e) {}
                 });
             }
         </script>
-        <!-- FIN PISTA 1 -->
 
         <div class="grid-2x2">
-            <a href="categoria.html?cat=distancia" class="cajon-premium">
-                <img src="giupi-viajero.png" alt="Distancia" class="img-cat">
-                <h3>A DISTANCIA</h3>
-            </a>
-            <a href="categoria.html?cat=reencuentro" class="cajon-premium">
-                <img src="giupi-elegante.png" alt="Reencuentro" class="img-cat">
-                <h3>REENCUENTRO</h3>
-            </a>
-            <a href="categoria.html?cat=casa" class="cajon-premium">
-                <img src="giupi-chef.png" alt="En Casa" class="img-cat">
-                <h3>EN CASA</h3>
-            </a>
-            <a href="categoria.html?cat=airelibre" class="cajon-premium">
-                <img src="giupi-explorador.png" alt="Aire Libre" class="img-cat">
-                <h3>AIRE LIBRE</h3>
-            </a>
+            <a href="categoria.html?cat=distancia" class="cajon-premium"><img src="giupi-viajero.png" alt="Distancia" class="img-cat"><h3>A DISTANCIA</h3></a>
+            <a href="categoria.html?cat=reencuentro" class="cajon-premium"><img src="giupi-elegante.png" alt="Reencuentro" class="img-cat"><h3>REENCUENTRO</h3></a>
+            <a href="categoria.html?cat=casa" class="cajon-premium"><img src="giupi-chef.png" alt="En Casa" class="img-cat"><h3>EN CASA</h3></a>
+            <a href="categoria.html?cat=airelibre" class="cajon-premium"><img src="giupi-explorador.png" alt="Aire Libre" class="img-cat"><h3>AIRE LIBRE</h3></a>
         </div>
 
         <a href="#" id="cajon-secreto" class="cajon-premium cajon-secreto bloqueado">
@@ -352,16 +455,11 @@
                 <span class="num-progreso" id="contador-progreso">0 / 100</span>
             </div>
             <div class="barra-fondo">
-                <div class="barra-llena" id="barra-progreso">
-                    <img src="giupi.png" class="giupi-corredor" alt="Giupi Tracker">
-                </div>
+                <div class="barra-llena" id="barra-progreso"><img src="giupi.png" class="giupi-corredor" alt="Giupi Tracker"></div>
             </div>
         </div>
 
-        <div class="btn-random" id="btn-revivir">
-            ✨ REVIVIR UN INSTANTE ALEATORIO
-        </div>
-
+        <div class="btn-random" id="btn-revivir">✨ REVIVIR UN INSTANTE ALEATORIO</div>
     </main>
 
     <div class="btn-flotante-galeria" onclick="window.location.href='galeria.html'">📸</div>
@@ -370,7 +468,6 @@
         let misionesCompletadas = [];
         const categorias = ['distancia', 'reencuentro', 'casa', 'airelibre', 'secreta'];
         let conteoCategorias = { 'distancia': 0, 'reencuentro': 0, 'casa': 0, 'airelibre': 0, 'secreta': 0 };
-        const nombresCat = { 'distancia': 'Distancia', 'reencuentro': 'Reencuentro', 'casa': 'En Casa', 'airelibre': 'Aire Libre', 'secreta': 'Secreta' };
         let totalCompletadas = 0;
 
         categorias.forEach(cat => {
@@ -395,14 +492,11 @@
             });
         });
 
-        // Configurar barra
         setTimeout(() => {
-            // Barra Progreso
             const porcentaje = Math.min((totalCompletadas / 100) * 100, 100);
             document.getElementById('barra-progreso').style.width = porcentaje + '%';
             document.getElementById('contador-progreso').innerText = totalCompletadas + " / 100";
 
-            // Desbloqueo de Categoría Secreta
             const btnSecreto = document.getElementById('cajon-secreto');
             if (totalCompletadas >= 50) {
                 btnSecreto.classList.remove('bloqueado');
