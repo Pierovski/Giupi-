@@ -69,7 +69,8 @@
     <main class="panel-cajones">
         
         <!-- BOTÓN DE SORPRESA DIRECTO -->
-        <a href="sorpresa.html" class="btn-regalo-especial">🎁 ABRIR REGALO</a>
+<a href="sorpresa.html" class="btn-regalo-especial" onclick="try{if(window.parent && window.parent.musica) window.parent.musica.pause(); if(window.top && window.top.musica) window.top.musica.pause();}catch(e){}">🎁 ABRIR REGALO</a>
+
 
         <div class="grid-2x2">
             <a href="categoria.html?cat=distancia" class="cajon-premium"><img src="giupi-viajero.png" alt="Distancia" class="img-cat"><h3>A DISTANCIA</h3></a>
