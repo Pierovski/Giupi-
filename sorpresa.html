@@ -10,13 +10,13 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: #020617; color: #f8fafc; overflow: hidden; height: 100vh; touch-action: manipulation; }
 
-        /* Pantalla Inicial */
+        /* Protector de Fuentes y Pantalla Inicial */
         #pantalla-desbloqueo { z-index: 100; opacity: 1; pointer-events: auto; transition: opacity 0.8s ease; background: #020617; }
         .btn-abrir-regalo {
             background: linear-gradient(135deg, #fbbf24, #d97706); border: none; padding: 20px 45px; border-radius: 40px; 
             color: #020617; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; 
             box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); cursor: pointer; animation: pulso-oro 2s infinite;
-            display: none; 
+            display: none;
         }
         .btn-abrir-regalo:active { transform: scale(0.95); }
         #cargando-txt { color: #fbbf24; font-size: 1rem; letter-spacing: 2px; animation: pulse 1s infinite alternate; }
@@ -24,7 +24,7 @@
         @keyframes pulso-oro { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); } 70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
         @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
 
-        /* Pantallas Base */
+        /* Estilos base de pantallas */
         .pantalla {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -59,7 +59,7 @@
         }
         .pantalla.activa .img-documento { transform: translateY(0); opacity: 1; pointer-events: auto; transition-delay: 0.5s; }
 
-        /* Contenedor de Videos */
+        /* Contenedor de Videos Cinemático */
         #visor-videos { z-index: 5; background: #000; padding: 0; }
         .letterbox { position: absolute; width: 100%; height: 12vh; background: #000; z-index: 10; transition: transform 1s ease; }
         .letterbox.top { top: 0; transform: translateY(-100%); }
@@ -86,6 +86,7 @@
         .btn-sellar { background: linear-gradient(135deg, #00d2ff, #0077ff); border: none; padding: 15px 30px; border-radius: 30px; color: #020617; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 15px rgba(0, 210, 255, 0.4); transition: transform 0.2s; }
         .btn-sellar:active { transform: scale(0.95); }
 
+        /* Pantalla Post-Créditos */
         #post-creditos { z-index: 200; background: #000; opacity: 0; pointer-events: none; transition: opacity 2s ease; }
     </style>
 </head>
@@ -203,7 +204,6 @@
             }());
         }
 
-        // El parámetro 'velocidad' permite alterar los FPS del video (1 es normal, 0.5 es cámara lenta)
         function reproducirVideo(src, velocidad = 1.0) {
             return new Promise((resolve) => {
                 const visor = document.getElementById('visor-videos');
@@ -212,7 +212,7 @@
                 visor.classList.add('activa'); 
                 contenedor.innerHTML = `<video src="${src}" muted playsinline></video>`;
                 activeVideo = contenedor.querySelector('video');
-                activeVideo.playbackRate = velocidad; // Aplica la cámara lenta si se solicita
+                activeVideo.playbackRate = velocidad; 
                 
                 activeVideo.addEventListener('playing', () => { visor.classList.add('mostrando-video'); });
                 
@@ -240,14 +240,14 @@
             const audioVoz = document.getElementById('audio-voz');
             
             if (audioVoz.paused) {
-                audioFondo.volume = 0.02; // Ducking: Baja el fondo para que la voz brille
+                audioFondo.volume = 0.02; // Volumen casi imperceptible
                 audioVoz.play();
                 this.classList.remove('latido');
                 this.style.background = "rgba(251, 191, 36, 0.3)";
             } else {
                 audioVoz.pause();
                 audioVoz.currentTime = 0;
-                audioFondo.volume = 0.8; // Restaura el volumen original
+                audioFondo.volume = 0.8; // Restaura volumen
                 this.style.background = "rgba(255,255,255,0.1)";
             }
 
@@ -269,6 +269,12 @@
         // 5. EL GUION CINEMATOGRÁFICO
         async function iniciarSorpresa() {
             juegoIniciado = true;
+
+            // FRENAR LA MÚSICA DEL MURO AL INICIAR
+            try { 
+                if (window.parent && window.parent.musica) window.parent.musica.pause(); 
+                if (window.top && window.top.musica) window.top.musica.pause();
+            } catch (e) {}
 
             document.getElementById('pantalla-desbloqueo').style.opacity = '0';
             document.getElementById('pantalla-desbloqueo').style.pointerEvents = 'none';
