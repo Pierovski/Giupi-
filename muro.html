@@ -6,391 +6,70 @@
     <title>Giupi - Nuestro Muro</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    <link rel="preload" href="boleto.png" as="image">
-    <link rel="preload" href="cusco.png" as="image">
-    <link rel="preload" href="giupisticker.png" as="image">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* PREVENCIÓN DE SELECCIÓN DE TEXTO Y MENÚS CONTEXTUALES EN MÓVILES */
-        * { 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', sans-serif; 
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none; /* Safari */
-            -khtml-user-select: none; /* Konqueror HTML */
-            -moz-user-select: none; /* Old versions of Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
-        }
-
-        /* EVITAR ARRASTRAR IMÁGENES Y MENÚS CONTEXTUALES SOBRE ELLAS */
-        img {
-            -webkit-user-drag: none;
-            -webkit-touch-callout: none;
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        img { -webkit-user-drag: none; -webkit-touch-callout: none; }
         
-        body { 
-            background: #020617; 
-            min-height: 100vh; 
-            padding: 40px 0 80px; 
-            margin: 0; 
-            overflow-x: hidden;
-            transition: background 1.5s ease;
-        }
-        body.noche-profunda { background: #000000; }
+        body { background: #020617; min-height: 100vh; padding: 40px 0 80px; margin: 0; overflow-x: hidden; }
 
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: #020617; z-index: 10000; 
-            display: flex; justify-content: center; align-items: center; 
-            transition: opacity 0.8s ease;
-        }
-        .splash-logo {
-            color: #fbbf24; font-family: 'Cinzel', serif; font-size: 3.5rem; 
-            letter-spacing: 6px; text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
-            animation: pulso-luz 1.5s infinite alternate;
-        }
-
-        #page-transition {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: #000000; z-index: 9999; pointer-events: none; 
-            opacity: 0; transition: opacity 0.4s ease;
-        }
-
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #020617; z-index: 10000; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
+        .splash-logo { color: #fbbf24; font-family: 'Cinzel', serif; font-size: 3.5rem; letter-spacing: 6px; text-shadow: 0 0 30px rgba(251, 191, 36, 0.5); animation: pulso-luz 1.5s infinite alternate; }
         @keyframes pulso-luz { 0% { transform: scale(0.95); opacity: 0.6; } 100% { transform: scale(1.05); opacity: 1; } }
-        @keyframes brillo-texto { to { background-position: 200% center; } }
-
-        #modal-pista { --x: 50%; --y: 50%; }
-        .mascara-linterna { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.98); pointer-events: none; z-index: 5; will-change: background; }
-        .particulas-polvo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 6; background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)" opacity="0.6"/%3E%3C/svg%3E'); mix-blend-mode: color-dodge; opacity: 0; transition: opacity 0.3s ease; -webkit-mask-image: radial-gradient(circle 80px at var(--x), var(--y), black 0%, transparent 100%); mask-image: radial-gradient(circle 80px at var(--x), var(--y), black 0%, transparent 100%); will-change: mask-image; }
         
-        /* BLOQUEAR SELECCIÓN DE IMAGEN PARA EVITAR EL MENÚ DEL MÓVIL */
-        .boleto-fondo { 
-            position: absolute; top: 20%; left: 5%; width: 90%; opacity: 0.3; filter: brightness(0.15); z-index: 1; border-radius: 12px; box-shadow: 0 0 40px rgba(0,0,0,0.9); transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1); transform-origin: center center; will-change: transform;
-            pointer-events: none; /* Impide interactuar directamente con la imagen */
-        }
-        .boleto-fondo.nitido { filter: brightness(1.2); z-index: 2; pointer-events: none; opacity: 0; -webkit-mask-image: radial-gradient(circle 90px at var(--x) var(--y), black 50%, transparent 100%); mask-image: radial-gradient(circle 90px at var(--x) var(--y), black 50%, transparent 100%); will-change: opacity, mask-image, transform; }
-        .boleto-fondo.iluminado, .boleto-fondo.nitido.iluminado { transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.05) translateY(-15px) !important; transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #page-transition { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
 
-        .luz-activa .boleto-fondo.nitido { opacity: 1; }
-        .luz-activa .particulas-polvo { opacity: 0.15; animation: polvo 15s linear infinite; }
-        .luz-activa .mascara-linterna { background: radial-gradient(circle at var(--x) var(--y), rgba(251, 191, 36, 0.2) 0px, transparent 80px, rgba(0, 0, 0, 0.98) 150px); }
-        @keyframes polvo { 0% { background-position: 0 0; } 100% { background-position: 100px 100px; } }
-
-        #modal-pista { transition: opacity 0.5s ease; }
-        #modal-pista.cerrando { opacity: 0 !important; }
-        #modal-pista.cerrando .boleto-fondo { transform: perspective(1000px) scale(0.8) translateY(30px) !important; opacity: 0; transition: all 0.5s ease; }
-        #ventana-mensaje, #btn-cerrar-pista { transition: opacity 0.3s ease; }
-        .luz-activa #ventana-mensaje, .luz-activa #btn-cerrar-pista { opacity: 0 !important; pointer-events: none; }
-
-        .texto-traduccion { position: relative; z-index: 10; text-align: center; height: 100px; display: flex; flex-direction: column; justify-content: center; }
-        .txt-q { color: #fbbf24; font-family: 'Cinzel', serif; font-size: 1.8rem; letter-spacing: 2px; transition: all 1s; opacity: 1; position: absolute; width: 100%; text-shadow: 0 4px 10px rgba(0,0,0,0.8); }
-        .txt-q.oculto { opacity: 0; letter-spacing: 15px; filter: blur(5px); transform: scale(1.1); }
-        @keyframes glitch-text { 0% { opacity: 1; transform: translateX(0); text-shadow: 2px 0 #ef4444, -2px 0 #00d2ff; } 20% { opacity: 0.8; transform: translateX(-2px); text-shadow: -2px 0 #ef4444, 2px 0 #00d2ff; } 40% { opacity: 0.9; transform: translateX(2px); text-shadow: 2px 0 #ef4444, -2px 0 #00d2ff; } 60% { opacity: 0.7; transform: translateX(-1px); text-shadow: -2px 0 #ef4444, 2px 0 #00d2ff; } 80% { opacity: 1; transform: translateX(3px); text-shadow: 2px 0 #ef4444, -2px 0 #00d2ff; } 100% { opacity: 0.8; transform: translateX(0); text-shadow: -2px 0 #ef4444, 2px 0 #00d2ff; } }
-        .contenedor-decodificando .txt-q { animation: glitch-text 0.15s infinite; color: #ffffff; }
-        .txt-e { color: #00d2ff; font-family: 'Dancing Script', cursive; font-size: 2.3rem; letter-spacing: 1px; transition: all 1s; opacity: 0; transform: scale(0.8); position: absolute; width: 100%; text-shadow: 0 0 15px rgba(0, 210, 255, 0.5); font-weight: bold; line-height: 1; }
-        .txt-e.visible { opacity: 1; transform: scale(1); }
-
-        @keyframes latido-btn { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(251, 191, 36, 0.1); } 50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(251, 191, 36, 0.3); } }
-        .btn-decodificar { position: relative; z-index: 10; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(251, 191, 36, 0.6); color: #fbbf24; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; backdrop-filter: blur(5px); animation: latido-btn 2s infinite ease-in-out; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .btn-decodificar:active { animation: none; transform: scale(0.95); background: rgba(251, 191, 36, 0.15); }
-        .btn-decodificar.exito { animation: none; background: #00d2ff; color: #020617; border-color: #00d2ff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.5); pointer-events: none; }
-        .sticker-mision { position: absolute; top: -30px; right: -20px; width: 95px; z-index: 20; pointer-events: none; filter: drop-shadow(2px 8px 10px rgba(0,0,0,0.5)); }
-        .sticker-oculto { opacity: 0; transform: translateY(-50px) rotate(-20deg) scale(0.5); }
-        .sticker-revelado { opacity: 1; transform: translateY(0) rotate(15deg) scale(1); transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-        .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; transition: transform 0.1s ease-out; }
+        .panel-cajones { display: flex; flex-direction: column; gap: 15px; padding: 0 20px; margin-top: 15px; }
         
-        .cajon-premium { 
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.3)); 
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -1px 1px rgba(0, 0, 0, 0.3), 0 8px 32px 0 rgba(0, 0, 0, 0.4); 
-            border-radius: 24px; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; 
+        /* BOTÓN DE SORPRESA */
+        .btn-regalo-especial {
+            background: linear-gradient(135deg, #fbbf24, #d97706); border: none; padding: 18px; border-radius: 20px;
+            color: #020617; font-weight: 800; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); cursor: pointer; text-align: center;
+            animation: pulso-oro 2s infinite; text-decoration: none; display: block; margin-bottom: 10px;
         }
-        .cajon-premium:active { transform: scale(0.95); background: rgba(15, 23, 42, 0.8); border-color: rgba(0, 210, 255, 0.3); }
+        .btn-regalo-especial:active { transform: scale(0.96); }
+        @keyframes pulso-oro { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); } 70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+
+        .cajon-premium { background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.3)); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-decoration: none; transition: transform 0.2s; }
+        .cajon-premium:active { transform: scale(0.95); background: rgba(15, 23, 42, 0.8); }
         .grid-2x2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .cajon-premium h3 { font-size: 0.8rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .cajon-secreto { flex-direction: row; padding: 18px; margin-top: 5px; background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(255, 255, 255, 0.15); transition: all 0.5s ease; box-shadow: none; }
-        .cajon-secreto.bloqueado { filter: grayscale(100%); cursor: not-allowed; color: #64748b; }
-        .cajon-secreto.bloqueado h3 { color: #64748b; text-shadow: none; }
-        .cajon-secreto.desbloqueado { background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(139, 92, 246, 0.5); filter: grayscale(0%); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 0 20px rgba(139, 92, 246, 0.3); cursor: pointer; }
-        .cajon-secreto.desbloqueado h3 { color: #c4b5fd; text-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+        .cajon-premium h3 { font-size: 0.8rem; font-weight: 700; margin: 0; color: #f1f5f9; text-transform: uppercase; letter-spacing: 1.5px; }
         
-        @keyframes romper-candado {
-            0% { transform: scale(1) rotate(0deg); }
-            20% { transform: scale(1.3) rotate(-15deg); filter: brightness(1.5); }
-            40% { transform: scale(1.3) rotate(15deg); filter: brightness(1.5); }
-            60% { transform: scale(1.5) rotate(-10deg); opacity: 1; }
-            100% { transform: scale(0) rotate(20deg); opacity: 0; }
-        }
-        .candado-icono { font-size: 1.8rem; display: inline-block; }
-
-        .btn-random { margin-top: 10px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.03), rgba(0, 210, 255, 0.03)); border: 1px dashed rgba(251, 191, 36, 0.25); border-radius: 20px; padding: 18px; text-align: center; color: #fbbf24; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; transition: all 0.2s; }
-        .btn-random:active { transform: scale(0.96); background: rgba(251, 191, 36, 0.1); }
-        .contenedor-progreso { margin-top: 25px; padding: 20px; background: rgba(15, 23, 42, 0.35); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(255,255,255,0.04); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 20px rgba(0,0,0,0.3); }
+        .cajon-secreto { flex-direction: row; padding: 18px; margin-top: 5px; background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(255, 255, 255, 0.15); transition: all 0.5s ease; }
+        .cajon-secreto.bloqueado { filter: grayscale(100%); cursor: not-allowed; color: #64748b; }
+        .cajon-secreto.desbloqueado { background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(139, 92, 246, 0.5); filter: grayscale(0%); cursor: pointer; }
+        .cajon-secreto.desbloqueado h3 { color: #c4b5fd; }
+        
+        .btn-random { margin-top: 10px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.03), rgba(0, 210, 255, 0.03)); border: 1px dashed rgba(251, 191, 36, 0.25); border-radius: 20px; padding: 18px; text-align: center; color: #fbbf24; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+        .btn-random:active { transform: scale(0.96); }
+        
+        .contenedor-progreso { margin-top: 25px; padding: 20px; background: rgba(15, 23, 42, 0.35); border-radius: 24px; border: 1px solid rgba(255,255,255,0.04); }
         .texto-progreso { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .label-progreso { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+        .label-progreso { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
         .num-progreso { color: #00d2ff; font-weight: 700; font-size: 0.9rem; }
         .barra-fondo { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 10px; position: relative; }
-        .barra-llena { height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #fbbf24); border-radius: 10px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+        .barra-llena { height: 100%; width: 0%; background: linear-gradient(90deg, #00d2ff, #fbbf24); border-radius: 10px; transition: width 1.5s; position: relative; }
         .giupi-corredor { position: absolute; right: -15px; top: -12px; width: 32px; height: auto; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); animation: flotar-suave 2s infinite ease-in-out; }
-        .btn-flotante-galeria { position: fixed; bottom: 25px; right: 25px; width: 45px; height: 45px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); cursor: pointer; z-index: 1000; transition: all 0.2s ease; }
-        .btn-flotante-galeria:active { transform: scale(0.9); background: rgba(30, 41, 59, 0.95); border-color: #fbbf24; }
+        
+        .btn-flotante-galeria { position: fixed; bottom: 25px; right: 25px; width: 45px; height: 45px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; z-index: 1000; }
+        
         @keyframes flotar-suave { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-        .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.3)); }
-        .grid-2x2 a:nth-child(1) .img-cat { animation-delay: 0s; }
-        .grid-2x2 a:nth-child(2) .img-cat { animation-delay: 0.5s; }
-        .grid-2x2 a:nth-child(3) .img-cat { animation-delay: 1s; }
-        .grid-2x2 a:nth-child(4) .img-cat { animation-delay: 1.5s; }
-        .corazon-particula { position: fixed; pointer-events: none; z-index: 2000; animation: volar-particula var(--duracion) ease-out forwards; font-size: 1.2rem; }
-        @keyframes volar-particula { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
+        .img-cat { width: 85%; max-height: 90px; object-fit: contain; animation: flotar-suave 3s ease-in-out infinite; }
     </style>
 </head>
-<body id="cuerpo">
+<body>
     
     <div id="splash-screen">
         <h1 class="splash-logo">GIUPI</h1>
     </div>
     <div id="page-transition"></div>
 
-    <main class="panel-cajones" id="contenedor-principal">
+    <main class="panel-cajones">
         
-        <div id="caja-pista-2" style="display: none; margin-bottom: 30px; text-align: center; margin-top: 10px;">
-            <div id="btn-abrir-pista" style="cursor: pointer; display: inline-flex; flex-direction: column; align-items: center; position: relative; transition: transform 0.2s;">
-                <div style="position: absolute; width: 120px; height: 120px; background: rgba(0, 210, 255, 0.35); filter: blur(35px); border-radius: 50%; top: 10px; animation: pulso-luz 3s infinite alternate;"></div>
-                <img src="cusco.png" alt="Pista Cusco" style="width: 150px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); position: relative; z-index: 1; animation: flotar-suave 4s infinite ease-in-out;">
-                <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(2, 6, 23, 0.95)); border: 1px solid rgba(0, 210, 255, 0.4); border-radius: 20px; padding: 12px 25px; margin-top: -15px; position: relative; z-index: 2; box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 10px rgba(0, 210, 255, 0.1); backdrop-filter: blur(10px);">
-                    <span id="texto-contador" style="font-family: 'Cinzel', serif; font-size: 1.3rem; background: linear-gradient(90deg, #00d2ff, #ffffff, #00d2ff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; letter-spacing: 2px; animation: brillo-texto 3s linear infinite;"></span>
-                </div>
-            </div>
-        </div>
-
-        <div id="modal-pista" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; padding: 20px; opacity: 0; overflow: hidden; touch-action: none;">
-            
-            <img src="boleto.png" id="img-boleto" class="boleto-fondo" alt="Boleto misterioso" onerror="this.style.display='none'">
-            <img src="boleto.png" id="img-boleto-nitido" class="boleto-fondo nitido" alt="Boleto nítido" onerror="this.style.display='none'">
-            <div id="mascara" class="mascara-linterna"></div>
-            <div id="particulas" class="particulas-polvo"></div>
-            
-            <div id="ventana-mensaje" style="position: relative; z-index: 10; text-align: center; width: 100%; max-width: 400px; background: rgba(15, 23, 42, 0.7); padding: 40px 20px; border-radius: 24px; border: 1px solid rgba(251, 191, 36, 0.2); box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.8);">
-                <img src="giupisticker.png" id="sticker-giupi" class="sticker-mision sticker-oculto" alt="Sticker" onerror="this.style.display='none'">
-                <p style="color: #fbbf24; font-size: 0.9rem; letter-spacing: 3px; margin-top: 0; margin-bottom: 30px; font-weight: bold;">✨ MENSAJE OCULTO ✨</p>
-                <div class="texto-traduccion" id="contenedor-textos">
-                    <h2 id="txt-q" class="txt-q">Qanwanqa maypipas</h2>
-                    <h2 id="txt-e" class="txt-e">"Contigo, donde sea"</h2>
-                </div>
-                <p id="txt-dias-modal" style="color: #f8fafc; font-size: 1rem; font-style: italic; opacity: 0; transition: opacity 1s; margin-top: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);"></p>
-                <div style="margin-top: 30px;">
-                    <!-- TEXTO CAMBIADO PARA INDICAR QUE SOLO SE REQUIERE UN CLIC -->
-                    <button id="btn-decodificar" class="btn-decodificar">Haz clic para descubrir</button>
-                </div>
-            </div>
-            
-            <button id="btn-cerrar-pista" style="position: relative; z-index: 10; margin-top: 30px; background: rgba(0,0,0,0.5); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); padding: 10px 25px; border-radius: 20px; font-size: 0.8rem; letter-spacing: 1px; cursor: pointer; backdrop-filter: blur(5px);">CERRAR Y VOLVER</button>
-        </div>
-
-        <script>
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    const splash = document.getElementById('splash-screen');
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.remove(), 800);
-                }, 1500);
-            });
-
-            window.addEventListener('deviceorientation', (e) => {
-                if(!e.gamma || !e.beta) return; 
-                const rotY = Math.min(Math.max(e.gamma, -30), 30); 
-                const rotX = Math.min(Math.max(e.beta - 45, -30), 30); 
-                document.getElementById('contenedor-principal').style.transform = `translate(${rotY * -0.5}px, ${rotX * -0.5}px)`;
-            });
-
-            const hoy = new Date();
-            const mes = hoy.getMonth(); 
-            const dia = hoy.getDate();
-            
-            if (mes === 7 && dia >= 14 && dia <= 24) {
-                document.getElementById('caja-pista-2').style.display = 'block';
-                const diasFaltantes = 25 - dia;
-                const textoContador = diasFaltantes === 1 ? 'FALTA 1 DÍA' : `FALTAN ${diasFaltantes} DÍAS`;
-                document.getElementById('texto-contador').innerText = textoContador;
-                document.getElementById('txt-dias-modal').innerText = "Prepárate. " + textoContador.toLowerCase() + "...";
-            }
-
-            const btnAbrir = document.getElementById('btn-abrir-pista');
-            const modalPista = document.getElementById('modal-pista');
-            const btnCerrar = document.getElementById('btn-cerrar-pista');
-            const boleto = document.getElementById('img-boleto');
-            const boletoNitido = document.getElementById('img-boleto-nitido');
-            const txtQ = document.getElementById('txt-q');
-            const txtE = document.getElementById('txt-e');
-            const txtDiasModal = document.getElementById('txt-dias-modal');
-            const btnDecodificar = document.getElementById('btn-decodificar');
-            const contenedorTextos = document.getElementById('contenedor-textos');
-            const stickerGiupi = document.getElementById('sticker-giupi');
-
-            // BLOQUEAR EL MENÚ CONTEXTUAL EN LA PANTALLA DE LA PISTA
-            document.getElementById('modal-pista').addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-            });
-            
-            let audioSorpresa = null;
-            let estaDecodificado = false;
-            let linternaTicking = false;
-
-            function fadeOutAudio(audioElement) {
-                if (!audioElement) return;
-                let vol = 1.0;
-                const interval = setInterval(() => {
-                    if (vol > 0.1) { vol -= 0.1; audioElement.volume = vol; } 
-                    else { clearInterval(interval); audioElement.pause(); audioElement.currentTime = 0; audioElement.volume = 1.0; }
-                }, 80);
-            }
-
-            function resetearMision() {
-                estaDecodificado = false;
-                
-                boleto.classList.remove('iluminado');
-                boletoNitido.classList.remove('iluminado');
-                txtQ.classList.remove('oculto');
-                txtE.classList.remove('visible');
-                contenedorTextos.classList.remove('contenedor-decodificando');
-                stickerGiupi.classList.remove('sticker-revelado');
-                stickerGiupi.classList.add('sticker-oculto');
-                
-                btnDecodificar.classList.remove('exito');
-                btnDecodificar.innerText = "Haz clic para descubrir";
-                btnDecodificar.style.pointerEvents = 'auto'; 
-                
-                txtDiasModal.style.opacity = '0';
-                
-                boleto.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-                boletoNitido.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-                
-                modalPista.style.setProperty('--x', '50%');
-                modalPista.style.setProperty('--y', '50%');
-            }
-
-            function actualizarLinterna(e) {
-                if (e.cancelable && e.type.startsWith('touch')) { e.preventDefault(); }
-
-                let x, y;
-                if (e.touches && e.touches.length > 0) { x = e.touches[0].clientX; y = e.touches[0].clientY; } 
-                else { x = e.clientX; y = e.clientY; }
-                
-                if(x !== undefined && y !== undefined) {
-                    if (!linternaTicking) {
-                        window.requestAnimationFrame(function() {
-                            modalPista.style.setProperty('--x', x + 'px');
-                            modalPista.style.setProperty('--y', y + 'px');
-
-                            if(!estaDecodificado) {
-                                const centroX = window.innerWidth / 2;
-                                const centroY = window.innerHeight / 2;
-                                const rotX = ((y - centroY) / centroY) * -10; 
-                                const rotY = ((x - centroX) / centroX) * 10;
-                                
-                                const transform3D = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.02)`;
-                                boleto.style.transform = transform3D;
-                                boletoNitido.style.transform = transform3D;
-                            }
-                            linternaTicking = false;
-                        });
-                        linternaTicking = true;
-                    }
-                }
-            }
-
-            function encenderLinterna(e) {
-                if (e.target.closest('#btn-decodificar') || e.target.closest('#btn-cerrar-pista')) return;
-                if (e.cancelable && e.type.startsWith('touch')) { e.preventDefault(); }
-                modalPista.classList.add('luz-activa');
-                actualizarLinterna(e); 
-            }
-
-            function apagarLinterna() {
-                modalPista.classList.remove('luz-activa');
-                if(!estaDecodificado) {
-                    boleto.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-                    boletoNitido.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-                }
-            }
-
-            modalPista.addEventListener('mousedown', encenderLinterna);
-            modalPista.addEventListener('touchstart', encenderLinterna, { passive: false });
-            modalPista.addEventListener('mousemove', actualizarLinterna);
-            modalPista.addEventListener('touchmove', actualizarLinterna, { passive: false });
-            modalPista.addEventListener('mouseup', apagarLinterna);
-            modalPista.addEventListener('mouseleave', apagarLinterna);
-            modalPista.addEventListener('touchend', apagarLinterna);
-            modalPista.addEventListener('touchcancel', apagarLinterna);
-
-            // FUNCIÓN ACTUALIZADA: Se ejecuta al instante sin el temporizador de espera.
-            function iniciarDecodificacion(e) {
-                if (estaDecodificado) return;
-                if (e.cancelable) e.preventDefault(); 
-                
-                estaDecodificado = true;
-                
-                boleto.style.transform = ''; 
-                boletoNitido.style.transform = ''; 
-                boleto.classList.add('iluminado');
-                boletoNitido.classList.add('iluminado');
-                
-                txtQ.classList.add('oculto');
-                txtE.classList.add('visible');
-                stickerGiupi.classList.remove('sticker-oculto');
-                stickerGiupi.classList.add('sticker-revelado');
-                
-                btnDecodificar.classList.add('exito');
-                btnDecodificar.innerText = "¡Misterio revelado!";
-                btnDecodificar.style.pointerEvents = 'none'; 
-                txtDiasModal.style.opacity = '1';
-                
-                if (typeof confetti === 'function') {
-                    confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 }, zIndex: 10001, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
-                }
-                if (navigator.vibrate) navigator.vibrate([200, 100, 300, 100, 400]);
-            }
-
-            // El botón reacciona con un solo toque o clic.
-            btnDecodificar.addEventListener('click', iniciarDecodificacion);
-
-            if (btnAbrir) {
-                btnAbrir.addEventListener('click', () => {
-                    try { if (window.parent && window.parent.musica) window.parent.musica.pause(); } catch (e) {}
-                    resetearMision();
-                    
-                    document.body.classList.add('noche-profunda');
-                    
-                    modalPista.style.display = 'flex';
-                    setTimeout(() => { modalPista.style.opacity = '1'; }, 10);
-                    if (!audioSorpresa) audioSorpresa = new Audio('sorpresa2.mp3');
-                    audioSorpresa.play().catch(e => console.log("Audio omitido"));
-                });
-            }
-
-            if (btnCerrar) {
-                btnCerrar.addEventListener('click', () => {
-                    modalPista.classList.add('cerrando');
-                    document.body.classList.remove('noche-profunda');
-                    
-                    setTimeout(() => { 
-                        modalPista.style.display = 'none'; 
-                        modalPista.classList.remove('cerrando');
-                        resetearMision(); 
-                    }, 500); 
-                    
-                    fadeOutAudio(audioSorpresa);
-                    try {
-                        if (window.parent && window.parent.activarMusica) window.parent.activarMusica();
-                        else if (window.parent && window.parent.musica) window.parent.musica.play();
-                    } catch (e) {}
-                });
-            }
-        </script>
+        <!-- BOTÓN DE SORPRESA DIRECTO -->
+        <a href="sorpresa.html" class="btn-regalo-especial">🎁 ABRIR REGALO</a>
 
         <div class="grid-2x2">
             <a href="categoria.html?cat=distancia" class="cajon-premium"><img src="giupi-viajero.png" alt="Distancia" class="img-cat"><h3>A DISTANCIA</h3></a>
@@ -401,7 +80,7 @@
 
         <a href="#" id="cajon-secreto" class="cajon-premium cajon-secreto bloqueado">
             <div class="candado-icono" id="icono-secreto">🔒</div>
-            <h3 id="texto-secreto" style="margin-left: 15px; text-align: left;">NIVEL SECRETO<br><span style="font-size: 0.6rem; opacity: 0.7;">Desbloqueo a los 50 recuerdos</span></h3>
+            <h3 id="texto-secreto" style="margin-left: 15px;">NIVEL SECRETO<br><span style="font-size: 0.6rem; opacity: 0.7;">Desbloqueo a los 50 recuerdos</span></h3>
         </a>
 
         <div class="contenedor-progreso">
@@ -420,112 +99,28 @@
     <div class="btn-flotante-galeria" onclick="window.location.href='galeria.html'">📸</div>
 
     <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 800);
+            }, 1000);
+        });
+
         let misionesCompletadas = [];
         const categorias = ['distancia', 'reencuentro', 'casa', 'airelibre', 'secreta'];
-        let conteoCategorias = { 'distancia': 0, 'reencuentro': 0, 'casa': 0, 'airelibre': 0, 'secreta': 0 };
         let totalCompletadas = 0;
 
         categorias.forEach(cat => {
             const volteadas = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
-            conteoCategorias[cat] = volteadas.length;
             totalCompletadas += volteadas.length;
-        });
-
-        const baseDeDatos = {
-            'distancia': ["Ver la misma película sincronizados presionando 'play' al mismo tiempo", "Enviar una sorpresa por delivery usando PedidosYa directamente a su casa", "Cena por videollamada vestidos de forma elegante", "Jugar algún videojuego cooperativo online", "Tour virtual por algún museo internacional usando Google Arts", "Armar una lista de reproducción compartida", "Leer el mismo capítulo de un libro y comentarlo", "Reto de fotos: enviarse 5 fotos de su día a día", "Enviar un audio cantando una nota de voz sin vergüenza", "Pedir exactamente el mismo snack en sus respectivas ciudades y comerlo en cámara", "Hacer un test de personalidad online (MBTI) juntos", "Planear un viaje futuro viendo mapas y presupuestos", "Ver el atardecer juntos por videollamada", "Escribir una historia de a dos por WhatsApp (una oración cada uno)", "Descubrir música nueva recomendándose 3 canciones", "Estudiar un idioma juntos (Duolingo en equipo)", "Juego de 'Las 36 preguntas para enamorarse'", "Enviar un pequeño detalle por correo tradicional", "Dormir con la videollamada encendida", "Maratón de series compartiendo pantalla", "Hacerse dibujos rápidos y mostrarlos en cámara", "Escuchar el mismo podcast al mismo tiempo", "Sesión de 'verdad o reto' a distancia", "Meditar juntos con el mismo audio de fondo", "Grabar un mini-vlog de su día exclusivo para el otro"],
-            'reencuentro': ["El abrazo largo sin prisa en el terminal o aeropuerto", "Ir por un desayuno de panes o empanadas recién horneadas", "Estrenar una fragancia pensada específicamente para el clima de ese día", "Cena de celebración en un lugar elegante", "Noche de hotel en la propia ciudad solo para desconectar", "Intercambio de los regalos que acumularon en la distancia", "Un brindis con copas por estar juntos de nuevo", "Desayuno en la cama preparado por el anfitrión", "Caminata sin rumbo solo para hablar", "Visitar el lugar exacto de su primera cita", "Sesión de fotos juntos para actualizar los fondos de pantalla", "Tarde completa sin mirar el celular", "Cocinar un plato laborioso juntos post-viaje", "Tarde de spa y masajes en casa", "Salir a bailar o a un bar con buena música", "Acostarse a ver las estrellas si el cielo está despejado", "Desempacar las maletas juntos con música de fondo", "Ir por un helado artesanal", "Noche de cobijas y películas", "Baño relajante o ducha juntos", "Probar un restaurante totalmente nuevo", "'Cita a ciegas': uno elige todo el itinerario y el otro solo se deja llevar", "Escribir una carta sobre lo que sintieron al verse", "Hacer una lista de metas a corto plazo", "Comprar un recuerdo físico del día del reencuentro"],
-            'casa': ["Noche de cocina: Preparar un buen chaufa de pollo desde cero", "Sesión musical: Escuchar los últimos arreglos o maquetas de 'Amor sin interés' o 'Calma'", "Hacer una rutina de ejercicios o día de pierna en la sala", "Noche de juegos de mesa o cartas", "Maratón de la saga de películas favorita de uno de los dos", "Armar un romabezas grande", "Cata de cervezas o vinos comprados en el supermercado", "Tarde de pintura (incluso si pintan mal)", "Preparar un postre horneado", "Reorganizar un cuarto o la decoración juntos", "Noche de karaoke en YouTube", "Leer un artículo largo o un cuento en voz alta", "Hacer un picnic en el piso de la sala", "Fondue de chocolate o queso casero", "Bailar en la sala sin música de fondo", "Armar un álbum de fotos físico", "Hacer pizzas caseras armando cada uno su mitad", "Sesión profunda de estiramientos", "Competencia de videojuegos", "Revisar y organizar las finanzas de la casa", "Hacer alguna manualidad sencilla (origami, arcilla)", "Guerra de almohadas clásica", "Contarse anécdotas de la infancia que nunca se hayan dicho", "Preparar cócteles o bebidas creativas", "Acampar en la sala con sábanas y luces"],
-            'airelibre': ["Salir a volar el dron (el Mini o el Mavic) para hacer tomas aéreas de un paisaje", "Tarde deportiva: Ver un partido de fútbol amateur desde la tribuna o jugar juntos en cancha sintética", "Hacer una ruta o escape rápido por la región montañosa local", "Tomar un paseo en bote por un río o laguna", "Buscar el mejor 'huarique' para comer ceviche mixto", "Ciclismo urbano (salir a pedalear por la ciudad)", "Caminata arquitectónica por el centro histórico", "Madrugar para ver el amanecer desde un punto alto", "Visitar ruinas, huacas o zonas arqueológicas", "Viaje corto a la playa a caminar por la arena", "Armar una carpa y acampar una noche", "Subir a un mirador de la ciudad", "Tarde de fotografía callejera con el celular", "Visitar un pueblito cercano al que nunca hayan ido", "Ir a los juegos mecánicos o parque de diversiones", "Tomar una clase al aire libre", "Observación de aves o buscar animales en un bosque", "Ir a un cine al aire libre o evento público", "Hacer una fogata pequeña (donde sea permitido) y quemar malvaviscos", "Volar una cometa", "Visitar un jardín botánico o vivero", "Salir a pasear al perro (Keylor, si está con ustedes) por un parque grande", "Recorrer una feria local de artesanos", "Hacer una ruta buscando murales o graffitis urbanos", "Sentarse en una plaza simplemente a ver pasar a la gente con un café"]
-        };
-
-        categorias.forEach(cat => {
-            const indices = JSON.parse(localStorage.getItem('misiones_' + cat)) || [];
-            indices.forEach(i => {
-                if(baseDeDatos[cat] && baseDeDatos[cat][i]) {
-                    misionesCompletadas.push({texto: baseDeDatos[cat][i], index: i, categoria: cat});
-                }
-            });
         });
 
         setTimeout(() => {
             const porcentaje = Math.min((totalCompletadas / 100) * 100, 100);
             document.getElementById('barra-progreso').style.width = porcentaje + '%';
             document.getElementById('contador-progreso').innerText = totalCompletadas + " / 100";
-
-            const btnSecreto = document.getElementById('cajon-secreto');
-            const iconoSecreto = document.getElementById('icono-secreto');
-            
-            if (totalCompletadas >= 50) {
-                btnSecreto.classList.remove('bloqueado');
-                btnSecreto.classList.add('desbloqueado');
-                document.getElementById('texto-secreto').innerHTML = 'EL REFUGIO SECRETO<br><span style="font-size: 0.6rem; opacity: 0.7; color:#fbbf24;">¡Nivel desbloqueado!</span>';
-                
-                if (!localStorage.getItem('secretoDesbloqueado')) {
-                    setTimeout(() => {
-                        iconoSecreto.style.animation = 'romper-candado 0.6s forwards';
-                        setTimeout(() => {
-                            if(typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 }, colors: ['#8b5cf6', '#c4b5fd', '#ffffff'] });
-                            iconoSecreto.style.animation = 'none';
-                            iconoSecreto.innerText = '🔮';
-                            localStorage.setItem('secretoDesbloqueado', 'true');
-                        }, 600);
-                    }, 2500); 
-                } else {
-                    iconoSecreto.innerText = '🔮';
-                }
-            } else {
-                btnSecreto.onclick = (e) => { 
-                    e.preventDefault(); 
-                    alert(`Están a ${50 - totalCompletadas} recuerdos de revelar los secretos ocultos. ¡Sigan así! 🔒`); 
-                };
-            }
         }, 300);
-
-        document.getElementById('btn-revivir').addEventListener('click', function() {
-            if(misionesCompletadas.length === 0) {
-                alert("Aún no han sellado ningún recuerdo. ¡Vayan a completar su primera misión!");
-                return;
-            }
-            this.innerText = "VIAJANDO EN EL TIEMPO...";
-            const elegido = misionesCompletadas[Math.floor(Math.random() * misionesCompletadas.length)];
-            
-            document.getElementById('page-transition').style.opacity = '1';
-            setTimeout(() => {
-                localStorage.setItem('misionActual', elegido.texto);
-                localStorage.setItem('misionIndex', elegido.index);
-                localStorage.setItem('misionCategoria', elegido.categoria);
-                window.location.href = 'registro.html';
-            }, 500);
-        });
-
-        function crearCorazones(x, y) {
-            const colores = ['#00d2ff', '#fbbf24', '#ffffff'];
-            for (let i = 0; i < 20; i++) {
-                const c = document.createElement('div');
-                c.className = 'corazon-particula';
-                c.innerHTML = '❤';
-                c.style.color = colores[Math.floor(Math.random() * colores.length)];
-                c.style.left = x + 'px';
-                c.style.top = y + 'px';
-                c.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
-                c.style.setProperty('--y', (Math.random() - 0.5) * 300 + 'px');
-                c.style.setProperty('--duracion', (Math.random() * 0.5 + 0.5) + 's');
-                document.body.appendChild(c);
-                setTimeout(() => c.remove(), 1000);
-            }
-        }
-
-        document.querySelectorAll('.cajon-premium:not(.bloqueado)').forEach(boton => {
-            boton.addEventListener('click', function(e) {
-                if(this.id === 'cajon-secreto' && totalCompletadas < 50) return;
-                e.preventDefault();
-                crearCorazones(e.clientX, e.clientY);
-                this.style.transform = 'scale(0.92)'; 
-                
-                document.getElementById('page-transition').style.opacity = '1';
-                setTimeout(() => { window.location.href = this.getAttribute('href'); }, 400);
-            });
-        });
     </script>
 </body>
 </html>

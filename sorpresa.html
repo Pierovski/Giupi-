@@ -7,188 +7,330 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { margin: 0; background: #020617; color: #f8fafc; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: #020617; color: #f8fafc; overflow: hidden; height: 100vh; touch-action: manipulation; }
 
-        #pantalla-desbloqueo {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #020617; z-index: 100;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.8s ease;
-        }
-        
+        /* Pantalla Inicial */
+        #pantalla-desbloqueo { z-index: 100; opacity: 1; pointer-events: auto; transition: opacity 0.8s ease; background: #020617; }
         .btn-abrir-regalo {
-            background: linear-gradient(135deg, #fbbf24, #d97706); border: none;
-            padding: 20px 45px; border-radius: 40px; color: #020617; font-weight: 700;
-            font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); cursor: pointer;
-            animation: pulso-oro 2s infinite; transition: transform 0.2s;
+            background: linear-gradient(135deg, #fbbf24, #d97706); border: none; padding: 20px 45px; border-radius: 40px; 
+            color: #020617; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; 
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4); cursor: pointer; animation: pulso-oro 2s infinite;
+            display: none; 
         }
         .btn-abrir-regalo:active { transform: scale(0.95); }
+        #cargando-txt { color: #fbbf24; font-size: 1rem; letter-spacing: 2px; animation: pulse 1s infinite alternate; }
 
-        @keyframes pulso-oro {
-            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); }
-            70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
-        }
+        @keyframes pulso-oro { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.8); } 70% { box-shadow: 0 0 0 15px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+        @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
 
-        .visor-slideshow { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #020617; }
-        
-        .capa-foto {
+        /* Pantallas Base */
+        .pantalla {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: contain; 
-            background-position: center top 10%; 
-            background-repeat: no-repeat;
-            transition: opacity 2.5s ease-in-out;
-            opacity: 0; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 25px; background: #020617; z-index: 10;
+            opacity: 0; pointer-events: none; filter: blur(10px) scale(1.05);
+            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1), filter 1.2s cubic-bezier(0.25, 1, 0.5, 1), transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: opacity, filter, transform;
         }
+        .pantalla.activa { opacity: 1; pointer-events: auto; filter: blur(0px) scale(1); transform: scale(1); }
 
-        .contenido-frente {
-            position: absolute; bottom: 0; left: 0; width: 100%; z-index: 10; 
-            display: flex; flex-direction: column; align-items: center; 
-            padding: 20px 20px 35px 20px; text-align: center;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0) 100%);
-        }
+        /* Textos y Brillos */
+        .titulo-feliz { font-family: 'Dancing Script', cursive; font-size: 3.5rem; color: #fbbf24; margin: 0 0 20px 0; line-height: 1.1; animation: latido-bpm 4s infinite ease-in-out; }
+        .texto-mensaje { font-size: 1.15rem; line-height: 1.6; color: #f8fafc; font-weight: 500; max-width: 450px; margin: 0 0 15px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .texto-dorado { color: #00d2ff; font-weight: 700; font-size: 1.4rem; letter-spacing: 1px; }
 
-        .texto-mensaje { 
-            font-size: 1.05rem; line-height: 1.6; color: #f8fafc; font-weight: 500; 
-            margin: 0 0 20px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.9); 
-            max-width: 400px;
+        .destello {
+            background: linear-gradient(90deg, #fbbf24 0%, #ffffff 50%, #fbbf24 100%);
+            background-size: 200% auto; -webkit-background-clip: text; color: transparent;
+            animation: brillo-texto 2.5s linear infinite; font-weight: 700;
         }
+        @keyframes brillo-texto { to { background-position: 200% center; } }
+        @keyframes latido-bpm { 0%, 100% { text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); } 50% { text-shadow: 0 0 30px rgba(251, 191, 36, 0.8); } }
 
-        .btn-sellar {
-            background: linear-gradient(135deg, #00d2ff, #0077ff); border: none;
-            padding: 15px 30px; border-radius: 30px; color: #020617; font-weight: 700;
-            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 6px 15px rgba(0, 210, 255, 0.4); cursor: pointer; transition: transform 0.2s;
+        /* Efecto Unboxing para Boletos */
+        .caja-documento { margin-top: 20px; position: relative; }
+        .img-documento {
+            width: 90%; max-width: 350px; border-radius: 12px; border: 2px solid rgba(251, 191, 36, 0.3);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), 0 15px 35px rgba(0,0,0,0.9);
+            transform: translateY(40px); opacity: 0; pointer-events: none;
+            transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1.5s ease;
+            will-change: transform, opacity;
         }
+        .pantalla.activa .img-documento { transform: translateY(0); opacity: 1; pointer-events: auto; transition-delay: 0.5s; }
+
+        /* Contenedor de Videos */
+        #visor-videos { z-index: 5; background: #000; padding: 0; }
+        .letterbox { position: absolute; width: 100%; height: 12vh; background: #000; z-index: 10; transition: transform 1s ease; }
+        .letterbox.top { top: 0; transform: translateY(-100%); }
+        .letterbox.bottom { bottom: 0; transform: translateY(100%); }
+        .mostrando-video .letterbox { transform: translateY(0); }
+        
+        #contenedor-video-dinamico { width: 100%; height: 100%; }
+        video { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Interfaz de Pausa y Botones Finales */
+        #indicador-pausa { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); color: #fff; font-size: 0.8rem; letter-spacing: 2px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(5px); }
+        #guia-pausa { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.7); font-size: 0.85rem; letter-spacing: 1px; z-index: 900; opacity: 0; transition: opacity 1s; pointer-events: none; text-shadow: 0 2px 4px #000; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 15px; }
+        
+        #cont-botones-finales { display: flex; flex-direction: column; align-items: center; gap: 15px; opacity: 0; transition: opacity 1s; pointer-events: none; margin-top: 15px; }
+        .pantalla.activa #cont-botones-finales { opacity: 1; pointer-events: auto; transition-delay: 1s; }
+
+        #btn-voz {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+        }
+        #btn-voz:active { transform: scale(0.9); }
+        .latido { animation: latido-suave 2s infinite; }
+        @keyframes latido-suave { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); box-shadow: 0 0 25px rgba(251, 191, 36, 0.6); } }
+
+        .btn-sellar { background: linear-gradient(135deg, #00d2ff, #0077ff); border: none; padding: 15px 30px; border-radius: 30px; color: #020617; font-weight: 700; font-size: 1rem; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 15px rgba(0, 210, 255, 0.4); transition: transform 0.2s; }
         .btn-sellar:active { transform: scale(0.95); }
+
+        #post-creditos { z-index: 200; background: #000; opacity: 0; pointer-events: none; transition: opacity 2s ease; }
     </style>
 </head>
 <body>
 
-    <audio id="audio-sorpresa" src="sorpresa.mp3" preload="auto"></audio>
+    <audio id="audio-fondo" src="gracias.mp3" preload="auto"></audio>
+    <audio id="audio-voz" src="voz.mp3" preload="auto"></audio>
 
-    <div id="pantalla-desbloqueo">
+    <div id="indicador-pausa">⏸ PAUSADO</div>
+    <div id="guia-pausa">Doble toque en la pantalla para pausar el video</div>
+
+    <!-- Pantalla 0: Desbloqueo -->
+    <div id="pantalla-desbloqueo" class="pantalla">
+        <p id="cargando-txt">Preparando sorpresa...</p>
         <button class="btn-abrir-regalo" id="btn-iniciar">Abrir Regalo 🎁</button>
     </div>
 
-    <div class="visor-slideshow">
-        <div id="capa-1" class="capa-foto"></div>
-        <div id="capa-2" class="capa-foto"></div>
+    <!-- Pantalla 1: Feliz Cumpleaños -->
+    <div id="msg-cumple" class="pantalla">
+        <h1 class="titulo-feliz">¡Feliz cumpleaños, mi <span class="destello">Crespita</span>!</h1>
+        <p class="texto-mensaje">Hoy celebro tu vida y doy gracias por tenerte a mi lado. Me siento increíblemente orgulloso de ti, de tu fortaleza y de todo el <span class="destello">esfuerzo</span> que haces día a día por tu familia.</p>
+        <p class="texto-mensaje">Eres el mejor ejemplo de que cuando alguien de verdad quiere superarse, no hay límites. Eres mi inspiración, mi compañera de aventuras y el <span class="destello">amor</span> de mi vida.</p>
+        <p class="texto-mensaje texto-dorado" style="font-size: 1.1rem; margin-top: 15px;">Y como hoy es tu día, prepárate para lo que viene...</p>
     </div>
 
-    <div class="contenido-frente">
-        <p class="texto-mensaje">
-            Gracias por la sorpresa mi amor ❤️ me encantó y me hizo sentir cosas que nunca experimenté. Eres muy linda amor de mi vida , y estaré siempre agradecido por este momento inolvidable.<br>
-            <span style="font-family: 'Dancing Script', cursive; font-size: 2.3rem; color: #fbbf24; display: block; margin-top: 10px;">Te amo</span>
-        </p>
+    <!-- Pantalla 2: Llamitas -->
+    <div id="msg-llamas" class="pantalla">
+        <h1 class="titulo-feliz" style="font-size: 2.5rem;">Ve preparando la cámara para las llamitas 🦙</h1>
+    </div>
 
-        <button class="btn-sellar" onclick="sellarYVolver()">Guardar en el corazón 🔒</button>
+    <!-- Pantalla 3: Boleto de Tren -->
+    <div id="msg-tren" class="pantalla">
+        <p class="texto-mensaje texto-dorado" style="margin-bottom: 0;">Con este ticket podrás obtener las siguientes vistas...</p>
+        <div class="caja-documento"><img src="tren.png" class="img-documento" id="img-tren" alt="Boleto de Tren"></div>
+    </div>
+
+    <!-- Pantalla 4: Entrada a Machu Picchu -->
+    <div id="msg-entrada" class="pantalla">
+        <p class="texto-mensaje texto-dorado" style="margin-bottom: 0;">Y con esta entrada obtendrás la vista más hermosa... después de tu sonrisa.</p>
+        <div class="caja-documento"><img src="entrada.png" class="img-documento" id="img-entrada" alt="Entrada Machu Picchu"></div>
+    </div>
+
+    <!-- Pantalla 5: Final -->
+    <div id="pantalla-final" class="pantalla">
+        <h1 class="titulo-feliz" style="font-size: 2.8rem;">¡Nos vamos a <span class="destello">Machu Picchu</span>, mi amor! ⛰️</h1>
+        <p class="texto-mensaje">Espero de todo corazón que este regalo te haya gustado. Quiero hacerte feliz siempre y ver esa hermosa sonrisa tuya iluminando cada día de nuestras vidas.</p>
+        <p class="texto-mensaje texto-dorado" style="font-size: 1.1rem; margin-top: 10px;">Esta es nuestra primera maravilla del mundo juntos... y aún nos quedan seis más por conocer.</p>
+        
+        <div id="cont-botones-finales">
+            <div id="btn-voz" class="latido" title="Mensaje de voz oculto">🎙️</div>
+            <button class="btn-sellar" id="btn-finalizar">Guardar recuerdo 🔒</button>
+        </div>
+    </div>
+
+    <!-- Visor de Videos -->
+    <div id="visor-videos" class="pantalla">
+        <div class="letterbox top"></div>
+        <div id="contenedor-video-dinamico"></div>
+        <div class="letterbox bottom"></div>
+    </div>
+
+    <div id="post-creditos" class="pantalla">
+        <p class="texto-dorado" style="font-family: 'Dancing Script', cursive; font-size: 2.5rem;">Nos vemos en Cusco...</p>
     </div>
 
     <script>
-        // Función dedicada para detener la música del marco principal
-        function silenciarMusicaDeFondo() {
-            try {
-                if (window.parent && window.parent.musica) {
-                    window.parent.musica.pause();
-                }
-                if (window.top && window.top.musica) {
-                    window.top.musica.pause();
-                }
-            } catch (e) {
-                console.log("No se pudo silenciar el fondo", e);
-            }
-        }
-
-        // 1. Intentar silenciar al cargar la página (puede ser bloqueado por el navegador)
-        window.onload = silenciarMusicaDeFondo;
-
-        // 2. Botón Iniciar - Interacción del usuario garantizada
-        document.getElementById('btn-iniciar').addEventListener('click', function() {
-            
-            // Forzar el silencio de la música de fondo justo al hacer clic
-            silenciarMusicaDeFondo();
-
-            const bloqueo = document.getElementById('pantalla-desbloqueo');
-            bloqueo.style.opacity = '0';
-            setTimeout(() => { bloqueo.style.display = 'none'; }, 800);
-
-            // Iniciar la música sorpresa
-            const musicaSorpresa = document.getElementById('audio-sorpresa');
-            musicaSorpresa.volume = 0.8;
-            musicaSorpresa.play().catch(err => console.log("Error al reproducir audio:", err));
-
-            const end = Date.now() + 3500;
-            (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
-                if (Date.now() < end) requestAnimationFrame(frame);
-            }());
+        // 1. Protector de Fuentes
+        document.fonts.ready.then(() => {
+            document.getElementById('cargando-txt').style.display = 'none';
+            document.getElementById('btn-iniciar').style.display = 'block';
         });
 
-        // 3. Nuevo Algoritmo Slideshow (Crossfade Verdadero)
-        const totalFotos = 11;
-        let mazo = [];
-        let idx = 0;
+        // 2. Control de Estados y Pausa
+        let isPaused = false;
+        let activeVideo = null;
+        let juegoIniciado = false;
 
-        function barajarMazo() {
-            mazo = [];
-            for (let i = 1; i <= totalFotos; i++) mazo.push(`s${i}.jpg`);
+        let lastTap = 0;
+        document.body.addEventListener('touchend', (e) => {
+            if(e.target.closest('#cont-botones-finales')) return;
+            if(!juegoIniciado) return;
             
-            for (let i = mazo.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [mazo[i], mazo[j]] = [mazo[j], mazo[i]];
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 300 && tapLength > 0) { togglePausa(); e.preventDefault(); }
+            lastTap = currentTime;
+        });
+
+        function togglePausa() {
+            isPaused = !isPaused;
+            document.getElementById('indicador-pausa').style.opacity = isPaused ? '1' : '0';
+            if(activeVideo) { isPaused ? activeVideo.pause() : activeVideo.play(); }
+        }
+
+        const esperar = async (ms) => {
+            let elapsed = 0; const step = 50;
+            while(elapsed < ms) {
+                if(!isPaused) elapsed += step;
+                await new Promise(r => setTimeout(r, step));
             }
-        }
+        };
 
-        barajarMazo();
-        const capas = [document.getElementById('capa-1'), document.getElementById('capa-2')];
-        let capaActual = 0;
+        // 3. UI y Animaciones
+        function mostrarPantalla(id) { document.getElementById(id).classList.add('activa'); }
+        function ocultarPantalla(id) { document.getElementById(id).classList.remove('activa'); }
 
-        capas[0].style.backgroundImage = `url('${mazo[0]}')`;
-        capas[0].style.opacity = '1';
-        
-        if (totalFotos > 1) {
-            capas[1].style.backgroundImage = `url('${mazo[1]}')`;
-        }
-
-        setInterval(() => {
-            if (totalFotos <= 1) return;
-
-            let capaSiguiente = (capaActual + 1) % 2;
-            
-            capas[capaSiguiente].style.opacity = '1';
-            capas[capaActual].style.opacity = '0';
-
-            setTimeout(() => {
-                idx++;
-                if (idx >= mazo.length - 1) { 
-                    barajarMazo(); 
-                    idx = 0; 
+        function lluviaDeConfeti(duracionEnMs) {
+            const end = Date.now() + duracionEnMs;
+            (function frame() {
+                if(!isPaused) {
+                    confetti({ particleCount: 3, angle: 60, spread: 60, origin: { x: 0 }, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
+                    confetti({ particleCount: 3, angle: 120, spread: 60, origin: { x: 1 }, colors: ['#fbbf24', '#00d2ff', '#ffffff'] });
                 }
-                let fotoFutura = mazo[idx + 1];
-                capas[capaActual].style.backgroundImage = `url('${fotoFutura}')`;
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        // El parámetro 'velocidad' permite alterar los FPS del video (1 es normal, 0.5 es cámara lenta)
+        function reproducirVideo(src, velocidad = 1.0) {
+            return new Promise((resolve) => {
+                const visor = document.getElementById('visor-videos');
+                const contenedor = document.getElementById('contenedor-video-dinamico');
                 
-                capaActual = capaSiguiente;
-            }, 2500); 
-            
-        }, 5500);
+                visor.classList.add('activa'); 
+                contenedor.innerHTML = `<video src="${src}" muted playsinline></video>`;
+                activeVideo = contenedor.querySelector('video');
+                activeVideo.playbackRate = velocidad; // Aplica la cámara lenta si se solicita
+                
+                activeVideo.addEventListener('playing', () => { visor.classList.add('mostrando-video'); });
+                
+                activeVideo.onended = async () => {
+                    visor.classList.remove('mostrando-video'); 
+                    activeVideo = null;
+                    await esperar(1200); 
+                    visor.classList.remove('activa');
+                    contenedor.innerHTML = '';
+                    resolve();
+                };
+                
+                activeVideo.onerror = async () => {
+                    activeVideo = null; visor.classList.remove('mostrando-video');
+                    await esperar(1000); resolve();
+                };
 
-        // 4. Volver al Muro y Reactivar Música Principal
-        function sellarYVolver() {
-            try {
-                // Reactivamos la música del index
-                if (window.parent && window.parent.activarMusica) {
-                    window.parent.activarMusica(); 
-                } else if (window.parent && window.parent.musica) {
-                    window.parent.musica.play();
-                }
-            } catch (e) {}
-
-            window.location.href = 'muro.html';
+                if(!isPaused) activeVideo.play().catch(e => resolve());
+            });
         }
+
+        // 4. El Mensaje de Voz (Audio Ducking)
+        document.getElementById('btn-voz').addEventListener('click', function() {
+            const audioFondo = document.getElementById('audio-fondo');
+            const audioVoz = document.getElementById('audio-voz');
+            
+            if (audioVoz.paused) {
+                audioFondo.volume = 0.02; // Ducking: Baja el fondo para que la voz brille
+                audioVoz.play();
+                this.classList.remove('latido');
+                this.style.background = "rgba(251, 191, 36, 0.3)";
+            } else {
+                audioVoz.pause();
+                audioVoz.currentTime = 0;
+                audioFondo.volume = 0.8; // Restaura el volumen original
+                this.style.background = "rgba(255,255,255,0.1)";
+            }
+
+            audioVoz.onended = () => {
+                audioFondo.volume = 0.8;
+                this.style.background = "rgba(255,255,255,0.1)";
+            };
+        });
+
+        function fadeOutAudioFondo() {
+            const audio = document.getElementById('audio-fondo');
+            let vol = audio.volume;
+            const fadeInterval = setInterval(() => {
+                if (vol > 0.1) { vol -= 0.1; audio.volume = vol; } 
+                else { clearInterval(fadeInterval); audio.pause(); }
+            }, 150);
+        }
+
+        // 5. EL GUION CINEMATOGRÁFICO
+        async function iniciarSorpresa() {
+            juegoIniciado = true;
+
+            document.getElementById('pantalla-desbloqueo').style.opacity = '0';
+            document.getElementById('pantalla-desbloqueo').style.pointerEvents = 'none';
+            
+            const audio = document.getElementById('audio-fondo');
+            audio.volume = 0.8; audio.play().catch(e => console.log("Audio falló"));
+
+            // Escena 1: Cumpleaños
+            mostrarPantalla('msg-cumple');
+            lluviaDeConfeti(5000);
+            await esperar(12000); 
+            ocultarPantalla('msg-cumple'); 
+            await esperar(1500);
+
+            // Guía de pausa visible solo en el primer video
+            document.getElementById('guia-pausa').style.opacity = '1';
+            setTimeout(() => { document.getElementById('guia-pausa').style.opacity = '0'; }, 8000);
+
+            await reproducirVideo('video1.mp4', 1.0);
+
+            // Escena 2: Llamitas
+            mostrarPantalla('msg-llamas');
+            lluviaDeConfeti(2000);
+            await esperar(5000); 
+            ocultarPantalla('msg-llamas'); 
+            await esperar(1500);
+
+            // VIDEO 2 A CÁMARA LENTA (0.5x de velocidad)
+            await reproducirVideo('video2.mp4', 0.5);
+
+            // Escena 3: Tren
+            mostrarPantalla('msg-tren');
+            lluviaDeConfeti(3000);
+            await esperar(7000); 
+            ocultarPantalla('msg-tren'); 
+            await esperar(1500);
+
+            await reproducirVideo('video3.mp4', 1.0);
+
+            // Escena 4: Entrada
+            mostrarPantalla('msg-entrada');
+            lluviaDeConfeti(3000);
+            await esperar(7000); 
+            ocultarPantalla('msg-entrada'); 
+            await esperar(1500);
+
+            await reproducirVideo('video4.mp4', 1.0);
+
+            // Escena 5: Final
+            mostrarPantalla('pantalla-final');
+            lluviaDeConfeti(5000);
+        }
+
+        document.getElementById('btn-iniciar').addEventListener('click', iniciarSorpresa);
+
+        document.getElementById('btn-finalizar').addEventListener('click', async () => {
+            document.getElementById('audio-voz').pause();
+            document.getElementById('post-creditos').style.opacity = '1';
+            fadeOutAudioFondo();
+            await esperar(3000);
+            window.location.href = 'muro.html';
+        });
     </script>
 </body>
 </html>
