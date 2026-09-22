@@ -25,6 +25,28 @@
                 opacity: 0;
             }
         }
+
+        /* Estilo para las flores amarillas temporales */
+        .flor-amarilla {
+            position: fixed;
+            top: -50px;
+            z-index: 9999;
+            pointer-events: none;
+            user-select: none;
+            animation: caer-flor linear forwards;
+            will-change: transform;
+        }
+
+        @keyframes caer-flor {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg) scale(1.2);
+                opacity: 0;
+            }
+        }
     </style>
     
     <link rel="manifest" href="manifest.json">
@@ -133,24 +155,21 @@
             });
         });
 
-        // Función para crear la explosión de corazones
         function crearExplosionCorazones() {
-            const colores = ['#00d2ff', '#fbbf24', '#ffffff']; // Celeste Giupi, Oro y Blanco
+            const colores = ['#00d2ff', '#fbbf24', '#ffffff']; 
             const cantidad = 40;
             const centroX = window.innerWidth / 2;
-            const centroY = window.innerHeight * 0.7; // Cerca del teclado
+            const centroY = window.innerHeight * 0.7; 
 
             for (let i = 0; i < cantidad; i++) {
                 const corazon = document.createElement('div');
                 corazon.className = 'corazon-particula';
-                corazon.innerHTML = '❤'; // Puedes usar un SVG si prefieres
+                corazon.innerHTML = '❤'; 
                 
-                // Estilo aleatorio
                 const color = colores[Math.floor(Math.random() * colores.length)];
                 const size = Math.random() * 20 + 10 + 'px';
                 const duracion = Math.random() * 1 + 0.5 + 's';
                 
-                // Variables para la animación CSS
                 const destinoX = (Math.random() - 0.5) * 400 + 'px';
                 const destinoY = (Math.random() - 0.5) * 400 + 'px';
                 const rotacion = Math.random() * 360 + 'deg';
@@ -165,8 +184,6 @@
                 corazon.style.setProperty('--duracion', duracion);
 
                 document.body.appendChild(corazon);
-
-                // Limpiar el DOM
                 setTimeout(() => corazon.remove(), 1500);
             }
         }
@@ -175,7 +192,6 @@
             if (pinActual === PIN_CORRECTO) {
                 pinInput.style.color = "#fbbf24";
                 
-                // ¡EFECTO MAGICO!
                 const sonidoGiupi = new Audio('giupi.mp3');
                 sonidoGiupi.play();
                 teclado.style.transition = "opacity 0.5s ease, transform 0.5s ease";
@@ -204,7 +220,6 @@
             }
         }
 
-        // Botones de borrar y ok
         document.querySelector('.btn-borrar').addEventListener('click', () => {
             pinActual = pinActual.slice(0, -1);
             pinInput.value = pinActual;
@@ -213,6 +228,34 @@
         document.querySelector('.btn-ok').addEventListener('click', (e) => {
             if(pinActual.length === 4) validarPin(e);
         });
+
+        // --- EFECTO FLORES AMARILLAS (SOLO 21 Y 22 DE SEPTIEMBRE) ---
+        function iniciarFloresAmarillas() {
+            const hoy = new Date();
+            const mes = hoy.getMonth(); // 8 es Septiembre en JS (0-indexado)
+            const dia = hoy.getDate();
+
+            // Evalúa si es hoy o mañana (21 o 22 de septiembre)
+            if (mes === 8 && (dia === 21 || dia === 22)) {
+                setInterval(() => {
+                    const flor = document.createElement('div');
+                    flor.className = 'flor-amarilla';
+                    flor.innerHTML = Math.random() > 0.5 ? '🌻' : '🌼';
+                    
+                    flor.style.left = Math.random() * 100 + 'vw';
+                    flor.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                    const duracion = Math.random() * 4 + 3; // 3 a 7 segundos de caída
+                    flor.style.animationDuration = duracion + 's';
+                    
+                    document.body.appendChild(flor);
+                    
+                    // Limpiar DOM después de la animación para no consumir memoria
+                    setTimeout(() => flor.remove(), duracion * 1000);
+                }, 450); // Aparece una flor nueva cada 450ms
+            }
+        }
+        
+        window.addEventListener('load', iniciarFloresAmarillas);
     </script>
 </body>
 </html>
